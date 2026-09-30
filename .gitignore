@@ -1,0 +1,49 @@
+# Secrets & Credentials
+config/config.php
+.env
+.env.local
+secrets.json
+
+# Logs
+logs/*
+!logs/.gitkeep
+
+# Cache/Temp
+cache/*
+!cache/.gitkeep
+tmp/*
+!tmp/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP
+vendor/
+composer.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.pytest_cache/
+
+# Node (if used)
+node_modules/
+npm-debug.log
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+.git/
+.github/
