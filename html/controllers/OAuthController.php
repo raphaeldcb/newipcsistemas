@@ -17,11 +17,24 @@ class OAuthController
         $this->pdo = $pdo;
         $this->config = $config;
 
-        try {
-            $this->graph = new MicrosoftGraphService($config, $pdo);
-        } catch (Exception $e) {
-            throw new Exception('Microsoft Graph not configured: ' . $e->getMessage());
+        // Only initialize if credentials are configured
+        if ($this->isConfigured()) {
+            try {
+                $this->graph = new MicrosoftGraphService($config, $pdo);
+            } catch (Exception $e) {
+                throw new Exception('Microsoft Graph not configured: ' . $e->getMessage());
+            }
         }
+    }
+
+    /**
+     * Check if Microsoft credentials are configured
+     */
+    public function isConfigured()
+    {
+        return !empty($this->config['microsoft']['client_id'])
+            && !empty($this->config['microsoft']['client_secret'])
+            && !empty($this->config['microsoft']['tenant_id']);
     }
 
     /**

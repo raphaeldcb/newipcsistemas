@@ -465,21 +465,37 @@
 require_once __DIR__ . '/../controllers/CommunicacionsController.php';
 require_once __DIR__ . '/../controllers/OAuthController.php';
 
-// Check Microsoft authentication
-$oauth = new OAuthController($pdo, $config);
-$microsoft_authenticated = $_SESSION['microsoft_authenticated'] ?? false;
-$microsoft_info = $microsoft_authenticated ? $oauth->getAccountInfo() : null;
+// Check Microsoft authentication (only if configured)
+$oauth = null;
+$microsoft_authenticated = false;
+$microsoft_info = null;
+
+// Only try OAuth if credentials are configured
+if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret'])) {
+    try {
+        $oauth = new OAuthController($pdo, $config);
+        $microsoft_authenticated = $_SESSION['microsoft_authenticated'] ?? false;
+        $microsoft_info = $microsoft_authenticated ? $oauth->getAccountInfo() : null;
+    } catch (Exception $e) {
+        // OAuth not properly configured, continue without it
+        error_log('OAuth initialization failed: ' . $e->getMessage());
+    }
+}
 
 // Handle sync
 $sync_result = null;
 $show_stats = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'sync') {
-    if (!$microsoft_authenticated) {
-        $sync_result = ['success' => false, 'error' => 'Você precisa se conectar ao Microsoft 365 primeiro'];
+    if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret'])) {
+        if (!$microsoft_authenticated) {
+            $sync_result = ['success' => false, 'error' => 'Você precisa se conectar ao Microsoft 365 primeiro'];
+        } else {
+            $controller = new CommunicationsController($pdo, $config);
+            $sync_result = $controller->sync();
+            $show_stats = true;
+        }
     } else {
-        $controller = new CommunicationsController($pdo, $config);
-        $sync_result = $controller->sync();
-        $show_stats = true;
+        $sync_result = ['success' => false, 'error' => 'Microsoft 365 não está configurado'];
     }
 }
 
