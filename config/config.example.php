@@ -32,11 +32,11 @@ return [
 
     // Microsoft Graph API
     'microsoft' => [
-        'client_id' => 'YOUR_CLIENT_ID_HERE',
-        'client_secret' => 'YOUR_CLIENT_SECRET_HERE',
-        'tenant_id' => 'YOUR_TENANT_ID_HERE',
-        'mailbox' => 'admin@ipcms.com.br',
-        'redirect_uri' => 'http://localhost/auth/callback',
+        'client_id' => getenv('GRAPH_CLIENT_ID') ?: '',
+        'client_secret' => getenv('GRAPH_CLIENT_SECRET') ?: '', // DO NOT COMMIT SECRETS
+        'tenant_id' => getenv('GRAPH_TENANT_ID') ?: '',
+        'mailbox' => getenv('GRAPH_MAILBOX') ?: 'financeiro@ipcms.com.br',
+        'redirect_uri' => getenv('GRAPH_REDIRECT_URI') ?: 'http://localhost:8000/index.php?page=auth/callback',
     ],
 
     // Python Service & Extraction
