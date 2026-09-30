@@ -4,10 +4,12 @@
  * JSON API for frontend interactions
  */
 
-header('Content-Type: application/json');
-
-// Start session
+// CRITICAL: No output before this header!
+// Start session FIRST
 session_start();
+
+// THEN set header
+header('Content-Type: application/json');
 
 // Check authentication (but allow API calls from authenticated page context)
 // AJAX calls from the page inherit the session cookie
@@ -170,3 +172,4 @@ switch ($action) {
 }
 
 echo json_encode($response);
+?>
