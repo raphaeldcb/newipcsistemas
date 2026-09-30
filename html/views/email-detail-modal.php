@@ -110,7 +110,7 @@
 function openEmailModal(commId) {
     // Fetch communication details via API
     // IMPORTANT: include credentials to send session cookie
-    fetch(`../../api.php?action=get_detail&id=${commId}`, {
+    fetch(`/newipcsistemas/api.php?action=get_detail&id=${commId}`, {
         credentials: 'include'
     })
         .then(r => r.json())
@@ -171,7 +171,7 @@ function closeEmailModal() {
 function markAsAnalyzed() {
     const commId = document.getElementById('emailDetailModal').dataset.commId;
 
-    fetch(`../../api.php?action=mark_analyzed&id=${commId}`, {
+    fetch(`/newipcsistemas/api.php?action=mark_analyzed&id=${commId}`, {
         method: 'POST',
         credentials: 'include'
     })
@@ -205,7 +205,7 @@ function scheduleResponse() {
     data.append('scheduled_date', scheduledDate);
     data.append('scheduled_time', scheduledTime);
 
-    fetch('../../api.php', {
+    fetch('/newipcsistemas/api.php', {
         method: 'POST',
         body: data,
         credentials: 'include'
