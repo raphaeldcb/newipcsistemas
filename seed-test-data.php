@@ -4,6 +4,7 @@
  * Populates database with test communications for extraction testing
  */
 
+require_once __DIR__ . '/config/load-env.php';
 require_once __DIR__ . '/config/config.php';
 
 try {
