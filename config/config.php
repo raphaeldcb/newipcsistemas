@@ -5,13 +5,13 @@
  */
 
 return [
-    // Database
+    // Database - HostGator Cloud
     'db' => [
         'host' => 'localhost',
         'port' => 3306,
-        'username' => 'root',
-        'password' => 'root',
-        'database' => 'novos_sistemas_ipc',
+        'username' => '***REMOVED***',
+        'password' => '***REMOVED***',
+        'database' => '***REMOVED***',
         'charset' => 'utf8mb4',
     ],
 
