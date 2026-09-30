@@ -59,11 +59,11 @@ function checkSession() {
 
 function testGetDetail() {
     log('getDetailLog', '🚀 Sending fetch request...', 'info');
-    log('getDetailLog', 'URL: /api.php?action=get_detail&id=1', 'info');
+    log('getDetailLog', 'URL: ../../api.php?action=get_detail&id=1', 'info');
     log('getDetailLog', 'Headers: credentials: "include"', 'info');
     log('getDetailLog', '', 'info');
 
-    fetch('/api.php?action=get_detail&id=1', {
+    fetch('../../api.php?action=get_detail&id=1', {
         credentials: 'include',
         headers: {
             'Accept': 'application/json'
