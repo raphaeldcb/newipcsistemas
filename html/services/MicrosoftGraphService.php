@@ -168,10 +168,13 @@ class MicrosoftGraphService
 
     /**
      * Sync messages from mailbox
+     * Uses /users/{mailbox} for client credentials flow (app-only) and /me for delegated flow
      */
     public function syncMessages($access_token, $delta_token = null)
     {
-        $endpoint = self::GRAPH_URL . '/me/mailFolders/inbox/messages/delta';
+        // Use /users/{mailbox} for app-only (client credentials) flow
+        // Use /me for delegated (user) flow
+        $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/mailFolders/inbox/messages/delta';
 
         $params = [
             '$select' => 'id,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,hasAttachments,attachments',
@@ -194,7 +197,7 @@ class MicrosoftGraphService
      */
     public function getMessageAttachments($access_token, $message_id)
     {
-        $endpoint = self::GRAPH_URL . '/me/messages/' . urlencode($message_id) . '/attachments';
+        $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/messages/' . urlencode($message_id) . '/attachments';
 
         $response = $this->makeGraphRequest($endpoint, 'GET', $access_token);
 
@@ -206,7 +209,7 @@ class MicrosoftGraphService
      */
     public function downloadAttachment($access_token, $message_id, $attachment_id)
     {
-        $endpoint = self::GRAPH_URL . '/me/messages/' . urlencode($message_id) . '/attachments/' . urlencode($attachment_id) . '/$value';
+        $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/messages/' . urlencode($message_id) . '/attachments/' . urlencode($attachment_id) . '/$value';
 
         return $this->makeGraphRequest($endpoint, 'GET', $access_token, true);
     }
