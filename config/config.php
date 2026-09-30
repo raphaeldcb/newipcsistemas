@@ -30,12 +30,12 @@ return [
         'secure' => false,
     ],
 
-    // Microsoft Graph API - Configured from Perito V6
+    // Microsoft Graph API - Configure with environment variables or .env file
     'microsoft' => [
-        'client_id' => '***REMOVED***',
-        'client_secret' => '***REMOVED***',
-        'tenant_id' => '***REMOVED***',
-        'mailbox' => 'financeiro@ipcms.com.br',
+        'client_id' => getenv('GRAPH_CLIENT_ID') ?: '***REMOVED***',
+        'client_secret' => getenv('GRAPH_CLIENT_SECRET') ?: '', // DO NOT COMMIT SECRETS
+        'tenant_id' => getenv('GRAPH_TENANT_ID') ?: '***REMOVED***',
+        'mailbox' => getenv('GRAPH_MAILBOX') ?: 'financeiro@ipcms.com.br',
         'redirect_uri' => 'http://localhost:8000/auth/callback',
     ],
 
