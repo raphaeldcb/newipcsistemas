@@ -109,7 +109,10 @@
 <script>
 function openEmailModal(commId) {
     // Fetch communication details via API
-    fetch(`/api.php?action=get_detail&id=${commId}`)
+    // IMPORTANT: include credentials to send session cookie
+    fetch(`/api.php?action=get_detail&id=${commId}`, {
+        credentials: 'include'
+    })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
@@ -168,7 +171,10 @@ function closeEmailModal() {
 function markAsAnalyzed() {
     const commId = document.getElementById('emailDetailModal').dataset.commId;
 
-    fetch(`/api.php?action=mark_analyzed&id=${commId}`, {method: 'POST'})
+    fetch(`/api.php?action=mark_analyzed&id=${commId}`, {
+        method: 'POST',
+        credentials: 'include'
+    })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
@@ -199,7 +205,11 @@ function scheduleResponse() {
     data.append('scheduled_date', scheduledDate);
     data.append('scheduled_time', scheduledTime);
 
-    fetch('/api.php', {method: 'POST', body: data})
+    fetch('/api.php', {
+        method: 'POST',
+        body: data,
+        credentials: 'include'
+    })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
