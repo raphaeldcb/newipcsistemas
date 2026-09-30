@@ -659,7 +659,7 @@ $stats = $data['stats'];
                         </div>
                         <div><?php echo date('d/m/Y H:i', strtotime($comm['received_datetime'] ?? 'now')); ?></div>
                         <div>
-                            <button type="button" class="btn-action" onclick="extractCommunication(<?php echo $comm['id']; ?>)">
+                            <button type="button" class="btn-action" onclick="openEmailModal(<?php echo $comm['id']; ?>)">
                                 🔍 Extrair
                             </button>
                         </div>
@@ -671,31 +671,12 @@ $stats = $data['stats'];
     </div>
 
     <script>
-    async function extractCommunication(id) {
-        const button = event.target;
-        const originalText = button.innerHTML;
-
-        try {
-            button.disabled = true;
-            button.innerHTML = '⏳ Extraindo...';
-
-            const response = await fetch(`/api.php?action=extract&id=${id}`);
-            const result = await response.json();
-
-            if (result.success) {
-                alert('✅ Informações extraídas com sucesso!');
-                location.reload();
-            } else {
-                alert(`❌ Erro: ${result.error}`);
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        } catch (error) {
-            alert(`❌ Erro ao conectar: ${error.message}`);
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }
-    }
+    // Note: extractCommunication() replaced by openEmailModal()
+    // Modal now handles viewing, extracting, response scheduling, and marking as analyzed
+    // See email-detail-modal.php for implementation
     </script>
+
+    <!-- Email Detail Modal -->
+    <?php require_once __DIR__ . '/email-detail-modal.php'; ?>
 </body>
 </html>
