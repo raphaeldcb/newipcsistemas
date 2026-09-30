@@ -33,7 +33,7 @@
 
             <p style="margin-top: 20px;">Por favor, tente novamente.</p>
 
-            <a href="/" class="back-link">← Voltar para Dashboard</a>
+            <a href="/" class="back-link">← Voltar para Painel</a>
         <?php endif; ?>
     </div>
 </body>

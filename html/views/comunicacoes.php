@@ -19,7 +19,7 @@
                 <li class="menu-item">
                     <a href="/newipcsistemas/index.php" class="menu-link">
                         <span class="icon">📊</span>
-                        <span>Dashboard</span>
+                        <span>Painel</span>
                     </a>
                 </li>
                 <li class="menu-item">

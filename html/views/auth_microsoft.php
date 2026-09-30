@@ -38,7 +38,7 @@
             <strong>⚠️ Nota:</strong> Você será redirecionado para o login da Microsoft de forma segura. Nós não armazenamos sua senha.
         </div>
 
-        <a href="/" class="back-link">← Voltar para Dashboard</a>
+        <a href="/" class="back-link">← Voltar para Painel</a>
     </div>
 </body>
 </html>
