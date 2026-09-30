@@ -136,7 +136,7 @@ $stats = $data['stats'];
         </div>
 
         <div class="debug-log">
-            <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Debug Log:</div>
+            <div>Debug Log:</div>
             <?php foreach ($debug_log as $log): ?>
                 <div class="<?php echo strpos($log, '✓') !== false ? 'success' : (strpos($log, '❌') !== false ? 'error' : ''); ?>">
                     <?php echo htmlspecialchars($log); ?>
@@ -147,7 +147,7 @@ $stats = $data['stats'];
         <div class="status-box <?php echo $microsoft_authenticated ? 'connected' : ''; ?>">
             <div>
                 <strong><?php echo $microsoft_authenticated ? '✅ CONECTADO' : '⚠️ NÃO CONECTADO'; ?></strong>
-                <p style="font-size: 12px; margin-top: 5px;">
+                <p>
                     <?php echo $microsoft_authenticated
                         ? 'Sucesso! A auto-conexão funcionou. A tela normal exibirá as funcionalidades completas.'
                         : 'A auto-conexão falhou. Verifique os logs acima para entender o motivo.'; ?>
@@ -156,43 +156,43 @@ $stats = $data['stats'];
             <a href="/newipcsistemas/index.php?page=comunicacoes" class="btn">Voltar para Comunicações →</a>
         </div>
 
-        <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px;">
+        <div>
             <h3>📋 Configurações Carregadas:</h3>
-            <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px; font-weight: bold;">Config Key</td>
-                    <td style="padding: 10px; font-weight: bold;">Valor</td>
+            <table>
+                <tr>
+                    <td>Config Key</td>
+                    <td>Valor</td>
                 </tr>
-                <tr style="background: #f8f9fa; border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">microsoft.client_id</td>
-                    <td style="padding: 10px; font-family: monospace;"><?php echo !empty($config['microsoft']['client_id']) ? substr($config['microsoft']['client_id'], 0, 20) . '...' : '(vazio)'; ?></td>
+                <tr>
+                    <td>microsoft.client_id</td>
+                    <td><?php echo !empty($config['microsoft']['client_id']) ? substr($config['microsoft']['client_id'], 0, 20) . '...' : '(vazio)'; ?></td>
                 </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">microsoft.client_secret</td>
-                    <td style="padding: 10px; font-family: monospace;"><?php echo !empty($config['microsoft']['client_secret']) ? substr($config['microsoft']['client_secret'], 0, 10) . '...' : '(vazio)'; ?></td>
+                <tr>
+                    <td>microsoft.client_secret</td>
+                    <td><?php echo !empty($config['microsoft']['client_secret']) ? substr($config['microsoft']['client_secret'], 0, 10) . '...' : '(vazio)'; ?></td>
                 </tr>
-                <tr style="background: #f8f9fa; border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">microsoft.tenant_id</td>
-                    <td style="padding: 10px; font-family: monospace;"><?php echo !empty($config['microsoft']['tenant_id']) ? $config['microsoft']['tenant_id'] : '(vazio)'; ?></td>
+                <tr>
+                    <td>microsoft.tenant_id</td>
+                    <td><?php echo !empty($config['microsoft']['tenant_id']) ? $config['microsoft']['tenant_id'] : '(vazio)'; ?></td>
                 </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">microsoft.mailbox</td>
-                    <td style="padding: 10px; font-family: monospace;"><?php echo htmlspecialchars($config['microsoft']['mailbox'] ?? '(vazio)'); ?></td>
+                <tr>
+                    <td>microsoft.mailbox</td>
+                    <td><?php echo htmlspecialchars($config['microsoft']['mailbox'] ?? '(vazio)'); ?></td>
                 </tr>
-                <tr style="background: #f8f9fa;">
-                    <td style="padding: 10px;">database.host</td>
-                    <td style="padding: 10px; font-family: monospace;"><?php echo htmlspecialchars($config['db']['host']); ?></td>
+                <tr>
+                    <td>database.host</td>
+                    <td><?php echo htmlspecialchars($config['db']['host']); ?></td>
                 </tr>
             </table>
         </div>
 
-        <div style="background: #e7f3ff; border: 1px solid #b3d9ff; padding: 15px; border-radius: 6px; margin-top: 20px;">
-            <h4 style="color: #004085;">ℹ️ Próximos Passos:</h4>
-            <ol style="margin-left: 20px; color: #004085; line-height: 1.8;">
+        <div>
+            <h4>ℹ️ Próximos Passos:</h4>
+            <ol>
                 <li>Se a conexão foi bem-sucedida: clique no botão "Voltar para Comunicações" acima</li>
                 <li>Se há erro: verifique os logs acima e procure por mensagens de erro (linhas em vermelho)</li>
                 <li>Se o problema persistir, verifique:
-                    <ul style="margin-top: 10px; margin-left: 20px;">
+                    <ul>
                         <li>Credenciais do Azure Portal estão corretas em .env.local</li>
                         <li>A aplicação tem permissões "Mail.Read" e "Mail.ReadWrite" no Azure</li>
                         <li>Admin Consent foi dado para a aplicação</li>

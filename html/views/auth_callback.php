@@ -21,7 +21,7 @@
                 }, 2000);
             </script>
         <?php else: ?>
-            <div class="spinner" style="border-top-color: #ff6b6b;"></div>
+            <div class="spinner"></div>
             <h1>❌ Erro na Autenticação</h1>
 
             <div class="error">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <p style="margin-top: 20px;">Por favor, tente novamente.</p>
+            <p>Por favor, tente novamente.</p>
 
             <a href="/" class="back-link">← Voltar para Painel</a>
         <?php endif; ?>

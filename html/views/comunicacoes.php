@@ -140,60 +140,58 @@ $stats = $data['stats'];
                     <p>Gerencie emails recebidos de tribunais e varas</p>
                 </div>
                 <div class="header-actions">
-                    <form method="POST" style="margin: 0;">
+                    <form method="POST">
                         <input type="hidden" name="action" value="sync">
-                        <button type="submit" class="btn btn-primary" <?php echo !$microsoft_authenticated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>↻ Sincronizar</button>
+                        <button type="submit" class="btn btn-primary" <?php echo !$microsoft_authenticated ? 'disabled' : ''; ?>>↻ Sincronizar</button>
                     </form>
                 </div>
             </div>
 
             <?php if ($microsoft_authenticated): ?>
-            <div style="background: #e8f5e9; color: #2e7d32; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
                 <div>
                     <strong>✅ Conectado ao Microsoft 365</strong> — <?php echo htmlspecialchars($config['microsoft']['mailbox'] ?? 'Mailbox'); ?>
                 </div>
-                <a href="/newipcsistemas/index.php?page=auth/disconnect" style="color: #2e7d32; text-decoration: none; font-size: 12px; font-weight: 500;">Desconectar →</a>
+                <a href="/newipcsistemas/index.php?page=auth/disconnect">Desconectar →</a>
             </div>
             <?php else: ?>
-            <div style="background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
                 <div>
                     <strong>⚠️ Não conectado ao Microsoft 365</strong> — Clique no botão para sincronizar emails
                 </div>
-                <a href="/newipcsistemas/index.php?page=auth/microsoft" style="color: #856404; text-decoration: none; font-size: 12px; font-weight: 500;">Conectar →</a>
+                <a href="/newipcsistemas/index.php?page=auth/microsoft">Conectar →</a>
             </div>
             <?php endif; ?>
 
             <?php if ($sync_result): ?>
-            <div style="background: <?php echo $sync_result['success'] ? '#e8f5e9' : '#ffebee'; ?>;
-                        color: <?php echo $sync_result['success'] ? '#2e7d32' : '#c62828'; ?>;
-                        padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid <?php echo $sync_result['success'] ? '#2e7d32' : '#c62828'; ?>;">
+            <div>
                 <?php echo htmlspecialchars($sync_result['message'] ?? $sync_result['error']); ?>
             </div>
             <?php endif; ?>
 
             <?php if ($show_stats): ?>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #667eea;"><?php echo $stats['total']; ?></div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Total</div>
+            <div>
+                <div>
+                    <div><?php echo $stats['total']; ?></div>
+                    <div>Total</div>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #0288d1;"><?php echo $stats['by_status']['new'] ?? 0; ?></div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Novas</div>
+                <div>
+                    <div><?php echo $stats['by_status']['new'] ?? 0; ?></div>
+                    <div>Novas</div>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #388e3c;"><?php echo $stats['by_status']['processed'] ?? 0; ?></div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Processadas</div>
+                <div>
+                    <div><?php echo $stats['by_status']['processed'] ?? 0; ?></div>
+                    <div>Processadas</div>
                 </div>
-                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #c62828;"><?php echo $stats['by_status']['error'] ?? 0; ?></div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Erros</div>
+                <div>
+                    <div><?php echo $stats['by_status']['error'] ?? 0; ?></div>
+                    <div>Erros</div>
                 </div>
             </div>
             <?php endif; ?>
 
             <div class="filters">
-                <form method="GET" style="display: flex; gap: 15px; flex-wrap: wrap; width: 100%;">
+                <form method="GET">
                     <div class="filter-group">
                         <label>Status</label>
                         <select name="status">
@@ -215,7 +213,7 @@ $stats = $data['stats'];
                         <input type="text" name="processo" placeholder="Número do processo..." value="<?php echo htmlspecialchars($_GET['processo'] ?? ''); ?>">
                     </div>
 
-                    <div class="filter-group" style="display: flex; align-items: flex-end;">
+                    <div class="filter-group">
                         <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
                     </div>
                 </form>

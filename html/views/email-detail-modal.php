@@ -5,103 +5,103 @@
  */
 ?>
 
-<div id="emailDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+<div id="emailDetailModal">
+    <div>
 
         <!-- Header -->
-        <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <h2 id="modalTitle" style="margin: 0; font-size: 20px; color: #333;">Detalhes do Email</h2>
-            <button onclick="closeEmailModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #999;">&times;</button>
+        <div>
+            <h2 id="modalTitle">Detalhes do Email</h2>
+            <button onclick="closeEmailModal()">&times;</button>
         </div>
 
         <!-- Email Content -->
-        <div style="padding: 20px;">
+        <div>
 
             <!-- From/To/Date Info -->
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
+            <div>
+                <div>
                     <div>
-                        <strong style="color: #666; text-transform: uppercase;">De</strong><br>
+                        <strong>De</strong><br>
                         <span id="modalFrom"></span>
                     </div>
                     <div>
-                        <strong style="color: #666; text-transform: uppercase;">Data</strong><br>
+                        <strong>Data</strong><br>
                         <span id="modalDate"></span>
                     </div>
-                    <div style="grid-column: 1 / -1;">
-                        <strong style="color: #666; text-transform: uppercase;">Assunto</strong><br>
-                        <span id="modalSubject" style="font-size: 15px; color: #333;"></span>
+                    <div>
+                        <strong>Assunto</strong><br>
+                        <span id="modalSubject"></span>
                     </div>
                 </div>
             </div>
 
             <!-- Email Body -->
-            <div style="background: white; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; min-height: 200px;">
-                <strong style="color: #666; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">Mensagem</strong>
-                <div id="modalBody" style="font-size: 14px; line-height: 1.6; color: #333; word-break: break-word;">
+            <div>
+                <strong>Mensagem</strong>
+                <div id="modalBody">
                     <!-- Email content will be loaded here -->
                 </div>
             </div>
 
             <!-- Extracted Data -->
-            <div style="background: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2e7d32;">
-                <strong style="color: #2e7d32; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">📋 Informações Extraídas</strong>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
+            <div>
+                <strong>📋 Informações Extraídas</strong>
+                <div>
                     <div>
                         <strong>Tribunal (Vara):</strong><br>
-                        <span id="modalVara" style="color: #333;">-</span>
+                        <span id="modalVara">-</span>
                     </div>
                     <div>
                         <strong>Região (Comarca):</strong><br>
-                        <span id="modalComarca" style="color: #333;">-</span>
+                        <span id="modalComarca">-</span>
                     </div>
                     <div>
                         <strong>Número do Processo:</strong><br>
-                        <span id="modalProcess" style="color: #333; font-family: monospace;">-</span>
+                        <span id="modalProcess">-</span>
                     </div>
                     <div>
                         <strong>Classificação:</strong><br>
-                        <span id="modalClassification" style="color: #333;">-</span>
+                        <span id="modalClassification">-</span>
                     </div>
                 </div>
             </div>
 
             <!-- Automatic Response Section -->
-            <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
-                <strong style="color: #856404; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 15px;">✉️ Resposta Automática</strong>
+            <div>
+                <strong>✉️ Resposta Automática</strong>
 
                 <!-- Response Preview -->
-                <div style="background: white; padding: 12px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #ddd; font-size: 12px; line-height: 1.5;">
-                    <div style="margin-bottom: 10px;">
+                <div>
+                    <div>
                         <strong>Para:</strong> <span id="responseToEmail"></span>
                     </div>
-                    <div style="margin-bottom: 10px;">
+                    <div>
                         <strong>Assunto:</strong> <span id="responseSubject"></span>
                     </div>
-                    <div style="background: #f5f5f5; padding: 10px; border-radius: 3px; max-height: 150px; overflow-y: auto;">
-                        <div id="responseBody" style="font-size: 11px; line-height: 1.4; white-space: pre-wrap;"></div>
+                    <div>
+                        <div id="responseBody"></div>
                     </div>
                 </div>
 
                 <!-- Schedule Info -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Data de Envio</label>
-                        <input type="date" id="responseDate" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                        <label>Data de Envio</label>
+                        <input type="date" id="responseDate">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Hora de Envio</label>
-                        <input type="time" id="responseTime" value="09:00" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                        <label>Hora de Envio</label>
+                        <input type="time" id="responseTime" value="09:00">
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer with Actions -->
-        <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end; background: #f8f9fa;">
-            <button onclick="closeEmailModal()" style="padding: 10px 20px; background: #ddd; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Cancelar</button>
-            <button onclick="markAsAnalyzed()" style="padding: 10px 20px; background: #2e7d32; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">✓ Marcar como Analisado</button>
-            <button onclick="scheduleResponse()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">📧 Agendar Resposta</button>
+        <div>
+            <button onclick="closeEmailModal()">Cancelar</button>
+            <button onclick="markAsAnalyzed()">✓ Marcar como Analisado</button>
+            <button onclick="scheduleResponse()">📧 Agendar Resposta</button>
         </div>
     </div>
 </div>
