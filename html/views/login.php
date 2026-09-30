@@ -1018,8 +1018,16 @@ a:hover {
 
     </style>
 </head>
-<body>
-    <div class="container">
+<body style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: white; border-radius: 12px; box-shadow: var(--shadow-lg); width: 100%; max-width: 400px; overflow: hidden;">
+        <div class="card-header" style="text-align: center; padding: 30px;">
+            <h1 style="font-size: 24px; margin-bottom: 8px; color: white;">🏛️ Novos Sistemas IPC</h1>
+            <p style="font-size: 14px; opacity: 0.9; color: white;">Gestão de Perícias Judiciais</p>
+        </div>
+
+        <div style="padding: 30px;">
+
+        <div class="container" style="max-width: 100%; padding: 0;">
         <div class="card">
             <div class="card-header">
                 <h1>🏛️ Novos Sistemas IPC</h1>
@@ -1067,6 +1075,8 @@ a:hover {
                 admin@ipcms.com.br / admin123
             </div>
             </div>
+        </div>
+        </div>
         </div>
     </div>
 </body>
