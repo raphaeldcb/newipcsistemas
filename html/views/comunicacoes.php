@@ -422,7 +422,7 @@
 
             <ul class="menu-items">
                 <li class="menu-item">
-                    <a href="/" class="menu-link">
+                    <a href="/newipcsistemas/index.php" class="menu-link">
                         <span class="icon">📊</span>
                         <span>Dashboard</span>
                     </a>

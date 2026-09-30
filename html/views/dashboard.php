@@ -286,7 +286,7 @@
 
             <ul class="menu-items">
                 <li class="menu-item">
-                    <a href="/" class="menu-link active">
+                    <a href="/newipcsistemas/index.php" class="menu-link active">
                         <span class="icon">📊</span>
                         <span>Dashboard</span>
                     </a>

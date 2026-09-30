@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?')
                 ->execute([$user['id']]);
 
-            header('Location: /');
+            header("Location: {$base}?page=comunicacoes");
             exit;
         } else {
             $error = 'Email ou senha incorretos';
