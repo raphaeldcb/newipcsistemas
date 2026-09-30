@@ -133,7 +133,7 @@
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="/login">
+        <form method="POST" action="/newipcsistemas/index.php?page=login">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input

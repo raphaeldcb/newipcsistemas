@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /newipcsistemas/
+
+    # Para arquivos e diretórios reais, serve como está
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Redireciona rotas para index.php
+    RewriteRule ^login/?$ index.php?page=login [QSA,L]
+    RewriteRule ^comunicacoes/?$ index.php?page=comunicacoes [QSA,L]
+    RewriteRule ^logout/?$ index.php?page=logout [QSA,L]
+    RewriteRule ^auth/microsoft/?$ index.php?page=auth/microsoft [QSA,L]
+    RewriteRule ^auth/callback/?$ index.php?page=auth/callback [QSA,L]
+    RewriteRule ^auth/disconnect/?$ index.php?page=auth/disconnect [QSA,L]
+</IfModule>
