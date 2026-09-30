@@ -6,6 +6,9 @@
 
 session_start();
 
+// Load environment variables from .env or .env.local
+require_once __DIR__ . '/config/load-env.php';
+
 $config = require_once __DIR__ . '/config/config.php';
 
 // Database connection
