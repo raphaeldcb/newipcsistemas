@@ -15,12 +15,12 @@ copy .env.example .env.local
 notepad .env.local
 ```
 
-**Preencha com seus valores do Azure:**
+**Preencha com seus valores do Azure Portal:**
 ```env
-GRAPH_CLIENT_ID=56fd2738-851e-4482-959d-c3fcea794d90
-GRAPH_CLIENT_SECRET=5eB8Q~1PDFk9ppIpKoKDXA0OSt_VKxUfVR2k2ctd
-GRAPH_TENANT_ID=cb5ff6f4-4845-46fd-9eb6-5ca720f7ae7b
-GRAPH_MAILBOX=financeiro@ipcms.com.br
+GRAPH_CLIENT_ID=seu_client_id_aqui
+GRAPH_CLIENT_SECRET=seu_client_secret_aqui
+GRAPH_TENANT_ID=seu_tenant_id_aqui
+GRAPH_MAILBOX=seu_email@dominio.com
 DB_HOST=localhost
 DB_USERNAME=root
 DB_PASSWORD=
