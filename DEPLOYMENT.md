@@ -200,7 +200,7 @@ BACKUP_DIR="/mnt/backups/novos-sistemas"
 DATE=$(date +%Y-%m-%d_%H-%M-%S)
 
 # MySQL backup
-mysqldump -u root -p$MYSQL_PASSWORD novos_sistemas_ipc | gzip > $BACKUP_DIR/db-$DATE.sql.gz
+mysqldump -u root -p$MYSQL_PASSWORD ***REMOVED*** | gzip > $BACKUP_DIR/db-$DATE.sql.gz
 
 # Application backup
 tar -czf $BACKUP_DIR/app-$DATE.tar.gz /var/www/novos-sistemas-ipc
@@ -249,7 +249,7 @@ memory_limit = 256M
 ```sql
 -- Create limited user (not root)
 CREATE USER 'novos_sistemas'@'localhost' IDENTIFIED BY 'strong_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON novos_sistemas_ipc.* TO 'novos_sistemas'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ***REMOVED***.* TO 'novos_sistemas'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Disable remote root login
@@ -315,7 +315,7 @@ cd /var/www/novos-sistemas-ipc
 git reset --hard <previous-commit-hash>
 
 # 2. Restore database
-mysql -u root -p novos_sistemas_ipc < /mnt/backups/db-backup.sql.gz
+mysql -u root -p ***REMOVED*** < /mnt/backups/db-backup.sql.gz
 
 # 3. Restart services
 systemctl restart php-fpm nginx
@@ -342,7 +342,7 @@ echo '{"id":1,"subject":"Test","from_name":"Test","from_address":"test@example.c
   python3 /var/www/novos-sistemas-ipc/python/extraction_service.py extract
 
 # 5. Check databases are syncing
-mysql -e "SELECT COUNT(*) FROM novos_sistemas_ipc.communications;"
+mysql -e "SELECT COUNT(*) FROM ***REMOVED***.communications;"
 ```
 
 ## 📈 Scaling Considerations

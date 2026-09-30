@@ -26,33 +26,9 @@ Validar o **Novos Sistemas IPC** funcionando 100% localmente com:
 
 ---
 
-## 🔧 FASE 1: Ambiente (5 minutos)
+## 🔧 FASE 1: Iniciar Serviços (5 minutos)
 
-### 1.1 Validar Sistema
-
-```bash
-cd /Users/ipc_server/newipcsistemas
-./validate-system.sh
-```
-
-**Esperado:** Todos os ✅ verdes
-
-```
-✅ PHP installed (8.2+)
-✅ Python installed (3.13+)
-✅ MySQL client installed
-✅ Ollama accessible
-✅ Qwen model available
-✅ Extraction service responds
-✅ Database schema exists
-✅ Security checks passed
-✅ Documentation files exist
-✅ Scripts are executable
-✅ Git repository initialized
-✅ All validations passed!
-```
-
-### 1.2 Iniciar Ollama (Terminal 1)
+### Terminal 1: Ollama
 
 ```bash
 ollama serve
@@ -63,11 +39,11 @@ ollama serve
 Listening on 127.0.0.1:11434
 ```
 
-### 1.3 Iniciar PHP Server (Terminal 2)
+### Terminal 2: PHP Server
 
 ```bash
-cd /Users/ipc_server/newipcsistemas
-./quick-start.sh start
+cd C:\wamp64\www\newipcsistemas
+C:\wamp64\bin\php\php8.2.18\php.exe -S localhost:8000 -t html
 ```
 
 **Esperado:**
@@ -97,12 +73,6 @@ http://localhost:8000
 - ✅ Opção "Comunicações" visível
 - ✅ Nome de usuário aparece no canto
 
-### 2.3 Verificar Dashboard
-
-- ✅ 4 itens no menu
-- ✅ Cards de estatísticas
-- ✅ Layout responsivo
-
 ---
 
 ## 📧 FASE 3: Testar sem Microsoft (5 minutos)
@@ -111,8 +81,8 @@ http://localhost:8000
 
 **Terminal 3:**
 ```bash
-cd /Users/ipc_server/newipcsistemas
-php seed-test-data.php
+cd C:\wamp64\www\newipcsistemas
+C:\wamp64\bin\php\php8.2.18\php.exe seed-test-data.php
 ```
 
 **Esperado:**
@@ -171,14 +141,6 @@ mysql -u ***REMOVED*** -p***REMOVED*** ***REMOVED*** -e "SELECT id, subject, var
 | 1  | Perícia Contábil - Processo...      | 2ª Vara Familiar  | 0123456-78.2024.8.26.0100|
 | 2  | Edital de Citação - Var. Cível...  | Vara Cível        | 0234567-89.2024.8.26.0200|
 ```
-
-### 4.4 Testar Batch Extraction
-
-```bash
-curl "http://localhost:8000/api.php?action=extract_batch&status=new&limit=10"
-```
-
-**Esperado:** JSON com extrações
 
 ---
 
@@ -257,34 +219,9 @@ curl "http://localhost:8000/api.php?action=extract&id=1"
 
 ---
 
-## 📊 FASE 7: Verificar Auditoria (3 minutos)
-
-### 7.1 Ver Logs de Processamento
-
-```bash
-mysql -u ***REMOVED*** -p***REMOVED*** ***REMOVED*** -e "SELECT action, details FROM processing_log LIMIT 5;"
-```
-
-**Esperado:**
-```
-| action                | details                              |
-|-----------------------|--------------------------------------|
-| information_extracted | {"vara": "2ª Vara...", ...}         |
-| microsoft_sync        | {"messages_synced": 42, ...}        |
-| login                 | {"user_id": 1, ...}                 |
-```
-
-### 7.2 Ver Comunicações Processadas
-
-```bash
-mysql -u ***REMOVED*** -p***REMOVED*** ***REMOVED*** -e "SELECT COUNT(*) as total, status, COUNT(*) as count FROM communications GROUP BY status;"
-```
-
----
-
 ## ✅ CHECKLIST FINAL
 
-- [ ] Sistema validado (./validate-system.sh ✅)
+- [ ] Sistema validado
 - [ ] Ollama rodando (ollama serve)
 - [ ] PHP server rodando (http://localhost:8000 ✅)
 - [ ] Login funciona (admin@ipcms.com.br ✅)
@@ -303,7 +240,7 @@ mysql -u ***REMOVED*** -p***REMOVED*** ***REMOVED*** -e "SELECT COUNT(*) as tota
 ### "Erro ao conectar Microsoft"
 ```bash
 # Verificar credenciais
-cat config/config.php | grep -A 5 "microsoft"
+type config\config.php | findstr microsoft
 
 # Esperado:
 # 'client_id' => '***REMOVED***'
@@ -313,7 +250,7 @@ cat config/config.php | grep -A 5 "microsoft"
 ### "Ollama não responde"
 ```bash
 # Verificar se está rodando
-curl http://localhost:11434/api/tags
+curl.exe http://localhost:11434/api/tags
 
 # Se não, iniciar:
 ollama serve
@@ -322,7 +259,7 @@ ollama serve
 ### "Banco de dados vazio"
 ```bash
 # Recarregar dados de teste
-php seed-test-data.php
+C:\wamp64\bin\php\php8.2.18\php.exe seed-test-data.php
 ```
 
 ### "Extração muito lenta"
@@ -343,7 +280,7 @@ curl "http://localhost:8000/api.php?action=extract_batch&status=new&limit=10"
 ```bash
 # Reiniciar PHP server
 # Verificar se dados continuam no banco
-mysql ... SELECT COUNT(*) FROM communications;
+mysql -u ***REMOVED*** -p***REMOVED*** ***REMOVED*** -e "SELECT COUNT(*) FROM communications;"
 ```
 
 ### Deploy HostGator
@@ -365,30 +302,9 @@ Se chegou aqui com todas as checkboxes marcadas, o sistema está:
 
 ---
 
-## 📞 Suporte
-
-- **Documentação:** Consulte os arquivos .md na raiz do projeto
-- **Erro específico:** Procure em README_SETUP.md → Troubleshooting
-- **Teste avançado:** Veja DEPLOYMENT.md para produção
-
----
-
 **Tempo total estimado:** 30-40 minutos  
 **Dificuldade:** Fácil (siga os passos)  
 **Status:** 🟢 **PRONTO PARA TESTES**
-
----
-
-**Comece agora com:**
-
-```bash
-cd /Users/ipc_server/newipcsistemas
-./validate-system.sh
-./quick-start.sh start
-php seed-test-data.php
-```
-
-Depois abra: http://localhost:8000 🚀
 
 ---
 

@@ -41,7 +41,7 @@ return [
 
     // Python Service & Extraction
     'python' => [
-        'path' => '/usr/bin/python3',
+        'path' => 'C:\\Python313\\python.exe',
         'script_dir' => dirname(__DIR__) . '/python',
         'log_file' => dirname(__DIR__) . '/logs/python_service.log',
         'ollama_url' => 'http://localhost:11434',

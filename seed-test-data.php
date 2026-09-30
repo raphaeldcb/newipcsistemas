@@ -89,7 +89,7 @@ foreach ($test_communications as $i => $comm) {
         $id = $pdo->lastInsertId();
         echo "✅ Communication #$id created\n";
         echo "   From: " . $comm['from_name'] . "\n";
-        echo "   Subject: " . $comm['subject'] . "\n";
+        echo "   Subject: " . substr($comm['subject'], 0, 70) . "...\n";
         echo "   Status: new (ready for extraction)\n\n";
     } else {
         echo "❌ Failed to create communication\n";
@@ -97,21 +97,14 @@ foreach ($test_communications as $i => $comm) {
 }
 
 // Get statistics
-$result = $pdo->query('SELECT COUNT(*) as total, status, COUNT(*) as count FROM communications GROUP BY status')->fetchAll();
-
-echo "\n📊 Database Statistics:\n";
-echo "=======================\n";
 $total_result = $pdo->query('SELECT COUNT(*) as total FROM communications')->fetch();
-echo "Total communications: " . $total_result['total'] . "\n";
-
-foreach ($result as $row) {
-    echo "  - " . ucfirst($row['status']) . ": " . $row['count'] . "\n";
-}
 
 echo "\n✅ Test data seeding complete!\n";
+echo "Total communications: " . $total_result['total'] . "\n";
+
 echo "\n🚀 Next steps:\n";
-echo "1. Start PHP server: php -S localhost:8000 -t html\n";
+echo "1. Start PHP server: C:\\wamp64\\bin\\php\\php8.2.18\\php.exe -S localhost:8000 -t html\n";
 echo "2. Login: admin@ipcms.com.br / admin123\n";
 echo "3. Go to Comunicações\n";
-echo "4. Click 'Extrair' on any communication\n";
+echo "4. Click '🔍 Extrair' on any communication\n";
 echo "5. Watch extraction results appear!\n";

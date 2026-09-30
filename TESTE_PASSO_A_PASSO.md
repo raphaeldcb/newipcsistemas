@@ -3,7 +3,7 @@
 ## ✅ Configuração Completa
 
 **Status:** Microsoft Graph configurado com credenciais do Perito V6
-- **Email:** financeiro@ipcmsc.com.br
+- **Email:** financeiro@ipcms.com.br
 - **Tenant:** ***REMOVED***
 - **Client ID:** ***REMOVED***
 
@@ -12,18 +12,14 @@
 ## 🚀 Passo 1: Preparar Ambiente
 
 ```bash
-cd /Users/ipc_server/newipcsistemas
+cd C:\wamp64\www\newipcsistemas
 
 # 1.1 Verificar dependências
-python3 --version          # Python 3.13+
-php --version              # PHP 8.2+
+C:\wamp64\bin\php\php8.2.18\php.exe --version              # PHP 8.2+
 mysql --version            # MySQL 8.3+
 
-# 1.2 Instalar dependências Python
-pip install requests>=2.31.0
-
-# 1.3 Verificar Ollama
-curl http://localhost:11434/api/tags
+# 1.2 Verificar Ollama
+curl.exe http://localhost:11434/api/tags
 # Se não responder, inicie: ollama serve
 ```
 
@@ -32,15 +28,12 @@ curl http://localhost:11434/api/tags
 ## 🎯 Passo 2: Validar Configuração
 
 ```bash
-# 2.1 Validar sistema completo
-./validate-system.sh
-
-# 2.2 Validar arquivo de configuração
-cat config/config.php | grep -A 5 "microsoft"
+# 2.1 Validar arquivo de configuração
+type config\config.php | findstr microsoft
 
 # Esperado:
 # 'client_id' => '***REMOVED***',
-# 'mailbox' => 'financeiro@ipcmsc.com.br',
+# 'mailbox' => 'financeiro@ipcms.com.br',
 ```
 
 ---
@@ -49,10 +42,10 @@ cat config/config.php | grep -A 5 "microsoft"
 
 ```bash
 # 3.1 Criar banco e tabelas
-mysql -u root -p < database/install.sql
+mysql -u ***REMOVED*** -p***REMOVED*** -h localhost < database\install.sql
 
 # 3.2 Verificar criação
-mysql -u root -p -e "USE novos_sistemas_ipc; SHOW TABLES;"
+mysql -u ***REMOVED*** -p***REMOVED*** -e "USE ***REMOVED***; SHOW TABLES;"
 
 # Esperado: communications, users, processing_log, etc
 ```
@@ -66,7 +59,8 @@ mysql -u root -p -e "USE novos_sistemas_ipc; SHOW TABLES;"
 ollama serve
 
 # Terminal 2: PHP Server
-./quick-start.sh start
+cd C:\wamp64\www\newipcsistemas
+C:\wamp64\bin\php\php8.2.18\php.exe -S localhost:8000 -t html
 
 # Esperado: PHP 8.2 server at http://localhost:8000
 ```
@@ -91,10 +85,12 @@ ollama serve
 1. Clique em **Comunicações** no menu
 2. Clique em "Conectar ao Microsoft 365" (botão amarelo)
 3. Será redirecionado para login Microsoft
-4. Login com: `financeiro@ipcmsc.com.br`
+4. Login com: `financeiro@ipcms.com.br`
 5. Autorize acesso aos emails
 
-**Esperado:** Status verde "✅ Conectado ao Microsoft 365"
+**Esperado:**
+- ✅ Status muda para **"✅ Conectado ao Microsoft 365"** (verde)
+- ✅ Email aparece: "financeiro@ipcms.com.br"
 
 ---
 
@@ -106,15 +102,10 @@ ollama serve
 3. Emails da mailbox aparecem na tabela
 
 **Esperado:**
-- Status muda para "Processando..."
-- Emails aparecem com "From", "Data"
-- Cards de estatísticas atualizam
-- Status volta para "Conectado"
-
-**No terminal (opcional):**
-```bash
-mysql -u root -p -e "SELECT COUNT(*) FROM novos_sistemas_ipc.communications;"
-```
+- ✅ "From" mostra remetentes reais
+- ✅ "Data" mostra datas reais
+- ✅ Cards de estatísticas atualizam
+- ✅ Status volta para "Conectado"
 
 ---
 
@@ -124,10 +115,10 @@ mysql -u root -p -e "SELECT COUNT(*) FROM novos_sistemas_ipc.communications;"
 
 ```bash
 # 8A.1 Carregar emails de teste
-php seed-test-data.php
+C:\wamp64\bin\php\php8.2.18\php.exe seed-test-data.php
 
 # 8A.2 Verificar no banco
-mysql -u root -p -e "SELECT id, subject FROM novos_sistemas_ipc.communications LIMIT 3;"
+mysql -u ***REMOVED*** -p***REMOVED*** -e "SELECT id, subject FROM ***REMOVED***.communications LIMIT 3;"
 ```
 
 ### Opção B: Com emails reais (após sincronizar)
@@ -173,111 +164,30 @@ curl "http://localhost:8000/api.php?action=stats"
 
 ```bash
 # 10.1 Ver log de processamento
-mysql -u root -p -e "SELECT action, details FROM novos_sistemas_ipc.processing_log LIMIT 5;"
+mysql -u ***REMOVED*** -p***REMOVED*** -e "SELECT action, details FROM ***REMOVED***.processing_log LIMIT 5;"
 
-# Esperado: information_extracted, microsoft_sync, etc
+# Esperado:
+# | action                | details                              |
+# |-----------------------|--------------------------------------|
+# | information_extracted | {"vara": "2ª Vara...", ...}         |
+# | microsoft_sync        | {"messages_synced": 42, ...}        |
+# | login                 | {"user_id": 1, ...}                 |
 
 # 10.2 Ver dados extraídos
-mysql -u root -p -e "SELECT id, subject, vara, comarca, processo_numero FROM novos_sistemas_ipc.communications;"
+mysql -u ***REMOVED*** -p***REMOVED*** -e "SELECT id, subject, vara, comarca, processo_numero FROM ***REMOVED***.communications;"
 
 # Esperado: Campos populados com informações extraídas
 ```
 
 ---
 
-## ✅ Passo 11: Executar Suite de Testes Completa
+## ✅ Checklist Final
 
-```bash
-# 11.1 Validar sistema
-./validate-system.sh
-
-# 11.2 Testar API
-./test-api.sh http://localhost:8000
-
-# 11.3 Testar extração
-python3 python/extraction_service.py test
-
-# Esperado: Todos os testes passam com ✅
-```
-
----
-
-## 🚨 Troubleshooting
-
-### "Erro de conexão ao Microsoft"
-```bash
-# Verificar credenciais
-cat config/config.php | grep -A 5 microsoft
-
-# Verificar se URL de redirect está correta
-# Deve ser: http://localhost:8000/auth/callback
-```
-
-### "Ollama não acessível"
-```bash
-# Iniciar Ollama em outro terminal
-ollama serve
-
-# Verificar modelo
-ollama list | grep qwen
-
-# Se não tiver, puxar:
-ollama pull qwen:7b
-```
-
-### "Banco de dados vazio"
-```bash
-# Recriar banco
-mysql -u root -p < database/install.sql
-
-# Ou carregar dados de teste
-php seed-test-data.php
-```
-
-### "Extração lenta"
-- Normal: Qwen 7B leva 5-15 segundos por email
-- Verifique GPU availability: `ollama list`
-- Aumente timeout em extraction_service.py se necessário
-
----
-
-## 📈 Próximos Passos
-
-### Fase 1: Teste Local ✅
-- [x] Ambiente preparado
-- [x] Microsoft configurado
-- [x] Banco criado
-- [x] Login funciona
-- [x] Microsoft conecta
-- [x] Emails sincronizam
-- [x] Extração funciona
-
-### Fase 2: Teste em Produção (Opcional)
-```bash
-# Seguir DEPLOYMENT.md para:
-# - Configure Nginx/Apache
-# - Setup SSL/HTTPS
-# - Configure Ollama em servidor
-# - Setup cron para batch extraction
-```
-
-### Fase 3: Integração
-```bash
-# Possivelmente integrar com:
-# - Perito V6 API
-# - PJe/e-SAJ
-# - Sistema de honorários
-```
-
----
-
-## 📝 Checklist Final
-
-- [ ] Sistema validado com `validate-system.sh`
+- [ ] Sistema validado
 - [ ] Banco de dados criado
 - [ ] PHP server rodando em http://localhost:8000
 - [ ] Login funciona (admin@ipcms.com.br / admin123)
-- [ ] Microsoft conecta (financeiro@ipcmsc.com.br)
+- [ ] Microsoft conecta (financeiro@ipcms.com.br)
 - [ ] Emails sincronizam
 - [ ] Extração de IA funciona (5-15 seg por email)
 - [ ] API endpoints respondendo
@@ -293,12 +203,6 @@ Se chegou aqui com todas as checkboxes marcadas, o sistema está 100% funcional 
 - ✅ Deploy em produção
 - ✅ Integração com outros sistemas
 - ✅ Customizações adicionais
-
-**Dúvidas?** Consulte:
-- GETTING_STARTED.md — Setup básico
-- README_SETUP.md — Configuração detalhada
-- DEPLOYMENT.md — Produção
-- PROJECT_STATUS.md — Visão geral
 
 ---
 
