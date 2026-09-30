@@ -438,16 +438,26 @@
 
         <!-- Main Content -->
 <?php
-// Load controller
+// Load controllers
 require_once __DIR__ . '/../controllers/CommunicacionsController.php';
+require_once __DIR__ . '/../controllers/OAuthController.php';
+
+// Check Microsoft authentication
+$oauth = new OAuthController($pdo, $config);
+$microsoft_authenticated = $_SESSION['microsoft_authenticated'] ?? false;
+$microsoft_info = $microsoft_authenticated ? $oauth->getAccountInfo() : null;
 
 // Handle sync
 $sync_result = null;
 $show_stats = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'sync') {
-    $controller = new CommunicationsController($pdo, $config);
-    $sync_result = $controller->sync();
-    $show_stats = true;
+    if (!$microsoft_authenticated) {
+        $sync_result = ['success' => false, 'error' => 'Você precisa se conectar ao Microsoft 365 primeiro'];
+    } else {
+        $controller = new CommunicationsController($pdo, $config);
+        $sync_result = $controller->sync();
+        $show_stats = true;
+    }
 }
 
 // Load communications
@@ -465,10 +475,26 @@ $stats = $data['stats'];
                 <div class="header-actions">
                     <form method="POST" style="margin: 0;">
                         <input type="hidden" name="action" value="sync">
-                        <button type="submit" class="btn btn-primary">↻ Sincronizar</button>
+                        <button type="submit" class="btn btn-primary" <?php echo !$microsoft_authenticated ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>↻ Sincronizar</button>
                     </form>
                 </div>
             </div>
+
+            <?php if ($microsoft_authenticated): ?>
+            <div style="background: #e8f5e9; color: #2e7d32; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>✅ Conectado ao Microsoft 365</strong> — <?php echo htmlspecialchars($config['microsoft']['mailbox'] ?? 'Mailbox'); ?>
+                </div>
+                <a href="/auth/disconnect" style="color: #2e7d32; text-decoration: none; font-size: 12px; font-weight: 500;">Desconectar →</a>
+            </div>
+            <?php else: ?>
+            <div style="background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>⚠️ Não conectado ao Microsoft 365</strong> — Clique no botão para sincronizar emails
+                </div>
+                <a href="/auth/microsoft" style="color: #856404; text-decoration: none; font-size: 12px; font-weight: 500;">Conectar →</a>
+            </div>
+            <?php endif; ?>
 
             <?php if ($sync_result): ?>
             <div style="background: <?php echo $sync_result['success'] ? '#e8f5e9' : '#ffebee'; ?>;

@@ -62,6 +62,39 @@ switch ($path) {
         header('Location: /');
         exit;
 
+    case '/auth/microsoft':
+        if (!$is_logged_in) {
+            header('Location: /');
+            exit;
+        }
+        require __DIR__ . '/html/controllers/OAuthController.php';
+        $oauth = new OAuthController($pdo, $config);
+        $auth_url = $oauth->getAuthorizationUrl();
+        require __DIR__ . '/html/views/auth_microsoft.php';
+        break;
+
+    case '/auth/callback':
+        if (!$is_logged_in) {
+            header('Location: /');
+            exit;
+        }
+        require __DIR__ . '/html/controllers/OAuthController.php';
+        $oauth = new OAuthController($pdo, $config);
+        $result = $oauth->handleCallback();
+        require __DIR__ . '/html/views/auth_callback.php';
+        break;
+
+    case '/auth/disconnect':
+        if (!$is_logged_in) {
+            header('Location: /');
+            exit;
+        }
+        require __DIR__ . '/html/controllers/OAuthController.php';
+        $oauth = new OAuthController($pdo, $config);
+        $oauth->disconnect();
+        header('Location: /comunicacoes?disconnected=true');
+        exit;
+
     case '/comunicacoes':
         if (!$is_logged_in) {
             header('Location: /');
