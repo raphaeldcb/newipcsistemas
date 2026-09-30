@@ -472,14 +472,14 @@ $microsoft_info = null;
 $auto_sync_attempted = false;
 
 // Only try OAuth if credentials are configured
-if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret'])) {
+if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret']) && !empty($config['microsoft']['tenant_id'])) {
     try {
         $oauth = new OAuthController($pdo, $config);
         $microsoft_authenticated = $_SESSION['microsoft_authenticated'] ?? false;
         $microsoft_info = $microsoft_authenticated ? $oauth->getAccountInfo() : null;
 
         // Auto-connect using Client Credentials if not authenticated
-        if (!$microsoft_authenticated && $oauth->isConfigured()) {
+        if (!$microsoft_authenticated && $oauth && $oauth->isConfigured()) {
             try {
                 require_once __DIR__ . '/../services/MicrosoftGraphService.php';
                 $graph = new MicrosoftGraphService($config, $pdo);
