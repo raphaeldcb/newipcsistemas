@@ -10,7 +10,7 @@
 
         <!-- Header -->
         <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <h2 id="modalTitle" style="margin: 0; font-size: 20px; color: #333;">Email Details</h2>
+            <h2 id="modalTitle" style="margin: 0; font-size: 20px; color: #333;">Detalhes do Email</h2>
             <button onclick="closeEmailModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #999;">&times;</button>
         </div>
 
@@ -21,15 +21,15 @@
             <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
                     <div>
-                        <strong style="color: #666; text-transform: uppercase;">From</strong><br>
+                        <strong style="color: #666; text-transform: uppercase;">De</strong><br>
                         <span id="modalFrom"></span>
                     </div>
                     <div>
-                        <strong style="color: #666; text-transform: uppercase;">Date</strong><br>
+                        <strong style="color: #666; text-transform: uppercase;">Data</strong><br>
                         <span id="modalDate"></span>
                     </div>
                     <div style="grid-column: 1 / -1;">
-                        <strong style="color: #666; text-transform: uppercase;">Subject</strong><br>
+                        <strong style="color: #666; text-transform: uppercase;">Assunto</strong><br>
                         <span id="modalSubject" style="font-size: 15px; color: #333;"></span>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
 
             <!-- Email Body -->
             <div style="background: white; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; min-height: 200px;">
-                <strong style="color: #666; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">Message</strong>
+                <strong style="color: #666; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">Mensagem</strong>
                 <div id="modalBody" style="font-size: 14px; line-height: 1.6; color: #333; word-break: break-word;">
                     <!-- Email content will be loaded here -->
                 </div>
@@ -45,22 +45,22 @@
 
             <!-- Extracted Data -->
             <div style="background: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2e7d32;">
-                <strong style="color: #2e7d32; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">📋 Extracted Information</strong>
+                <strong style="color: #2e7d32; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 10px;">📋 Informações Extraídas</strong>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
                     <div>
-                        <strong>Court (Vara):</strong><br>
+                        <strong>Tribunal (Vara):</strong><br>
                         <span id="modalVara" style="color: #333;">-</span>
                     </div>
                     <div>
-                        <strong>Region (Comarca):</strong><br>
+                        <strong>Região (Comarca):</strong><br>
                         <span id="modalComarca" style="color: #333;">-</span>
                     </div>
                     <div>
-                        <strong>Process Number:</strong><br>
+                        <strong>Número do Processo:</strong><br>
                         <span id="modalProcess" style="color: #333; font-family: monospace;">-</span>
                     </div>
                     <div>
-                        <strong>Classification:</strong><br>
+                        <strong>Classificação:</strong><br>
                         <span id="modalClassification" style="color: #333;">-</span>
                     </div>
                 </div>
@@ -68,15 +68,15 @@
 
             <!-- Automatic Response Section -->
             <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
-                <strong style="color: #856404; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 15px;">✉️ Automatic Response</strong>
+                <strong style="color: #856404; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 15px;">✉️ Resposta Automática</strong>
 
                 <!-- Response Preview -->
                 <div style="background: white; padding: 12px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #ddd; font-size: 12px; line-height: 1.5;">
                     <div style="margin-bottom: 10px;">
-                        <strong>To:</strong> <span id="responseToEmail"></span>
+                        <strong>Para:</strong> <span id="responseToEmail"></span>
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <strong>Subject:</strong> <span id="responseSubject"></span>
+                        <strong>Assunto:</strong> <span id="responseSubject"></span>
                     </div>
                     <div style="background: #f5f5f5; padding: 10px; border-radius: 3px; max-height: 150px; overflow-y: auto;">
                         <div id="responseBody" style="font-size: 11px; line-height: 1.4; white-space: pre-wrap;"></div>
@@ -86,11 +86,11 @@
                 <!-- Schedule Info -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Send Date</label>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Data de Envio</label>
                         <input type="date" id="responseDate" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Send Time</label>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px;">Hora de Envio</label>
                         <input type="time" id="responseTime" value="09:00" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                     </div>
                 </div>
@@ -99,9 +99,9 @@
 
         <!-- Footer with Actions -->
         <div style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end; background: #f8f9fa;">
-            <button onclick="closeEmailModal()" style="padding: 10px 20px; background: #ddd; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Cancel</button>
-            <button onclick="markAsAnalyzed()" style="padding: 10px 20px; background: #2e7d32; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">✓ Mark as Analyzed</button>
-            <button onclick="scheduleResponse()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">📧 Schedule Response</button>
+            <button onclick="closeEmailModal()" style="padding: 10px 20px; background: #ddd; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Cancelar</button>
+            <button onclick="markAsAnalyzed()" style="padding: 10px 20px; background: #2e7d32; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">✓ Marcar como Analisado</button>
+            <button onclick="scheduleResponse()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">📧 Agendar Resposta</button>
         </div>
     </div>
 </div>
@@ -119,11 +119,11 @@ function openEmailModal(commId) {
                 const comm = data.communication;
 
                 // Populate email info
-                document.getElementById('modalTitle').textContent = comm.subject || 'Email Details';
+                document.getElementById('modalTitle').textContent = comm.subject || 'Detalhes do Email';
                 document.getElementById('modalFrom').textContent = comm.from_name + ' <' + comm.from_address + '>';
                 document.getElementById('modalSubject').textContent = comm.subject;
                 document.getElementById('modalDate').textContent = new Date(comm.received_datetime).toLocaleString('pt-BR');
-                document.getElementById('modalBody').textContent = comm.body_preview || '(No content)';
+                document.getElementById('modalBody').textContent = comm.body_preview || '(Sem conteúdo)';
 
                 // Populate extracted data
                 document.getElementById('modalVara').textContent = comm.vara || '-';
@@ -161,7 +161,7 @@ Esta é uma mensagem automática. O e-mail original foi devidamente encaminhado 
                 document.getElementById('emailDetailModal').style.display = 'block';
             }
         })
-        .catch(err => alert('Error loading email details: ' + err));
+        .catch(err => alert('Erro ao carregar detalhes do email: ' + err));
 }
 
 function closeEmailModal() {
@@ -178,14 +178,14 @@ function markAsAnalyzed() {
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert('✅ Email marked as analyzed and categorized in Outlook');
+                alert('✅ Email marcado como analisado e categorizado no Outlook');
                 closeEmailModal();
                 location.reload();
             } else {
-                alert('❌ Error: ' + data.error);
+                alert('❌ Erro: ' + data.error);
             }
         })
-        .catch(err => alert('Error: ' + err));
+        .catch(err => alert('Erro: ' + err));
 }
 
 function scheduleResponse() {
@@ -213,14 +213,14 @@ function scheduleResponse() {
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert('✅ Response scheduled for ' + scheduledDate + ' at ' + scheduledTime);
+                alert('✅ Resposta agendada para ' + scheduledDate + ' às ' + scheduledTime);
                 closeEmailModal();
                 location.reload();
             } else {
-                alert('❌ Error: ' + data.error);
+                alert('❌ Erro: ' + data.error);
             }
         })
-        .catch(err => alert('Error: ' + err));
+        .catch(err => alert('Erro: ' + err));
 }
 
 // Close modal when clicking outside
