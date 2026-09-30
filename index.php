@@ -1,12 +1,11 @@
 <?php
 /**
  * Novos Sistemas IPC - Main Entry Point
+ * Suporta query string (?page=) e URL rewriting
  */
 
-// Start session
 session_start();
 
-// Load configuration
 $config = require_once __DIR__ . '/config/config.php';
 
 // Database connection
@@ -24,7 +23,7 @@ try {
     die('Database connection error: ' . $e->getMessage());
 }
 
-// Check if user is logged in
+// Check authentication
 $is_logged_in = isset($_SESSION['user_id']);
 $user = null;
 
@@ -32,39 +31,44 @@ if ($is_logged_in) {
     $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
-
     if (!$user) {
         session_destroy();
-        header('Location: /');
+        header('Location: /newipcsistemas/index.php');
         exit;
     }
 }
 
-// Routing
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = rtrim($path, '/') ?: '/';
+// Determine page
+$page = strtolower($_GET['page'] ?? '');
 
-switch ($path) {
-    case '/':
-        if ($is_logged_in) {
-            require __DIR__ . '/html/views/dashboard.php';
+// Base path for redirects
+$base = '/newipcsistemas/index.php';
+
+// Route handling
+switch ($page) {
+    // ===== LOGIN =====
+    case 'login':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require __DIR__ . '/html/controllers/AuthController.php';
         } else {
+            if ($is_logged_in) {
+                header("Location: {$base}");
+                exit;
+            }
             require __DIR__ . '/html/views/login.php';
         }
         break;
 
-    case '/login':
-        require __DIR__ . '/html/controllers/AuthController.php';
-        break;
-
-    case '/logout':
+    // ===== LOGOUT =====
+    case 'logout':
         session_destroy();
-        header('Location: /');
+        header("Location: {$base}");
         exit;
 
-    case '/auth/microsoft':
+    // ===== MICROSOFT OAUTH =====
+    case 'auth/microsoft':
         if (!$is_logged_in) {
-            header('Location: /');
+            header("Location: {$base}?page=login");
             exit;
         }
         require __DIR__ . '/html/controllers/OAuthController.php';
@@ -73,9 +77,9 @@ switch ($path) {
         require __DIR__ . '/html/views/auth_microsoft.php';
         break;
 
-    case '/auth/callback':
+    case 'auth/callback':
         if (!$is_logged_in) {
-            header('Location: /');
+            header("Location: {$base}?page=login");
             exit;
         }
         require __DIR__ . '/html/controllers/OAuthController.php';
@@ -84,27 +88,32 @@ switch ($path) {
         require __DIR__ . '/html/views/auth_callback.php';
         break;
 
-    case '/auth/disconnect':
+    case 'auth/disconnect':
         if (!$is_logged_in) {
-            header('Location: /');
+            header("Location: {$base}?page=login");
             exit;
         }
         require __DIR__ . '/html/controllers/OAuthController.php';
         $oauth = new OAuthController($pdo, $config);
         $oauth->disconnect();
-        header('Location: /comunicacoes?disconnected=true');
+        header("Location: {$base}?page=comunicacoes&disconnected=true");
         exit;
 
-    case '/comunicacoes':
+    // ===== COMMUNICATIONS =====
+    case 'comunicacoes':
         if (!$is_logged_in) {
-            header('Location: /');
+            header("Location: {$base}?page=login");
             exit;
         }
         require __DIR__ . '/html/views/comunicacoes.php';
         break;
 
+    // ===== DEFAULT / DASHBOARD =====
     default:
-        http_response_code(404);
-        echo '<h1>404 - Page Not Found</h1>';
+        if ($is_logged_in) {
+            require __DIR__ . '/html/views/dashboard.php';
+        } else {
+            require __DIR__ . '/html/views/login.php';
+        }
         break;
 }

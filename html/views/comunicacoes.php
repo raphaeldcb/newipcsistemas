@@ -428,7 +428,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/comunicacoes" class="menu-link active">
+                    <a href="/newipcsistemas/index.php?page=comunicacoes" class="menu-link active">
                         <span class="icon">📧</span>
                         <span>Comunicações</span>
                     </a>
@@ -455,7 +455,7 @@
                         <p><?php echo htmlspecialchars($user['email']); ?></p>
                     </div>
                 </div>
-                <a href="/logout" class="logout-btn">Sair</a>
+                <a href="/newipcsistemas/index.php?page=logout" class="logout-btn">Sair</a>
             </div>
         </div>
 
@@ -508,14 +508,14 @@ $stats = $data['stats'];
                 <div>
                     <strong>✅ Conectado ao Microsoft 365</strong> — <?php echo htmlspecialchars($config['microsoft']['mailbox'] ?? 'Mailbox'); ?>
                 </div>
-                <a href="/auth/disconnect" style="color: #2e7d32; text-decoration: none; font-size: 12px; font-weight: 500;">Desconectar →</a>
+                <a href="/newipcsistemas/index.php?page=auth/disconnect" style="color: #2e7d32; text-decoration: none; font-size: 12px; font-weight: 500;">Desconectar →</a>
             </div>
             <?php else: ?>
             <div style="background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <strong>⚠️ Não conectado ao Microsoft 365</strong> — Clique no botão para sincronizar emails
                 </div>
-                <a href="/auth/microsoft" style="color: #856404; text-decoration: none; font-size: 12px; font-weight: 500;">Conectar →</a>
+                <a href="/newipcsistemas/index.php?page=auth/microsoft" style="color: #856404; text-decoration: none; font-size: 12px; font-weight: 500;">Conectar →</a>
             </div>
             <?php endif; ?>
 

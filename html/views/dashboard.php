@@ -292,7 +292,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/comunicacoes" class="menu-link">
+                    <a href="/newipcsistemas/index.php?page=comunicacoes" class="menu-link">
                         <span class="icon">📧</span>
                         <span>Comunicações</span>
                     </a>
@@ -319,7 +319,7 @@
                         <p><?php echo htmlspecialchars($user['email']); ?></p>
                     </div>
                 </div>
-                <a href="/logout" class="logout-btn">Sair</a>
+                <a href="/newipcsistemas/index.php?page=logout" class="logout-btn">Sair</a>
             </div>
         </div>
 
@@ -339,7 +339,7 @@
                     <div class="card-description">
                         Gerencie emails recebidos de tribunais, varas e comarcas. Extraia automaticamente informações de processos, pedidos e dados relevantes.
                     </div>
-                    <a href="/comunicacoes" class="card-button">Acessar →</a>
+                    <a href="/newipcsistemas/index.php?page=comunicacoes" class="card-button">Acessar →</a>
                 </div>
 
                 <div class="card">
