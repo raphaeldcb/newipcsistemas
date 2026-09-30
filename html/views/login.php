@@ -1019,15 +1019,20 @@ a:hover {
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>🏛️ Novos Sistemas IPC</h1>
-            <p>Gestão de Perícias Judiciais</p>
-        </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>🏛️ Novos Sistemas IPC</h1>
+                <p>Gestão de Perícias Judiciais</p>
+            </div>
 
-        <?php if (!empty($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
+            <?php if (!empty($error)): ?>
+                <div style="padding: var(--spacing-lg); background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--color-error); color: var(--color-error);">
+                    <strong>❌ Erro:</strong> <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="card-body">
 
         <form method="POST" action="/newipcsistemas/index.php?page=login">
             <div class="form-group">
@@ -1054,12 +1059,14 @@ a:hover {
                 >
             </div>
 
-            <button type="submit" class="submit-btn">Entrar</button>
-        </form>
+                <button type="submit" class="btn btn-primary">🔐 Entrar</button>
+            </form>
 
-        <div class="demo-credentials">
-            <strong>Demonstração:</strong>
-            admin@ipcms.com.br / admin123
+            <div style="padding: var(--spacing-lg); background: var(--bg-secondary); border-radius: var(--radius-md); text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+                <strong>🔓 Demonstração:</strong><br>
+                admin@ipcms.com.br / admin123
+            </div>
+            </div>
         </div>
     </div>
 </body>
