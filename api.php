@@ -31,9 +31,11 @@ try {
     exit;
 }
 
-// Load controller
+// Load controllers
 require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
+require_once __DIR__ . '/html/controllers/ExtractionController.php';
 $controller = new CommunicationsController($pdo, $config);
+$extraction = new ExtractionController($pdo, $config);
 
 // Route the request
 $action = $_GET['action'] ?? null;
@@ -86,6 +88,21 @@ switch ($action) {
     case 'stats':
         $data = $controller->list();
         $response = ['success' => true, 'stats' => $data['stats']];
+        break;
+
+    case 'extract':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $response = $extraction->extractCommunication($id);
+        } else {
+            $response = ['success' => false, 'error' => 'Missing communication ID'];
+        }
+        break;
+
+    case 'extract_batch':
+        $status = $_GET['status'] ?? 'new';
+        $limit = $_GET['limit'] ?? 10;
+        $response = $extraction->extractBatch($status, $limit);
         break;
 
     default:

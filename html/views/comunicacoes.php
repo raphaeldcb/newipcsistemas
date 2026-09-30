@@ -250,7 +250,7 @@
             background: #f8f9fa;
             border-bottom: 1px solid #eee;
             display: grid;
-            grid-template-columns: 40px 200px 150px 200px 100px 100px;
+            grid-template-columns: 40px 200px 150px 200px 100px 100px 80px;
             gap: 15px;
             font-size: 12px;
             font-weight: 600;
@@ -262,7 +262,7 @@
             padding: 15px 20px;
             border-bottom: 1px solid #eee;
             display: grid;
-            grid-template-columns: 40px 200px 150px 200px 100px 100px;
+            grid-template-columns: 40px 200px 150px 200px 100px 100px 80px;
             gap: 15px;
             align-items: center;
             transition: background 0.3s;
@@ -276,6 +276,29 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-action:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .status-badge {
@@ -562,6 +585,7 @@ $stats = $data['stats'];
                     <div>Processo</div>
                     <div>Status</div>
                     <div>Data</div>
+                    <div>Ação</div>
                 </div>
 
                 <?php if (empty($communications)): ?>
@@ -585,11 +609,44 @@ $stats = $data['stats'];
                             </span>
                         </div>
                         <div><?php echo date('d/m/Y H:i', strtotime($comm['received_datetime'] ?? 'now')); ?></div>
+                        <div>
+                            <button type="button" class="btn-action" onclick="extractCommunication(<?php echo $comm['id']; ?>)">
+                                🔍 Extrair
+                            </button>
+                        </div>
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>
     </div>
+
+    <script>
+    async function extractCommunication(id) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+
+        try {
+            button.disabled = true;
+            button.innerHTML = '⏳ Extraindo...';
+
+            const response = await fetch(`/api.php?action=extract&id=${id}`);
+            const result = await response.json();
+
+            if (result.success) {
+                alert('✅ Informações extraídas com sucesso!');
+                location.reload();
+            } else {
+                alert(`❌ Erro: ${result.error}`);
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        } catch (error) {
+            alert(`❌ Erro ao conectar: ${error.message}`);
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    }
+    </script>
 </body>
 </html>
