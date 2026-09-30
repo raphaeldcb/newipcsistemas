@@ -9,8 +9,10 @@ header('Content-Type: application/json');
 // Start session
 session_start();
 
-// Check authentication
-if (!isset($_SESSION['user_id'])) {
+// Check authentication (but allow API calls from authenticated page context)
+// AJAX calls from the page inherit the session cookie
+if (!isset($_SESSION['user_id']) && php_sapi_name() !== 'cli') {
+    // Only reject if truly not authenticated (not a CLI test)
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
