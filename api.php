@@ -16,6 +16,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Load environment variables
+require_once __DIR__ . '/config/load-env.php';
+
 // Load config and database
 $config = require_once __DIR__ . '/config/config.php';
 try {
@@ -34,8 +37,13 @@ try {
 // Load controllers
 require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
 require_once __DIR__ . '/html/controllers/ExtractionController.php';
+require_once __DIR__ . '/html/controllers/EmailResponseController.php';
+require_once __DIR__ . '/html/services/EmailCategorizationService.php';
+
 $controller = new CommunicationsController($pdo, $config);
 $extraction = new ExtractionController($pdo, $config);
+$email_response = new EmailResponseController($pdo, $config);
+$categorization = new EmailCategorizationService($config, $pdo);
 
 // Route the request
 $action = $_GET['action'] ?? null;
@@ -103,6 +111,55 @@ switch ($action) {
         $status = $_GET['status'] ?? 'new';
         $limit = $_GET['limit'] ?? 10;
         $response = $extraction->extractBatch($status, $limit);
+        break;
+
+    case 'get_detail':
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $stmt = $pdo->prepare('SELECT * FROM communications WHERE id = ?');
+            $stmt->execute([$id]);
+            $comm = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($comm) {
+                $response = ['success' => true, 'communication' => $comm];
+            } else {
+                $response = ['success' => false, 'error' => 'Communication not found'];
+            }
+        } else {
+            $response = ['success' => false, 'error' => 'Missing communication ID'];
+        }
+        break;
+
+    case 'mark_analyzed':
+        $id = $_POST['id'] ?? null;
+        if ($id) {
+            $access_token = $_SESSION['microsoft_access_token'] ?? null;
+            $response = $categorization->markAsAnalyzed($id, $access_token);
+        } else {
+            $response = ['success' => false, 'error' => 'Missing communication ID'];
+        }
+        break;
+
+    case 'schedule_response':
+        $comm_id = $_POST['communication_id'] ?? null;
+        $to_email = $_POST['to_email'] ?? null;
+        $subject = $_POST['subject'] ?? null;
+        $body = $_POST['body'] ?? null;
+        $scheduled_date = $_POST['scheduled_date'] ?? null;
+        $scheduled_time = $_POST['scheduled_time'] ?? null;
+
+        if ($comm_id && $to_email && $subject && $body && $scheduled_date && $scheduled_time) {
+            $response = $email_response->scheduleResponse(
+                $comm_id,
+                $to_email,
+                $subject,
+                $body,
+                $scheduled_date,
+                $scheduled_time
+            );
+        } else {
+            $response = ['success' => false, 'error' => 'Missing required fields'];
+        }
         break;
 
     default:
