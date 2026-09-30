@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Fetch API Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+        .log { background: #252526; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #007acc; }
+        .success { border-left-color: #4ec9b0; }
+        .error { border-left-color: #f48771; }
+        .info { border-left-color: #9cdcfe; }
+        button { padding: 10px 20px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #005a9e; }
+        .header { font-size: 18px; font-weight: bold; margin: 20px 0 10px 0; color: #4ec9b0; }
+    </style>
+</head>
+<body>
+
+<h1>🧪 Fetch API Debug Test</h1>
+
+<div class="header">1. Check Session Status</div>
+<button onclick="checkSession()">Check Session Cookie</button>
+<div id="sessionLog"></div>
+
+<div class="header">2. Test API Call (GET /api.php?action=get_detail&id=1)</div>
+<button onclick="testGetDetail()">Test GET /api.php (with credentials)</button>
+<div id="getDetailLog"></div>
+
+<div class="header">3. Detailed Response Analysis</div>
+<div id="detailLog"></div>
+
+<div class="header">4. HTTP Headers Sent</div>
+<div id="headersLog"></div>
+
+<script>
+function log(containerId, message, type = 'info') {
+    const container = document.getElementById(containerId);
+    const div = document.createElement('div');
+    div.className = `log ${type}`;
+    div.textContent = message;
+    container.appendChild(div);
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+function checkSession() {
+    log('sessionLog', '🔍 Checking session...', 'info');
+
+    const sessionId = getCookie('PHPSESSID');
+    if (sessionId) {
+        log('sessionLog', `✅ Session ID Found: ${sessionId}`, 'success');
+        log('sessionLog', '✅ Browser CAN send cookies with credentials: "include"', 'success');
+    } else {
+        log('sessionLog', '❌ NO SESSION COOKIE FOUND!', 'error');
+        log('sessionLog', '⚠️  You must be logged in first. Visit: http://localhost/newipcsistemas/', 'error');
+    }
+
+    log('sessionLog', `📍 Current URL: ${window.location.href}`, 'info');
+    log('sessionLog', `📍 document.cookie: ${document.cookie || '(empty)'}`, 'info');
+}
+
+function testGetDetail() {
+    log('getDetailLog', '🚀 Sending fetch request...', 'info');
+    log('getDetailLog', 'URL: /api.php?action=get_detail&id=1', 'info');
+    log('getDetailLog', 'Headers: credentials: "include"', 'info');
+    log('getDetailLog', '', 'info');
+
+    fetch('/api.php?action=get_detail&id=1', {
+        credentials: 'include',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        log('getDetailLog', `📨 Response Status: ${response.status} ${response.statusText}`,
+            response.ok ? 'success' : 'error');
+
+        // Log all response headers
+        log('headersLog', '📋 Response Headers:', 'info');
+        response.headers.forEach((value, name) => {
+            log('headersLog', `  ${name}: ${value}`, 'info');
+        });
+
+        return response.text();
+    })
+    .then(text => {
+        log('getDetailLog', '📝 Raw Response Body:', 'info');
+        log('getDetailLog', text.substring(0, 200) + (text.length > 200 ? '...' : ''), 'info');
+
+        // Try to parse as JSON
+        try {
+            const json = JSON.parse(text);
+            if (json.success) {
+                log('getDetailLog', '✅ SUCCESS: Data received!', 'success');
+                log('detailLog', JSON.stringify(json, null, 2), 'success');
+            } else {
+                log('getDetailLog', `❌ API Error: ${json.error}`, 'error');
+                log('detailLog', JSON.stringify(json, null, 2), 'error');
+            }
+        } catch (e) {
+            log('getDetailLog', `❌ PARSE ERROR: Response is not valid JSON`, 'error');
+            log('getDetailLog', `Error: ${e.message}`, 'error');
+            log('detailLog', `Response appears to be HTML (likely an error page): ${text.substring(0, 100)}`, 'error');
+        }
+    })
+    .catch(error => {
+        log('getDetailLog', `❌ FETCH ERROR: ${error.message}`, 'error');
+        log('detailLog', error.stack, 'error');
+    });
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// Auto-check session on page load
+window.addEventListener('load', () => {
+    log('sessionLog', '⏱️  Page loaded. Running checks...', 'info');
+    checkSession();
+});
+</script>
+
+</body>
+</html>
