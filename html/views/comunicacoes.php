@@ -469,6 +469,7 @@ require_once __DIR__ . '/../controllers/OAuthController.php';
 $oauth = null;
 $microsoft_authenticated = false;
 $microsoft_info = null;
+$auto_sync_attempted = false;
 
 // Only try OAuth if credentials are configured
 if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret'])) {
@@ -476,16 +477,48 @@ if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['cl
         $oauth = new OAuthController($pdo, $config);
         $microsoft_authenticated = $_SESSION['microsoft_authenticated'] ?? false;
         $microsoft_info = $microsoft_authenticated ? $oauth->getAccountInfo() : null;
+
+        // Auto-connect using Client Credentials if not authenticated
+        if (!$microsoft_authenticated && $oauth->isConfigured()) {
+            try {
+                require_once __DIR__ . '/../services/MicrosoftGraphService.php';
+                $graph = new MicrosoftGraphService($config, $pdo);
+                $token_response = $graph->getClientCredentialsToken();
+
+                if (isset($token_response['access_token'])) {
+                    $_SESSION['microsoft_access_token'] = $token_response['access_token'];
+                    $_SESSION['microsoft_token_type'] = $token_response['token_type'] ?? 'Bearer';
+                    $_SESSION['microsoft_expires_in'] = $token_response['expires_in'] ?? 3600;
+                    $_SESSION['microsoft_token_expires_at'] = time() + ($token_response['expires_in'] ?? 3600);
+                    $_SESSION['microsoft_authenticated'] = true;
+                    $_SESSION['microsoft_auth_time'] = time();
+
+                    $microsoft_authenticated = true;
+                    $auto_sync_attempted = true;
+                }
+            } catch (Exception $e) {
+                error_log('Auto-connect failed: ' . $e->getMessage());
+            }
+        }
     } catch (Exception $e) {
         // OAuth not properly configured, continue without it
         error_log('OAuth initialization failed: ' . $e->getMessage());
     }
 }
 
-// Handle sync
+// Handle sync (manual or automatic)
 $sync_result = null;
 $show_stats = false;
+$perform_sync = false;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'sync') {
+    $perform_sync = true;
+} elseif ($auto_sync_attempted && $microsoft_authenticated) {
+    // Auto-sync after successful auto-connect
+    $perform_sync = true;
+}
+
+if ($perform_sync) {
     if (!empty($config['microsoft']['client_id']) && !empty($config['microsoft']['client_secret'])) {
         if (!$microsoft_authenticated) {
             $sync_result = ['success' => false, 'error' => 'Você precisa se conectar ao Microsoft 365 primeiro'];

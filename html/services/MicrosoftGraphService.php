@@ -86,6 +86,37 @@ class MicrosoftGraphService
     }
 
     /**
+     * Get access token using Client Credentials flow (auto-connect without user interaction)
+     */
+    public function getClientCredentialsToken()
+    {
+        $token_url = str_replace('{tenant}', $this->tenant_id, self::TOKEN_URL);
+
+        $params = [
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
+            'grant_type' => 'client_credentials',
+            'scope' => 'https://graph.microsoft.com/.default',
+        ];
+
+        $ch = curl_init($token_url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code !== 200) {
+            throw new Exception('Failed to get client credentials token: ' . $response);
+        }
+
+        return json_decode($response, true);
+    }
+
+    /**
      * Get new access token using refresh token
      */
     public function refreshAccessToken($refresh_token)
