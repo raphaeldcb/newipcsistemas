@@ -102,6 +102,15 @@ switch ($page) {
         header("Location: {$base}?page=comunicacoes&disconnected=true");
         exit;
 
+    // ===== COMMUNICATIONS DEBUG =====
+    case 'comunicacoes-debug':
+        if (!$is_logged_in) {
+            header("Location: {$base}?page=login");
+            exit;
+        }
+        require __DIR__ . '/html/views/comunicacoes-debug.php';
+        break;
+
     // ===== COMMUNICATIONS =====
     case 'comunicacoes':
         if (!$is_logged_in) {
