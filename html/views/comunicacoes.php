@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comunicações - Novos Sistemas IPC</title>
     <link rel="stylesheet" href="/newipcsistemas/html/css/theme-unified.css">
-    <style>
-        /* TEST: Se você vê FUNDO AZUL, o CSS está funcionando */
-        body { background-color: #132F4A !important; color: white !important; }
-        .sidebar { background-color: #0D1F2D !important; }
-        .btn-primary { background-color: #10B981 !important; }
-    </style>
 </head>
 <body>
     <div class="container">
