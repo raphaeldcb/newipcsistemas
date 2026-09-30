@@ -35,7 +35,7 @@ return [
         'client_id' => '***REMOVED***',
         'client_secret' => '***REMOVED***',
         'tenant_id' => '***REMOVED***',
-        'mailbox' => 'financeiro@ipcmsc.com.br',
+        'mailbox' => 'financeiro@ipcms.com.br',
         'redirect_uri' => 'http://localhost:8000/auth/callback',
     ],
 
