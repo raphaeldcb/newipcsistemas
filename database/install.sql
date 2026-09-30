@@ -185,7 +185,7 @@ CREATE TABLE `processing_log` (
 
 -- Insert default admin user (password: admin123)
 INSERT INTO `users` (email, password_hash, name, role, active) VALUES
-('admin@ipcms.com.br', '$2y$10$8/4rFr6cFvUkNHKT.u7Z4uNj.E/6UqN5eMD0bM8JZ5iYmB7Jx1jqG', 'Administrator', 'admin', TRUE);
+('admin@ipcms.com.br', '$2y$10$sOqiAF3IX9OhhcE4b6GdHON4A7IttnxKZCWCuXBwyNgxm4FSCbobW', 'Administrator', 'admin', TRUE);
 
 -- Insert default response templates
 INSERT INTO `response_templates` (name, description, subject_template, body_template, variables, active) VALUES
