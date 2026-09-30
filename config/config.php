@@ -5,13 +5,13 @@
  */
 
 return [
-    // Database - HostGator Cloud
+    // Database - Load from environment
     'db' => [
-        'host' => 'localhost',
-        'port' => 3306,
-        'username' => '***REMOVED***',
-        'password' => '***REMOVED***',
-        'database' => '***REMOVED***',
+        'host' => getenv('DB_HOST') ?: 'localhost',
+        'port' => getenv('DB_PORT') ?: 3306,
+        'username' => getenv('DB_USERNAME') ?: 'root',
+        'password' => getenv('DB_PASSWORD') ?: '',
+        'database' => getenv('DB_DATABASE') ?: 'novos_sistemas_ipc',
         'charset' => 'utf8mb4',
     ],
 
@@ -30,12 +30,12 @@ return [
         'secure' => false,
     ],
 
-    // Microsoft Graph API - Configure with environment variables or .env file
+    // Microsoft Graph API - Load from environment variables (.env or .env.local)
     'microsoft' => [
-        'client_id' => getenv('GRAPH_CLIENT_ID') ?: '***REMOVED***',
-        'client_secret' => getenv('GRAPH_CLIENT_SECRET') ?: '***REMOVED***', // From Perito v6
-        'tenant_id' => getenv('GRAPH_TENANT_ID') ?: '***REMOVED***',
-        'mailbox' => getenv('GRAPH_MAILBOX') ?: 'financeiro@ipcms.com.br',
+        'client_id' => getenv('GRAPH_CLIENT_ID') ?: '',
+        'client_secret' => getenv('GRAPH_CLIENT_SECRET') ?: '',
+        'tenant_id' => getenv('GRAPH_TENANT_ID') ?: '',
+        'mailbox' => getenv('GRAPH_MAILBOX') ?: '',
         'redirect_uri' => getenv('GRAPH_REDIRECT_URI') ?: 'http://localhost:8000/index.php?page=auth/callback',
     ],
 
