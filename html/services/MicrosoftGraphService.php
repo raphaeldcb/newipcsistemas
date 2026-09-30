@@ -72,14 +72,20 @@ class MicrosoftGraphService
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        // SSL verification - disable for development on Windows, enable in production
+        $verify_ssl = (getenv('APP_ENV') === 'production') ? true : false;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_ssl);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verify_ssl ? 2 : 0);
 
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
         curl_close($ch);
 
         if ($http_code !== 200) {
-            throw new Exception('Failed to get access token: ' . $response);
+            $error_msg = $response ?: $curl_error;
+            throw new Exception('Failed to get access token: ' . $error_msg);
         }
 
         return json_decode($response, true);
@@ -103,14 +109,20 @@ class MicrosoftGraphService
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        // SSL verification - disable for development on Windows, enable in production
+        $verify_ssl = (getenv('APP_ENV') === 'production') ? true : false;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_ssl);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verify_ssl ? 2 : 0);
 
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
         curl_close($ch);
 
         if ($http_code !== 200) {
-            throw new Exception('Failed to get client credentials token: ' . $response);
+            $error_msg = $response ?: $curl_error;
+            throw new Exception('Failed to get client credentials token: ' . $error_msg);
         }
 
         return json_decode($response, true);
@@ -135,14 +147,20 @@ class MicrosoftGraphService
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        // SSL verification - disable for development on Windows, enable in production
+        $verify_ssl = (getenv('APP_ENV') === 'production') ? true : false;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_ssl);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verify_ssl ? 2 : 0);
 
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
         curl_close($ch);
 
         if ($http_code !== 200) {
-            throw new Exception('Failed to refresh access token');
+            $error_msg = $response ?: $curl_error;
+            throw new Exception('Failed to refresh access token: ' . $error_msg);
         }
 
         return json_decode($response, true);
@@ -207,7 +225,12 @@ class MicrosoftGraphService
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        // SSL verification - disable for development on Windows, enable in production
+        $verify_ssl = (getenv('APP_ENV') === 'production') ? true : false;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verify_ssl);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verify_ssl ? 2 : 0);
+
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
         if ($method === 'POST' || $method === 'PATCH') {
