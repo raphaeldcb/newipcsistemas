@@ -437,6 +437,25 @@
         </div>
 
         <!-- Main Content -->
+<?php
+// Load controller
+require_once __DIR__ . '/../controllers/CommunicacionsController.php';
+
+// Handle sync
+$sync_result = null;
+$show_stats = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'sync') {
+    $controller = new CommunicationsController($pdo, $config);
+    $sync_result = $controller->sync();
+    $show_stats = true;
+}
+
+// Load communications
+$controller = new CommunicationsController($pdo, $config);
+$data = $controller->list();
+$communications = $data['communications'];
+$stats = $data['stats'];
+?>
         <div class="main-content">
             <div class="header">
                 <div class="header-title">
@@ -444,60 +463,105 @@
                     <p>Gerencie emails recebidos de tribunais e varas</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-primary">↻ Sincronizar</button>
+                    <form method="POST" style="margin: 0;">
+                        <input type="hidden" name="action" value="sync">
+                        <button type="submit" class="btn btn-primary">↻ Sincronizar</button>
+                    </form>
                 </div>
             </div>
 
+            <?php if ($sync_result): ?>
+            <div style="background: <?php echo $sync_result['success'] ? '#e8f5e9' : '#ffebee'; ?>;
+                        color: <?php echo $sync_result['success'] ? '#2e7d32' : '#c62828'; ?>;
+                        padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid <?php echo $sync_result['success'] ? '#2e7d32' : '#c62828'; ?>;">
+                <?php echo htmlspecialchars($sync_result['message'] ?? $sync_result['error']); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($show_stats): ?>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #667eea;"><?php echo $stats['total']; ?></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Total</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #0288d1;"><?php echo $stats['by_status']['new'] ?? 0; ?></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Novas</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #388e3c;"><?php echo $stats['by_status']['processed'] ?? 0; ?></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Processadas</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #c62828;"><?php echo $stats['by_status']['error'] ?? 0; ?></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Erros</div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="filters">
-                <div class="filter-group">
-                    <label>Status</label>
-                    <select>
-                        <option value="">Todos</option>
-                        <option value="new">Novas</option>
-                        <option value="processing">Processando</option>
-                        <option value="processed">Processadas</option>
-                        <option value="error">Erros</option>
-                    </select>
-                </div>
+                <form method="GET" style="display: flex; gap: 15px; flex-wrap: wrap; width: 100%;">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="">Todos</option>
+                            <option value="new" <?php echo ($_GET['status'] ?? '') === 'new' ? 'selected' : ''; ?>>Novas</option>
+                            <option value="processing" <?php echo ($_GET['status'] ?? '') === 'processing' ? 'selected' : ''; ?>>Processando</option>
+                            <option value="processed" <?php echo ($_GET['status'] ?? '') === 'processed' ? 'selected' : ''; ?>>Processadas</option>
+                            <option value="error" <?php echo ($_GET['status'] ?? '') === 'error' ? 'selected' : ''; ?>>Erros</option>
+                        </select>
+                    </div>
 
-                <div class="filter-group">
-                    <label>Vara/Comarca</label>
-                    <input type="text" placeholder="Filtrar por vara...">
-                </div>
+                    <div class="filter-group">
+                        <label>Vara/Comarca</label>
+                        <input type="text" name="vara" placeholder="Filtrar por vara..." value="<?php echo htmlspecialchars($_GET['vara'] ?? ''); ?>">
+                    </div>
 
-                <div class="filter-group">
-                    <label>Processo</label>
-                    <input type="text" placeholder="Número do processo...">
-                </div>
+                    <div class="filter-group">
+                        <label>Processo</label>
+                        <input type="text" name="processo" placeholder="Número do processo..." value="<?php echo htmlspecialchars($_GET['processo'] ?? ''); ?>">
+                    </div>
 
-                <div class="filter-group">
-                    <label>Período</label>
-                    <select>
-                        <option value="">Últimos 30 dias</option>
-                        <option value="">Últimos 7 dias</option>
-                        <option value="">Hoje</option>
-                    </select>
-                </div>
+                    <div class="filter-group" style="display: flex; align-items: flex-end;">
+                        <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+                    </div>
+                </form>
             </div>
 
             <div class="communications-list">
                 <div class="communications-header">
-                    <div></div>
+                    <div>✓</div>
                     <div>Remetente</div>
                     <div>Vara</div>
                     <div>Processo</div>
-                    <div>Assunto</div>
                     <div>Status</div>
+                    <div>Data</div>
                 </div>
 
+                <?php if (empty($communications)): ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">📧</div>
-                    <div class="empty-state-title">Nenhuma comunicação recebida</div>
+                    <div class="empty-state-title">Nenhuma comunicação encontrada</div>
                     <div class="empty-state-description">
                         Clique em "Sincronizar" para buscar emails da mailbox configurada.
                     </div>
-                    <button class="btn btn-primary">Sincronizar Agora</button>
                 </div>
+                <?php else: ?>
+                    <?php foreach ($communications as $comm): ?>
+                    <div class="communication-item">
+                        <input type="checkbox" class="checkbox">
+                        <div><?php echo htmlspecialchars($comm['from_name'] ?? $comm['from_address'] ?? 'Desconhecido'); ?></div>
+                        <div><?php echo htmlspecialchars($comm['vara'] ?? '-'); ?></div>
+                        <div><?php echo htmlspecialchars($comm['processo_numero'] ?? '-'); ?></div>
+                        <div>
+                            <span class="status-badge status-<?php echo $comm['status']; ?>">
+                                <?php echo ucfirst($comm['status']); ?>
+                            </span>
+                        </div>
+                        <div><?php echo date('d/m/Y H:i', strtotime($comm['received_datetime'] ?? 'now')); ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
