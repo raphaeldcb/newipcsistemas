@@ -187,7 +187,7 @@ class MicrosoftGraphService
 
         $url = $endpoint . '?' . http_build_query($params);
 
-        $response = $this->makeGraphRequest($url, 'GET', $access_token);
+        $response = $this->makeGraphRequest($url, $access_token, 'GET');
 
         return $response;
     }
@@ -199,7 +199,7 @@ class MicrosoftGraphService
     {
         $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/messages/' . urlencode($message_id) . '/attachments';
 
-        $response = $this->makeGraphRequest($endpoint, 'GET', $access_token);
+        $response = $this->makeGraphRequest($endpoint, $access_token, 'GET');
 
         return $response['value'] ?? [];
     }
@@ -211,13 +211,13 @@ class MicrosoftGraphService
     {
         $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/messages/' . urlencode($message_id) . '/attachments/' . urlencode($attachment_id) . '/$value';
 
-        return $this->makeGraphRequest($endpoint, 'GET', $access_token, true);
+        return $this->makeGraphRequest($endpoint, $access_token, 'GET', true);
     }
 
     /**
      * Make API request to Microsoft Graph
      */
-    private function makeGraphRequest($url, $method = 'GET', $access_token, $binary = false)
+    private function makeGraphRequest($url, $access_token, $method = 'GET', $binary = false)
     {
         $ch = curl_init($url);
 
