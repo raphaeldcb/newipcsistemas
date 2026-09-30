@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Novos Sistemas IPC</title>
-    <link rel="stylesheet" href="/newipcsistemas/html/css/theme-unified.css">
+    <link rel="stylesheet" href="../css/theme-unified.css">
 </head>
 <body>
     <div class="container">
