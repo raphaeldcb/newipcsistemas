@@ -49,6 +49,7 @@ try {
 require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
 require_once __DIR__ . '/html/controllers/ExtractionController.php';
 require_once __DIR__ . '/html/controllers/EmailResponseController.php';
+require_once __DIR__ . '/html/controllers/UserController.php';
 require_once __DIR__ . '/html/services/EmailCategorizationService.php';
 require_once __DIR__ . '/html/services/EmailClassifierService.php';
 // Auto-refresh Microsoft token
@@ -206,6 +207,47 @@ switch ($action) {
             $response = $classifier->classifyEmail($comm_id);
         } else {
             $response = ['success' => false, 'error' => 'Missing communication ID'];
+        }
+        break;
+
+    case 'create_user':
+        $email = $_POST['email'] ?? null;
+        $password = $_POST['password'] ?? null;
+        $is_admin = $_POST['is_admin'] ?? 0;
+
+        if ($email && $password) {
+            $user_controller = new UserController($pdo);
+            $response = $user_controller->createUser($email, $password, $is_admin);
+        } else {
+            $response = ['success' => false, 'error' => 'Missing email or password'];
+        }
+        break;
+
+    case 'update_user':
+        $id = $_POST['id'] ?? null;
+        $email = $_POST['email'] ?? null;
+        $is_admin = $_POST['is_admin'] ?? 0;
+        $password = $_POST['password'] ?? null;
+
+        if ($id && $email) {
+            $user_controller = new UserController($pdo);
+            $response = $user_controller->updateUser($id, $email, $is_admin);
+
+            if ($response['success'] && $password) {
+                $response = $user_controller->updatePassword($id, $password);
+            }
+        } else {
+            $response = ['success' => false, 'error' => 'Missing id or email'];
+        }
+        break;
+
+    case 'delete_user':
+        $id = $_POST['id'] ?? null;
+        if ($id) {
+            $user_controller = new UserController($pdo);
+            $response = $user_controller->deleteUser($id);
+        } else {
+            $response = ['success' => false, 'error' => 'Missing id'];
         }
         break;
 
