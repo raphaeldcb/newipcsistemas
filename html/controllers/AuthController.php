@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email e senha são obrigatórios';
     } else {
-        $stmt = $pdo->prepare('SELECT id, email, password_hash, name FROM users WHERE email = ? AND active = TRUE');
+        $stmt = $pdo->prepare('SELECT id, email, password_hash, name, role FROM users WHERE email = ? AND active = TRUE');
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_name'] = $user['name'];
+            $_SESSION['role'] = $user['role'];
 
             // Update last login
             $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?')
