@@ -10,6 +10,13 @@ session_start();
 
 // THEN set header
 header('Content-Type: application/json');
+// Error handler for JSON output
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => $errstr, 'file' => basename($errfile), 'line' => $errline]);
+    exit;
+});
+
 
 // Check authentication (but allow API calls from authenticated page context)
 // AJAX calls from the page inherit the session cookie
