@@ -9,13 +9,32 @@ $user = $_SESSION['user'] ?? [];
 
 // Get real communications from database
 global $pdo;
-$stmt = $pdo->query("
+
+// Get filter from URL
+$filter = $_GET['filter'] ?? 'ALL';
+
+// Build query with filter
+$sql = "
     SELECT id, received_datetime as date, from_name, from_address,
-           vara, comarca, processo_numero as process, status, subject
+           vara, comarca, processo_numero as process, status, subject,
+           classification, cnj_number, has_complete_data
     FROM communications
-    ORDER BY received_datetime DESC
-    LIMIT 100
-");
+    WHERE 1=1
+";
+
+if ($filter === 'JUDICIAL') {
+    $sql .= " AND classification = 'JUDICIAL'";
+} elseif ($filter === 'NON_JUDICIAL') {
+    $sql .= " AND classification = 'NON_JUDICIAL'";
+} elseif ($filter === 'INCOMPLETE') {
+    $sql .= " AND classification = 'JUDICIAL' AND has_complete_data = 0";
+} elseif ($filter === 'COMPLETE') {
+    $sql .= " AND classification = 'JUDICIAL' AND has_complete_data = 1";
+}
+
+$sql .= " ORDER BY received_datetime DESC LIMIT 100";
+
+$stmt = $pdo->query($sql);
 $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ?>
 <!DOCTYPE html>
@@ -276,24 +295,14 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         <div class="filter-section">
             <div class="form-group">
-                <label>Status</label>
-                <select>
-                    <option>Todos</option>
-                    <option>Novo</option>
-                    <option>Processando</option>
-                    <option>Processado</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Vara/Comarca</label>
-                <input type="text" placeholder="Filtrar por vara...">
-            </div>
-            <div class="form-group">
-                <label>Processo</label>
-                <input type="text" placeholder="Número do processo...">
-            </div>
-            <div class="form-group">
-                <button class="btn" style="align-self: flex-end;">🔍 Filtrar</button>
+                <label>Classificação</label>
+                <div style="display: flex; gap: 10px;">
+                    <a href="?page=comunicacoes&filter=ALL" class="btn" style="text-decoration: none; padding: 8px 12px; font-size: 13px;">Todos</a>
+                    <a href="?page=comunicacoes&filter=JUDICIAL" class="btn" style="text-decoration: none; padding: 8px 12px; font-size: 13px;">⚖️ Judicial</a>
+                    <a href="?page=comunicacoes&filter=NON_JUDICIAL" class="btn" style="text-decoration: none; padding: 8px 12px; font-size: 13px;">📄 Não Judicial</a>
+                    <a href="?page=comunicacoes&filter=COMPLETE" class="btn" style="text-decoration: none; padding: 8px 12px; font-size: 13px;">✅ Completos</a>
+                    <a href="?page=comunicacoes&filter=INCOMPLETE" class="btn" style="text-decoration: none; padding: 8px 12px; font-size: 13px;">❌ Incompletos</a>
+                </div>
             </div>
         </div>
 

@@ -118,14 +118,52 @@ class EmailClassifierService
     }
 
     /**
-     * Extract CNJ number: 0000000-00.0000.0.00.0000
+     * Extract and validate CNJ number: 0000000-00.0000.0.00.0000
+     * Strict validation - must match exact pattern and pass check digits
      */
     private function extractCNJNumber($text)
     {
-        if (preg_match('/\b(\d{7})-(\d{2})\.(\d{4})\.(\d)\.(\d{2})\.(\d{4})\b/', $text, $matches)) {
-            return $matches[0];
+        // Strict regex: 7 digits - 2 digits . 4 digits . 1 digit . 2 digits . 4 digits
+        if (preg_match('/\b(\d{7})-(\d{2})\.(\d{4})\.(\d{1})\.(\d{2})\.(\d{4})\b/', $text, $matches)) {
+            $cnj = $matches[0];
+
+            // Validate CNJ structure
+            if ($this->isValidCNJ($cnj)) {
+                return $cnj;
+            }
         }
         return null;
+    }
+
+    /**
+     * Validate CNJ number: checks format and business rules
+     * Format: NNNNNNN-DD.AAAA.J.TT.OOOO
+     */
+    private function isValidCNJ($cnj)
+    {
+        if (!preg_match('/^(\d{7})-(\d{2})\.(\d{4})\.(\d{1})\.(\d{2})\.(\d{4})$/', $cnj, $matches)) {
+            return false;
+        }
+
+        list(, $nnnnnnn, $dd, $aaaa, $j, $tt, $oooo) = $matches;
+
+        // Segment must be 1-9 (not 0)
+        if ($j === '0') {
+            return false;
+        }
+
+        // Tribunal must be 01-28
+        if ((int)$tt < 1 || (int)$tt > 28) {
+            return false;
+        }
+
+        // Year must be 1990 to current year
+        $year = (int)$aaaa;
+        if ($year < 1990 || $year > date('Y')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
