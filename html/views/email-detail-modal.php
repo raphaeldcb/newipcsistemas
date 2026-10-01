@@ -344,13 +344,19 @@ function closeEmailModal() {
 }
 
 function markAsAnalyzed() {
-    const commId = document.getElementById('emailDetailModal').dataset.commId;
+    const modal = document.getElementById('emailDetailModal');
+    const commId = modal ? modal.dataset.commId : null;
+
+    console.log('🔍 markAsAnalyzed - modal:', modal);
+    console.log('🔍 markAsAnalyzed - commId:', commId);
+    console.log('🔍 markAsAnalyzed - dataset:', modal ? modal.dataset : 'N/A');
 
     if (!commId) {
         alert('❌ Erro: Missing communication ID');
         return;
     }
 
+    console.log('✅ markAsAnalyzed - proceeding with ID:', commId);
     fetch(`/newipcsistemas/api.php?action=mark_analyzed&id=${commId}`, {
         method: 'POST',
         credentials: 'include'
