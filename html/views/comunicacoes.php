@@ -310,13 +310,13 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 140px;">Data</th>
-                        <th style="width: 180px;">Remetente</th>
-                        <th style="width: 150px;">Vara</th>
-                        <th style="width: 140px;">Processo (CNJ)</th>
-                        <th style="width: 120px;">Classificação</th>
+                        <th style="width: 130px;">Data</th>
+                        <th style="width: 140px;">Remetente</th>
+                        <th style="width: 220px;">Vara</th>
+                        <th style="width: 160px;">Processo (CNJ)</th>
+                        <th style="width: 130px;">Classificação</th>
                         <th style="width: 100px;">Analisado</th>
-                        <th style="width: 70px;">Ação</th>
+                        <th style="width: 60px;">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
