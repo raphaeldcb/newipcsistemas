@@ -34,7 +34,7 @@ if (!$token) {
 echo "✅ Token obtained\n\n";
 
 // 2. Get emails via GraphService
-$graphService = new MicrosoftGraphService($config);
+$graphService = new MicrosoftGraphService($config, $pdo);
 $emails = $graphService->syncMessages($token);
 
 echo "API Response:\n";
