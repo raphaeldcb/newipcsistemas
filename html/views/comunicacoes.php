@@ -17,7 +17,7 @@ $filter = $_GET['filter'] ?? 'ALL';
 $sql = "
     SELECT id, received_datetime as date, from_name, from_address,
            vara, comarca, processo_numero as process, status, subject,
-           classification, cnj_number, has_complete_data
+           classification, cnj_number, has_complete_data, analyzed
     FROM communications
     WHERE 1=1
 ";
