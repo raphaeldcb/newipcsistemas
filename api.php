@@ -50,6 +50,7 @@ require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
 require_once __DIR__ . '/html/controllers/ExtractionController.php';
 require_once __DIR__ . '/html/controllers/EmailResponseController.php';
 require_once __DIR__ . '/html/services/EmailCategorizationService.php';
+require_once __DIR__ . '/html/services/EmailClassifierService.php';
 // Auto-refresh Microsoft token
 require_once __DIR__ . '/html/services/MicrosoftTokenService.php';
 require_once __DIR__ . '/html/services/MicrosoftAppAuthService.php';
@@ -195,6 +196,16 @@ switch ($action) {
             );
         } else {
             $response = ['success' => false, 'error' => 'Missing required fields'];
+        }
+        break;
+
+    case 'classify_email':
+        $comm_id = $_GET['id'] ?? $_POST['id'] ?? null;
+        if ($comm_id) {
+            $classifier = new EmailClassifierService($pdo);
+            $response = $classifier->classifyEmail($comm_id);
+        } else {
+            $response = ['success' => false, 'error' => 'Missing communication ID'];
         }
         break;
 

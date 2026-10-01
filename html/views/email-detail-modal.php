@@ -269,6 +269,8 @@
         <!-- Footer with Actions -->
         <div class="modal-footer">
             <button class="modal-footer button btn-cancel" onclick="closeEmailModal()">Cancelar</button>
+            <button class="modal-footer button btn-action" onclick="classifyEmail()">🤖 Classificar</button>
+            <button class="modal-footer button btn-action" id="autoResponseBtn" style="display:none;" onclick="generateAutoResponse()">⚡ Gerar Resposta</button>
             <button class="modal-footer button btn-action" onclick="markAsAnalyzed()">✓ Marcar como Analisado</button>
             <button class="modal-footer button btn-action" onclick="scheduleResponse()">📧 Agendar Resposta</button>
         </div>
@@ -341,6 +343,49 @@ Esta é uma mensagem automática. O e-mail original foi devidamente encaminhado 
 
 function closeEmailModal() {
     document.getElementById('emailDetailModal').classList.remove('active');
+}
+
+function classifyEmail() {
+    const commId = document.getElementById('emailDetailModal').dataset.commId;
+
+    console.log('🤖 classifyEmail - ID:', commId);
+
+    if (!commId) {
+        alert('❌ Erro: Communication ID missing');
+        return;
+    }
+
+    fetch(`/newipcsistemas/api.php?action=classify_email&id=${commId}`, {
+        credentials: 'include'
+    })
+        .then(r => r.json())
+        .then(data => {
+            console.log('📊 Classification result:', data);
+            if (data.success) {
+                const classification = data.classification;
+                const cnj = data.cnj_number || '-';
+                const vara = data.vara || '-';
+                const comarca = data.comarca || '-';
+                const hasData = data.has_complete_data;
+
+                alert(`✅ Classificado como: ${classification}\n\nCNJ: ${cnj}\nVara: ${vara}\nComarca: ${comarca}\n\nDados completos: ${hasData ? 'SIM ✓' : 'NÃO ✗'}`);
+
+                // Show auto-response button if judicial and has complete data
+                if (classification === 'JUDICIAL' && hasData) {
+                    document.getElementById('autoResponseBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('autoResponseBtn').style.display = 'none';
+                }
+            } else {
+                alert('❌ Erro: ' + (data.error || 'Desconhecido'));
+            }
+        })
+        .catch(err => alert('❌ Erro: ' + err));
+}
+
+function generateAutoResponse() {
+    const commId = document.getElementById('emailDetailModal').dataset.commId;
+    alert('⚡ Gerando resposta automática para ID: ' + commId + '\n\n(Função em desenvolvimento)');
 }
 
 function markAsAnalyzed() {
