@@ -7,13 +7,16 @@ if (!isset($_SESSION['user_id'])) {
 
 $user = $_SESSION['user'] ?? [];
 
-// Simulação: dados reais viriam do banco/API
-// Exemplo: listar todas as comunicações do usuário
-$communications = [
-    ['id' => 1, 'date' => '2026-09-30 14:30', 'from' => 'Tribunal de Justiça', 'vara' => 'TJMS', 'process' => '0000000-00.0000.0.00.0000', 'status' => 'Processado', 'subject' => 'Intimação - Processo 0000000'],
-    ['id' => 2, 'date' => '2026-09-29 10:15', 'from' => 'Procuradora Geral', 'vara' => 'TJSP', 'process' => '1111111-11.1111.1.11.1111', 'status' => 'Processado', 'subject' => 'RE: Comunicação importante'],
-    ['id' => 3, 'date' => '2026-09-28 09:45', 'from' => 'ESAJ Sistema', 'vara' => 'TJRJ', 'process' => '2222222-22.2222.2.22.2222', 'status' => 'Novo', 'subject' => 'Nova intimação recebida'],
-];
+// Get real communications from database
+global $pdo;
+$stmt = $pdo->query("
+    SELECT id, received_datetime as date, from_name as from, from_address,
+           vara, comarca, processo_numero as process, status, subject
+    FROM communications
+    ORDER BY received_datetime DESC
+    LIMIT 100
+");
+$communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
