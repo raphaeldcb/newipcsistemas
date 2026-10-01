@@ -317,7 +317,7 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <td><?php echo htmlspecialchars($comm['vara'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($comm['process'] ?? '-'); ?></td>
                         <td><span class="badge <?php echo $comm['status'] === 'Processado' ? 'badge-success' : 'badge-new'; ?>"><?php echo htmlspecialchars($comm['status']); ?></span></td>
-                        <td><button class="btn btn-small" onclick="openEmailModal(<?php echo $comm['id']; ?>)">Ver</button></td>
+                        <td><button class="btn btn-small" onclick="openEmailModal('<?php echo $comm['id']; ?>')">Ver</button></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>

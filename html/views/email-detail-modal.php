@@ -338,6 +338,11 @@ function closeEmailModal() {
 function markAsAnalyzed() {
     const commId = document.getElementById('emailDetailModal').dataset.commId;
 
+    if (!commId) {
+        alert('❌ Erro: Missing communication ID');
+        return;
+    }
+
     fetch(`/newipcsistemas/api.php?action=mark_analyzed&id=${commId}`, {
         method: 'POST',
         credentials: 'include'
