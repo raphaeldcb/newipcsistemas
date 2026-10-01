@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../services/MicrosoftGraphService.php';
+require_once __DIR__ . '/../services/EmailClassifierService.php';
 require_once __DIR__ . '/../models/Communication.php';
 
 class CommunicationsController
@@ -103,6 +104,14 @@ class CommunicationsController
 
                     // Log the sync
                     $this->logProcessing($comm_id, 'synced', json_encode($data));
+
+                    // Auto-classify email
+                    try {
+                        $classifier = new EmailClassifierService($this->pdo);
+                        $classifier->classifyEmail($comm_id);
+                    } catch (Exception $e) {
+                        error_log('Email classification failed: ' . $e->getMessage());
+                    }
 
                     $synced_count++;
                 }
