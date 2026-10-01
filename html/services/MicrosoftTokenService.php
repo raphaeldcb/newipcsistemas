@@ -30,7 +30,8 @@ class MicrosoftTokenService {
         if (!$user) return null;
 
         // Check if token expired (or expires in next 5 minutes)
-        $expiresAt = strtotime($user['token_expires_at']);
+        // If token_expires_at is NULL, treat as expired
+        $expiresAt = $user['token_expires_at'] ? strtotime($user['token_expires_at']) : 0;
         $now = time();
         $buffer = 5 * 60; // 5 minutes buffer
 
