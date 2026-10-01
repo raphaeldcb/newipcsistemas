@@ -277,12 +277,20 @@
 
 <script>
 function openEmailModal(commId) {
+    console.log('🔍 openEmailModal called with ID:', commId);
+
+    if (!commId) {
+        alert('❌ Erro: No communication ID provided');
+        return;
+    }
+
     // Fetch communication details via API
     fetch(`/newipcsistemas/api.php?action=get_detail&id=${commId}`, {
         credentials: 'include'
     })
         .then(r => r.json())
         .then(data => {
+            console.log('📦 API Response:', data);
             if (data.success) {
                 const comm = data.communication;
 
