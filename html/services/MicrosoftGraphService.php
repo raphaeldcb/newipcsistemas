@@ -174,16 +174,14 @@ class MicrosoftGraphService
     {
         // Use /users/{mailbox} for app-only (client credentials) flow
         // Use /me for delegated (user) flow
-        $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/mailFolders/inbox/messages/delta';
+        $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/mailFolders/inbox/messages';
 
         $params = [
             '$select' => 'id,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,hasAttachments,attachments',
             '$top' => 100,
         ];
 
-        if ($delta_token) {
-            $params['$deltatoken'] = $delta_token;
-        }
+
 
         $url = $endpoint . '?' . http_build_query($params);
 
