@@ -328,7 +328,7 @@ $communications = [
     <script>
         function syncEmails() {
             alert('Sincronizando emails...');
-            fetch('/newipcsistemas/api.php?action=sync_emails', {
+            fetch('/newipcsistemas/api.php?action=sync', {
                 method: 'POST',
                 credentials: 'include'
             })
