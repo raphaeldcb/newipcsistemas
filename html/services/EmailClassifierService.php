@@ -172,14 +172,18 @@ class EmailClassifierService
     private function extractVara($text)
     {
         $vara_patterns = [
-            '/\b(\d+)\.?ª\s+VARA\b/i',
-            '/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)\s+(?:DE|DA|DO)?\s+(\w+)/i',
-            '/VARA\s+(\w+)/i'
+            '/\b(\d+)\.?ª\s+VARA\b/i' => 0,  // Return full match: "1ª VARA"
+            '/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)\s+(?:DE|DA|DO)?\s+(\w+)/i' => 1,  // Return group 1: city name
+            '/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)\s+DE\s+(\w+\s+\w+)/i' => 1,  // Handle 2-word places
+            '/VARA\s+DE\s+(\w+\s+\w+)/i' => 1,  // City with spaces
+            '/VARA\s+DE\s+(\w+)/i' => 1,  // Simple "VARA DE CITY"
+            '/(\d+)\.?ª\s+VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)/i' => 0  // "1ª VARA CÍVEL"
         ];
 
-        foreach ($vara_patterns as $pattern) {
+        foreach ($vara_patterns as $pattern => $group) {
             if (preg_match($pattern, $text, $matches)) {
-                return trim($matches[0]);
+                $result = isset($matches[$group]) ? $matches[$group] : $matches[0];
+                return trim($result);
             }
         }
         return null;
