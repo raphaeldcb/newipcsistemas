@@ -160,7 +160,7 @@ switch ($action) {
         break;
 
     case 'mark_analyzed':
-        $id = $_POST['id'] ?? null;
+        $id = $_GET['id'] ?? $_POST['id'] ?? null;
         if ($id) {
             $access_token = $_SESSION['microsoft_access_token'] ?? null;
             $response = $categorization->markAsAnalyzed($id, $access_token);
