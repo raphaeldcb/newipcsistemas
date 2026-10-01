@@ -43,6 +43,7 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comunicações - Novos Sistemas IPC</title>
+    <link rel="icon" type="image/svg+xml" href="/newipcsistemas/html/favicon.svg">
     <style>
         :root {
             --color-primary: #132F4A;
