@@ -75,13 +75,13 @@ class EmailCategorizationService
 
             // If access token available, also categorize in Outlook
             if ($access_token) {
-                $comm = $this->pdo->prepare('SELECT graph_message_id FROM communications WHERE id = ?');
+                $comm = $this->pdo->prepare('SELECT message_id FROM communications WHERE id = ?');
                 $comm->execute([$communication_id]);
                 $data = $comm->fetch();
 
-                if ($data && $data['graph_message_id']) {
+                if ($data && $data['message_id']) {
                     try {
-                        $this->categorizeEmailAsAnalyzed($access_token, $data['graph_message_id']);
+                        $this->categorizeEmailAsAnalyzed($access_token, $data['message_id']);
                     } catch (Exception $e) {
                         error_log('Failed to categorize in Outlook: ' . $e->getMessage());
                         // Continue anyway - database update succeeded
