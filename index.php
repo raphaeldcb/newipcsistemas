@@ -124,6 +124,14 @@ switch ($page) {
         require __DIR__ . '/html/views/comunicacoes.php';
         break;
 
+    case 'usuarios':
+        if (!$is_logged_in) {
+            header("Location: {$base}?page=login");
+            exit;
+        }
+        require __DIR__ . '/html/views/usuarios.php';
+        break;
+
     // ===== DEFAULT / DASHBOARD =====
     default:
         if ($is_logged_in) {
