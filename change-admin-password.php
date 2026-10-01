@@ -4,8 +4,8 @@
  * Muda a senha do admin@ipcms.com.br
  */
 
-require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/load-env.php';
+require_once __DIR__ . '/config/config.php';
 
 // Senha nova
 $new_password = 'Tucano%23';
