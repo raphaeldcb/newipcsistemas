@@ -170,12 +170,13 @@ switch ($action) {
         break;
 
     case 'schedule_response':
-        $comm_id = $_POST['communication_id'] ?? null;
-        $to_email = $_POST['to_email'] ?? null;
-        $subject = $_POST['subject'] ?? null;
-        $body = $_POST['body'] ?? null;
-        $scheduled_date = $_POST['scheduled_date'] ?? null;
-        $scheduled_time = $_POST['scheduled_time'] ?? null;
+        $body_data = json_decode(file_get_contents('php://input'), true) ?? [];
+        $comm_id = $_POST['communication_id'] ?? $body_data['id'] ?? null;
+        $to_email = $_POST['to_email'] ?? $body_data['to'] ?? null;
+        $subject = $_POST['subject'] ?? $body_data['subject'] ?? null;
+        $body = $_POST['body'] ?? $body_data['body'] ?? null;
+        $scheduled_date = $_POST['scheduled_date'] ?? $body_data['date'] ?? null;
+        $scheduled_time = $_POST['scheduled_time'] ?? $body_data['time'] ?? null;
 
         if ($comm_id && $to_email && $subject && $body && $scheduled_date && $scheduled_time) {
             $response = $email_response->scheduleResponse(
