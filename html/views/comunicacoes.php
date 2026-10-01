@@ -1,3 +1,20 @@
+<?php
+// Verificar autenticação
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /newipcsistemas/index.php?page=login');
+    exit;
+}
+
+$user = $_SESSION['user'] ?? [];
+
+// Simulação: dados reais viriam do banco/API
+// Exemplo: listar todas as comunicações do usuário
+$communications = [
+    ['id' => 1, 'date' => '2026-09-30 14:30', 'from' => 'Tribunal de Justiça', 'vara' => 'TJMS', 'process' => '0000000-00.0000.0.00.0000', 'status' => 'Processado', 'subject' => 'Intimação - Processo 0000000'],
+    ['id' => 2, 'date' => '2026-09-29 10:15', 'from' => 'Procuradora Geral', 'vara' => 'TJSP', 'process' => '1111111-11.1111.1.11.1111', 'status' => 'Processado', 'subject' => 'RE: Comunicação importante'],
+    ['id' => 3, 'date' => '2026-09-28 09:45', 'from' => 'ESAJ Sistema', 'vara' => 'TJRJ', 'process' => '2222222-22.2222.2.22.2222', 'status' => 'Novo', 'subject' => 'Nova intimação recebida'],
+];
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -103,11 +120,18 @@
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: var(--shadow-md);
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
         }
 
         .filter-section {
@@ -179,6 +203,11 @@
             color: var(--color-success);
         }
 
+        .badge-new {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
         .user-menu {
             margin-top: auto;
             padding-top: var(--spacing-lg);
@@ -201,7 +230,7 @@
         .logout-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
         @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: var(--spacing-md); }
             .main-content { margin-left: 0; }
             .header { flex-direction: column; gap: var(--spacing-md); }
             .filter-section { grid-template-columns: 1fr; }
@@ -239,7 +268,7 @@
                 <h1>📧 Comunicações</h1>
                 <p>Gerencie emails recebidos de tribunais e varas</p>
             </div>
-            <button class="btn">↻ Sincronizar</button>
+            <button class="btn" onclick="syncEmails()">↻ Sincronizar</button>
         </div>
 
         <div class="filter-section">
@@ -278,22 +307,16 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <?php foreach ($communications as $comm): ?>
                     <tr>
-                        <td>30/09/2026</td>
-                        <td>Tribunal de Justiça</td>
-                        <td>TJMS</td>
-                        <td>0000000-00.0000.0.00.0000</td>
-                        <td><span class="badge badge-success">Processado</span></td>
-                        <td><a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">Ver</a></td>
+                        <td><?php echo htmlspecialchars($comm['date']); ?></td>
+                        <td><?php echo htmlspecialchars($comm['from']); ?></td>
+                        <td><?php echo htmlspecialchars($comm['vara']); ?></td>
+                        <td><?php echo htmlspecialchars($comm['process']); ?></td>
+                        <td><span class="badge <?php echo $comm['status'] === 'Processado' ? 'badge-success' : 'badge-new'; ?>"><?php echo htmlspecialchars($comm['status']); ?></span></td>
+                        <td><button class="btn btn-small" onclick="openEmailModal(<?php echo $comm['id']; ?>)">Ver</button></td>
                     </tr>
-                    <tr>
-                        <td>29/09/2026</td>
-                        <td>Procuradora Geral</td>
-                        <td>TJSP</td>
-                        <td>1111111-11.1111.1.11.1111</td>
-                        <td><span class="badge badge-success">Processado</span></td>
-                        <td><a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">Ver</a></td>
-                    </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -301,5 +324,25 @@
 
     <!-- Email Detail Modal -->
     <?php include __DIR__ . '/email-detail-modal.php'; ?>
+
+    <script>
+        function syncEmails() {
+            alert('Sincronizando emails...');
+            fetch('/newipcsistemas/api.php?action=sync_emails', {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Emails sincronizados com sucesso!');
+                    location.reload();
+                } else {
+                    alert('❌ Erro: ' + (data.error || 'Desconhecido'));
+                }
+            })
+            .catch(err => alert('❌ Erro ao sincronizar: ' + err));
+        }
+    </script>
 </body>
 </html>
