@@ -418,15 +418,23 @@ function markAsAnalyzed() {
     })
         .then(r => r.json())
         .then(data => {
+            console.log('📋 markAsAnalyzed API Response:', data);
+            console.log('   - success:', data.success);
+            console.log('   - message:', data.message);
+            console.log('   - error:', data.error);
+
             if (data.success) {
-                alert('✅ Email marcado como analisado');
+                alert('✅ Email marcado como analisado\n\n📧 Categoria adicionada no Outlook');
                 closeEmailModal();
                 location.reload();
             } else {
                 alert('❌ Erro: ' + (data.error || 'Desconhecido'));
             }
         })
-        .catch(err => alert('❌ Erro: ' + err));
+        .catch(err => {
+            console.error('❌ Fetch error:', err);
+            alert('❌ Erro ao conectar com servidor: ' + err);
+        });
 }
 
 function scheduleResponse() {
