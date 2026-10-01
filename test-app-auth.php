@@ -25,6 +25,13 @@ if ($token) {
     echo "Token (first 50 chars): " . substr($token, 0, 50) . "...\n";
 } else {
     echo "❌ FAILED! No token returned.\n";
+    if (isset($_SESSION['app_auth_debug'])) {
+        echo "\n--- Debug Info ---\n";
+        echo "HTTP Code: " . ($_SESSION['app_auth_debug']['http_code'] ?? 'N/A') . "\n";
+        echo "cURL Error: " . ($_SESSION['app_auth_debug']['curl_error'] ?? 'N/A') . "\n";
+        echo "Response: " . ($_SESSION['app_auth_debug']['response'] ?? 'N/A') . "\n";
+        echo "Token Error: " . ($_SESSION['app_auth_debug']['token_error'] ?? 'N/A') . "\n";
+    }
 }
 
 echo "</pre>";

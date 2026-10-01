@@ -44,16 +44,24 @@ class MicrosoftAppAuthService {
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
+
+        // Debug info
+        error_log("App-Only Auth: HTTP $httpCode, Error: $curlError");
+        error_log("Response: " . substr($response, 0, 200));
 
         if ($httpCode === 200) {
             $tokenData = json_decode($response, true);
             if (isset($tokenData['access_token'])) {
-                // Store in session for this request
                 $_SESSION['microsoft_access_token'] = $tokenData['access_token'];
                 $_SESSION['microsoft_token_expires_at'] = time() + ($tokenData['expires_in'] ?? 3600);
                 return $tokenData['access_token'];
+            } else {
+                error_log("No access_token in response: " . json_encode($tokenData));
             }
+        } else {
+            error_log("Auth failed with HTTP $httpCode: " . $response);
         }
 
         return null;
