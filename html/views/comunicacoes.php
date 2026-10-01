@@ -298,5 +298,8 @@
             </table>
         </div>
     </div>
+
+    <!-- Email Detail Modal -->
+    <?php include __DIR__ . '/email-detail-modal.php'; ?>
 </body>
 </html>
