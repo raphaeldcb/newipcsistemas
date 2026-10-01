@@ -76,22 +76,26 @@ class EmailClassifierService
 
     /**
      * Classify text as JUDICIAL or NON_JUDICIAL
+     * Stricter rules - requires MULTIPLE judicial indicators
      */
     private function classifyAsJudicial($text)
     {
         $judicial_keywords = [
             'TRIBUNAL', 'JUIZ', 'SENTENÇA', 'DECISÃO', 'APELAÇÃO', 'AGRAVO',
-            'PROCESSO', 'AUTOS', 'VARA', 'COMARCA', 'CNJ', 'INTIMAÇÃO',
+            'AUTOS', 'VARA', 'COMARCA', 'CNJ', 'INTIMAÇÃO',
             'CARTÓRIO', 'MANDADO', 'PETIÇÃO', 'DESPACHO', 'ACÓRDÃO',
             'RECURSO', 'AUDIÊNCIA', 'CITAÇÃO', 'NOTIFICAÇÃO JUDICIAL',
-            'PODER JUDICIÁRIO', 'EXECUÇÃO', 'CUMPRIMENTO SENTENÇA'
+            'PODER JUDICIÁRIO', 'EXECUÇÃO', 'CUMPRIMENTO SENTENÇA',
+            'PROCESSO JUDICIAL', 'AÇÃO JUDICIAL', 'OFÍCIO JUDICIAL'
         ];
 
         $non_judicial_keywords = [
             'FATURA', 'NOTA FISCAL', 'COBRANÇA', 'PAGAMENTO', 'BOLETO',
             'VENCIMENTO', 'DÉBITO', 'CRÉDITO', 'BANCO', 'CARTÃO',
             'INTERNET', 'TELEFONE', 'ENERGIA', 'ÁGUA', 'ASSINATURA',
-            'PROMOÇÃO', 'OFERTA', 'DESCONTO', 'VENDA', 'COMPRA'
+            'PROMOÇÃO', 'OFERTA', 'DESCONTO', 'VENDA', 'COMPRA',
+            'CADASTRO', 'ATUALIZAÇÃO CADASTRAL', 'CHAVE DE ACESSO',
+            'OPERACIONAL', 'ADMINISTRATIVO', 'RESPONDA ESTE EMAIL'
         ];
 
         $judicial_score = 0;
@@ -105,7 +109,7 @@ class EmailClassifierService
 
         foreach ($non_judicial_keywords as $keyword) {
             if (strpos($text, $keyword) !== false) {
-                $non_judicial_score += 1;
+                $non_judicial_score += 2;  // Increased weight for non-judicial
             }
         }
 
@@ -114,7 +118,13 @@ class EmailClassifierService
             return 'UNKNOWN';
         }
 
-        return $judicial_score > $non_judicial_score ? 'JUDICIAL' : 'NON_JUDICIAL';
+        // Require at least 2 judicial indicators or clear judicial language
+        // Non-judicial has priority if found
+        if ($non_judicial_score > 0) {
+            return 'NON_JUDICIAL';
+        }
+
+        return $judicial_score >= 2 ? 'JUDICIAL' : 'UNKNOWN';
     }
 
     /**
