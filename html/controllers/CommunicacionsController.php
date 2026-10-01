@@ -122,10 +122,14 @@ class CommunicationsController
                 $_SESSION['microsoft_delta_token'] = $result['@odata.deltaLink'];
             }
 
+            // Reprocess ALL emails with new classification rules
+            $reprocessed = $this->reprocessAllEmails();
+
             return [
                 'success' => true,
                 'synced_count' => $synced_count,
-                'message' => "Synced $synced_count messages",
+                'reprocessed_count' => $reprocessed,
+                'message' => "Synced $synced_count messages, reprocessed $reprocessed emails",
             ];
 
         } catch (Exception $e) {
@@ -160,6 +164,34 @@ class CommunicationsController
         $this->logProcessing($id, 'information_extracted', json_encode($data));
 
         return ['success' => true];
+    }
+
+    /**
+     * Reprocess ALL emails with current classification rules
+     */
+    private function reprocessAllEmails()
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT id FROM communications ORDER BY received_datetime DESC");
+            $emails = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $classifier = new EmailClassifierService($this->pdo);
+            $count = 0;
+
+            foreach ($emails as $email) {
+                try {
+                    $classifier->classifyEmail($email['id']);
+                    $count++;
+                } catch (Exception $e) {
+                    error_log('Failed to reclassify email ' . $email['id'] . ': ' . $e->getMessage());
+                }
+            }
+
+            return $count;
+        } catch (Exception $e) {
+            error_log('Reprocess all emails failed: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     /**

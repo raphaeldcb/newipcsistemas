@@ -68,7 +68,7 @@ class EmailCategorizationService
         try {
             $stmt = $this->pdo->prepare('
                 UPDATE communications
-                SET status = "processed", analyzed_at = NOW()
+                SET status = "processed", analyzed = 1, analyzed_at = NOW()
                 WHERE id = ?
             ');
             $stmt->execute([$communication_id]);
