@@ -106,7 +106,11 @@ EOT;
     {
         error_log("🔍 createDraftInOutlook - token present: " . (empty($access_token) ? 'NO' : 'YES'));
 
-        $ch = curl_init('https://graph.microsoft.com/v1.0/me/messages');
+        $mailbox = $this->config['microsoft']['mailbox'] ?? 'financeiro@ipcms.com.br';
+        $url = 'https://graph.microsoft.com/v1.0/users/' . urlencode($mailbox) . '/messages';
+        error_log("📍 Draft URL: " . $url);
+
+        $ch = curl_init($url);
 
         $payload = [
             'subject' => $subject,
