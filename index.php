@@ -44,15 +44,9 @@ if ($is_logged_in) {
 // Determine page
 $page = strtolower($_GET['page'] ?? '');
 
-// AUTO-AUTHENTICATE WITH MICROSOFT (only when accessing comunicacoes)
-// Avoid redirect loops by only redirecting for specific pages
-if ($is_logged_in && !isset($_SESSION['microsoft_access_token']) &&
-    ($page === 'comunicacoes' || strpos($page, 'auth/microsoft') === 0)) {
-    if ($page !== 'auth/microsoft') {
-        header('Location: /newipcsistemas/index.php?page=auth/microsoft');
-        exit;
-    }
-}
+// NOTE: Auto-authentication removed - user must login to Microsoft once
+// Token is automatically refreshed via MicrosoftTokenService when needed
+// No redirect popup, seamless background refresh
 
 // Base path for redirects
 $base = '/newipcsistemas/index.php';

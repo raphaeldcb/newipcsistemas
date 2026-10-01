@@ -43,6 +43,14 @@ require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
 require_once __DIR__ . '/html/controllers/ExtractionController.php';
 require_once __DIR__ . '/html/controllers/EmailResponseController.php';
 require_once __DIR__ . '/html/services/EmailCategorizationService.php';
+// Auto-refresh Microsoft token if expired
+require_once __DIR__ . '/html/services/MicrosoftTokenService.php';
+$tokenService = new MicrosoftTokenService($pdo, $config);
+$validToken = $tokenService->getValidAccessToken();
+if ($validToken) {
+    $_SESSION['microsoft_access_token'] = $validToken;
+}
+
 
 $controller = new CommunicationsController($pdo, $config);
 $extraction = new ExtractionController($pdo, $config);
