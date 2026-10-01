@@ -133,19 +133,6 @@
           font-size: 14px;
         }
 
-        .demo-info {
-          background: var(--bg-secondary);
-          border-radius: var(--radius-md);
-          padding: 15px;
-          text-align: center;
-          font-size: 13px;
-          color: var(--text-secondary);
-          margin-top: var(--spacing-lg);
-        }
-
-        .demo-info strong {
-          color: var(--text-primary);
-        }
     </style>
 </head>
 <body>
@@ -189,11 +176,6 @@
 
                 <button type="submit" class="btn-login">🔐 Entrar</button>
             </form>
-
-            <div class="demo-info">
-                <strong>🔓 Demonstração:</strong><br>
-                admin@ipcms.com.br / admin123
-            </div>
         </div>
     </div>
 </body>
