@@ -183,13 +183,15 @@ switch ($action) {
         error_log("SCHEDULE_RESPONSE - Parsed: comm_id=$comm_id, to=$to_email, subject=$subject, body_len=" . strlen($body ?? '') . ", date=$scheduled_date, time=$scheduled_time");
 
         if ($comm_id && $to_email && $subject && $body && $scheduled_date && $scheduled_time) {
+            $access_token = $_SESSION['microsoft_access_token'] ?? null;
             $response = $email_response->scheduleResponse(
                 $comm_id,
                 $to_email,
                 $subject,
                 $body,
                 $scheduled_date,
-                $scheduled_time
+                $scheduled_time,
+                $access_token
             );
         } else {
             $response = ['success' => false, 'error' => 'Missing required fields'];

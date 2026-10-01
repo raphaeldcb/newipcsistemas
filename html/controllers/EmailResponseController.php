@@ -60,7 +60,7 @@ EOT;
     /**
      * Schedule email response for sending
      */
-    public function scheduleResponse($communication_id, $to_email, $subject, $body, $scheduled_date, $scheduled_time)
+    public function scheduleResponse($communication_id, $to_email, $subject, $body, $scheduled_date, $scheduled_time, $access_token = null)
     {
         try {
             $stmt = $this->pdo->prepare('
@@ -83,10 +83,59 @@ EOT;
             $update = $this->pdo->prepare('UPDATE communications SET status = ? WHERE id = ?');
             $update->execute(['processing', $communication_id]);
 
+            // If access token available, create draft in Outlook
+            if ($access_token) {
+                try {
+                    $this->createDraftInOutlook($to_email, $subject, $body, $access_token);
+                } catch (Exception $e) {
+                    error_log('Failed to create Outlook draft: ' . $e->getMessage());
+                    // Continue anyway - database save succeeded
+                }
+            }
+
             return ['success' => true, 'message' => 'Response scheduled for ' . $scheduled_date . ' at ' . $scheduled_time];
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Create draft email in Outlook via Graph API
+     */
+    private function createDraftInOutlook($to_email, $subject, $body, $access_token)
+    {
+        $ch = curl_init('https://graph.microsoft.com/v1.0/me/messages');
+
+        $payload = [
+            'subject' => $subject,
+            'toRecipients' => [
+                ['emailAddress' => ['address' => $to_email]]
+            ],
+            'body' => [
+                'contentType' => 'HTML',
+                'content' => nl2br($body)
+            ]
+        ];
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $access_token,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code >= 400) {
+            throw new Exception("Graph API error ($http_code): " . $response);
+        }
+
+        return json_decode($response, true);
     }
 
     /**
