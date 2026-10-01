@@ -310,22 +310,32 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Remetente</th>
-                        <th>Vara</th>
-                        <th>Processo</th>
-                        <th>Status</th>
-                        <th>Ação</th>
+                        <th style="width: 140px;">Data</th>
+                        <th style="width: 180px;">Remetente</th>
+                        <th style="width: 150px;">Vara</th>
+                        <th style="width: 140px;">Processo (CNJ)</th>
+                        <th style="width: 120px;">Classificação</th>
+                        <th style="width: 100px;">Analisado</th>
+                        <th style="width: 70px;">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($communications as $comm): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($comm['date']); ?></td>
+                        <td><?php echo htmlspecialchars(substr($comm['date'], 0, 16)); ?></td>
                         <td><?php echo htmlspecialchars($comm['from_name'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($comm['vara'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($comm['process'] ?? '-'); ?></td>
-                        <td><span class="badge <?php echo $comm['status'] === 'Processado' ? 'badge-success' : 'badge-new'; ?>"><?php echo htmlspecialchars($comm['status']); ?></span></td>
+                        <td><?php echo htmlspecialchars($comm['cnj_number'] ?? ($comm['process'] ?? '-')); ?></td>
+                        <td>
+                            <?php
+                            $class = $comm['classification'] === 'JUDICIAL' ? 'badge-success' : ($comm['classification'] === 'NON_JUDICIAL' ? 'badge-warning' : 'badge-info');
+                            $label = $comm['classification'] === 'JUDICIAL' ? '⚖️ Judicial' : ($comm['classification'] === 'NON_JUDICIAL' ? '📄 Não Judicial' : '❓ Desconhecido');
+                            ?>
+                            <span class="badge <?php echo $class; ?>"><?php echo $label; ?></span>
+                        </td>
+                        <td>
+                            <?php echo ($comm['analyzed'] ?? false) ? '✅ Sim' : '⏳ Não'; ?>
+                        </td>
                         <td><button class="btn btn-small" onclick="openEmailModal('<?php echo $comm['id']; ?>')">Ver</button></td>
                     </tr>
                     <?php endforeach; ?>
