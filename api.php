@@ -171,12 +171,16 @@ switch ($action) {
 
     case 'schedule_response':
         $body_data = json_decode(file_get_contents('php://input'), true) ?? [];
+        error_log('SCHEDULE_RESPONSE - body_data: ' . json_encode($body_data));
+
         $comm_id = $_POST['communication_id'] ?? $body_data['id'] ?? null;
         $to_email = $_POST['to_email'] ?? $body_data['to'] ?? null;
         $subject = $_POST['subject'] ?? $body_data['subject'] ?? null;
         $body = $_POST['body'] ?? $body_data['body'] ?? null;
         $scheduled_date = $_POST['scheduled_date'] ?? $body_data['date'] ?? null;
         $scheduled_time = $_POST['scheduled_time'] ?? $body_data['time'] ?? null;
+
+        error_log("SCHEDULE_RESPONSE - Parsed: comm_id=$comm_id, to=$to_email, subject=$subject, body_len=" . strlen($body ?? '') . ", date=$scheduled_date, time=$scheduled_time");
 
         if ($comm_id && $to_email && $subject && $body && $scheduled_date && $scheduled_time) {
             $response = $email_response->scheduleResponse(

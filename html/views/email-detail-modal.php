@@ -382,18 +382,30 @@ function scheduleResponse() {
     const responseSubject = document.getElementById('responseSubject').textContent;
     const responseToEmail = document.getElementById('responseToEmail').textContent;
 
+    console.log('📋 scheduleResponse - Sending:');
+    console.log('  - commId:', commId);
+    console.log('  - responseDate:', responseDate);
+    console.log('  - responseTime:', responseTime);
+    console.log('  - responseToEmail:', responseToEmail);
+    console.log('  - responseSubject:', responseSubject);
+    console.log('  - responseBody length:', responseBody.length);
+
+    const payload = {
+        id: commId,
+        date: responseDate,
+        time: responseTime,
+        to: responseToEmail,
+        subject: responseSubject,
+        body: responseBody
+    };
+
+    console.log('📦 Payload:', payload);
+
     fetch(`/newipcsistemas/api.php?action=schedule_response`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            id: commId,
-            date: responseDate,
-            time: responseTime,
-            to: responseToEmail,
-            subject: responseSubject,
-            body: responseBody
-        })
+        body: JSON.stringify(payload)
     })
         .then(r => r.json())
         .then(data => {
