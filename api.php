@@ -43,10 +43,20 @@ require_once __DIR__ . '/html/controllers/CommunicacionsController.php';
 require_once __DIR__ . '/html/controllers/ExtractionController.php';
 require_once __DIR__ . '/html/controllers/EmailResponseController.php';
 require_once __DIR__ . '/html/services/EmailCategorizationService.php';
-// Auto-refresh Microsoft token if expired
+// Auto-refresh Microsoft token
 require_once __DIR__ . '/html/services/MicrosoftTokenService.php';
+require_once __DIR__ . '/html/services/MicrosoftAppAuthService.php';
+
+// Try user token first, fall back to app-only auth
 $tokenService = new MicrosoftTokenService($pdo, $config);
 $validToken = $tokenService->getValidAccessToken();
+
+if (!$validToken) {
+    // User not authenticated, use app-only auth
+    $appAuth = new MicrosoftAppAuthService($config);
+    $validToken = $appAuth->getValidToken();
+}
+
 if ($validToken) {
     $_SESSION['microsoft_access_token'] = $validToken;
 }
