@@ -44,6 +44,15 @@ if ($is_logged_in) {
 // Determine page
 $page = strtolower($_GET['page'] ?? '');
 
+// AUTO-AUTHENTICATE WITH MICROSOFT
+// If logged in, not already authenticated with Microsoft, and not on a auth page
+if ($is_logged_in && !isset($_SESSION['microsoft_access_token']) &&
+    strpos($page, 'auth') === false && $page !== 'logout') {
+    // Automatically redirect to Microsoft authentication
+    header('Location: /newipcsistemas/index.php?page=auth/microsoft');
+    exit;
+}
+
 // Base path for redirects
 $base = '/newipcsistemas/index.php';
 
