@@ -349,21 +349,54 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     <script>
         function syncEmails() {
-            alert('Sincronizando emails...');
+            const btn = document.querySelector('.btn');
+            const originalText = btn.textContent;
+            const startTime = Date.now();
+
+            // Change button to loading state
+            btn.disabled = true;
+            btn.textContent = '⏳ Processando...';
+            btn.style.opacity = '0.6';
+
+            // Start timer
+            const timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const secs = elapsed % 60;
+                const mins = Math.floor(elapsed / 60);
+                btn.textContent = `⏳ ${mins}:${String(secs).padStart(2, '0')}`;
+            }, 100);
+
             fetch('/newipcsistemas/api.php?action=sync', {
                 method: 'POST',
                 credentials: 'include'
             })
             .then(r => r.json())
             .then(data => {
+                clearInterval(timerInterval);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = Math.floor(elapsed / 60);
+                const secs = elapsed % 60;
+
                 if (data.success) {
-                    alert('✅ Emails sincronizados com sucesso!');
+                    const syncedCount = data.synced_count || 0;
+                    const reprocessedCount = data.reprocessed_count || 0;
+                    alert(`✅ Sincronização Completa!\n\n📧 ${syncedCount} emails sincronizados\n🔄 ${reprocessedCount} reprocessados\n⏱️ ${mins}:${String(secs).padStart(2, '0')}s`);
                     location.reload();
                 } else {
+                    btn.textContent = originalText;
                     alert('❌ Erro: ' + (data.error || 'Desconhecido'));
                 }
             })
-            .catch(err => alert('❌ Erro ao sincronizar: ' + err));
+            .catch(err => {
+                clearInterval(timerInterval);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.textContent = originalText;
+                alert('❌ Erro ao sincronizar: ' + err);
+            });
         }
     </script>
 </body>
