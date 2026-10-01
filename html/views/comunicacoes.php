@@ -10,7 +10,7 @@ $user = $_SESSION['user'] ?? [];
 // Get real communications from database
 global $pdo;
 $stmt = $pdo->query("
-    SELECT id, received_datetime as date, from_name as from, from_address,
+    SELECT id, received_datetime as date, from_name, from_address,
            vara, comarca, processo_numero as process, status, subject
     FROM communications
     ORDER BY received_datetime DESC
@@ -313,7 +313,7 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                     <?php foreach ($communications as $comm): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($comm['date']); ?></td>
-                        <td><?php echo htmlspecialchars($comm['from']); ?></td>
+                        <td><?php echo htmlspecialchars($comm['from_name'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($comm['vara']); ?></td>
                         <td><?php echo htmlspecialchars($comm['process']); ?></td>
                         <td><span class="badge <?php echo $comm['status'] === 'Processado' ? 'badge-success' : 'badge-new'; ?>"><?php echo htmlspecialchars($comm['status']); ?></span></td>
