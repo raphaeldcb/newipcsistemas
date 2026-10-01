@@ -270,7 +270,7 @@ $communications = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         <ul class="menu-items">
             <li><a href="/newipcsistemas/index.php">📊 Painel</a></li>
             <li><a href="/newipcsistemas/index.php?page=comunicacoes" class="active">📧 Comunicações</a></li>
-            <?php if ($_SESSION['is_admin'] ?? false): ?>
+            <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
                 <li><a href="/newipcsistemas/index.php?page=usuarios">👥 Usuários</a></li>
             <?php endif; ?>
             <li><a href="#">⚙️ Configurações</a></li>

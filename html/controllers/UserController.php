@@ -17,7 +17,7 @@ class UserController
      */
     public function listUsers()
     {
-        $stmt = $this->pdo->query('SELECT id, email, is_admin, created_at FROM users ORDER BY email');
+        $stmt = $this->pdo->query('SELECT id, email, role, created_at FROM users ORDER BY email');
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
@@ -34,15 +34,15 @@ class UserController
     /**
      * Create new user
      */
-    public function createUser($email, $password, $is_admin = false)
+    public function createUser($email, $password, $role = 'user')
     {
         try {
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
             $stmt = $this->pdo->prepare('
-                INSERT INTO users (email, password_hash, is_admin, created_at)
-                VALUES (?, ?, ?, NOW())
+                INSERT INTO users (email, password_hash, name, role, created_at)
+                VALUES (?, ?, ?, ?, NOW())
             ');
-            $stmt->execute([$email, $password_hash, $is_admin ? 1 : 0]);
+            $stmt->execute([$email, $password_hash, '', $role]);
             return ['success' => true, 'message' => 'Usuário criado com sucesso'];
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
@@ -52,15 +52,15 @@ class UserController
     /**
      * Update user
      */
-    public function updateUser($id, $email, $is_admin)
+    public function updateUser($id, $email, $role = 'user')
     {
         try {
             $stmt = $this->pdo->prepare('
                 UPDATE users
-                SET email = ?, is_admin = ?
+                SET email = ?, role = ?
                 WHERE id = ?
             ');
-            $stmt->execute([$email, $is_admin ? 1 : 0, $id]);
+            $stmt->execute([$email, $role, $id]);
             return ['success' => true, 'message' => 'Usuário atualizado com sucesso'];
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];

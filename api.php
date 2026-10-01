@@ -213,11 +213,11 @@ switch ($action) {
     case 'create_user':
         $email = $_POST['email'] ?? null;
         $password = $_POST['password'] ?? null;
-        $is_admin = $_POST['is_admin'] ?? 0;
+        $role = $_POST['role'] ?? 'user';
 
         if ($email && $password) {
             $user_controller = new UserController($pdo);
-            $response = $user_controller->createUser($email, $password, $is_admin);
+            $response = $user_controller->createUser($email, $password, $role);
         } else {
             $response = ['success' => false, 'error' => 'Missing email or password'];
         }
@@ -226,12 +226,12 @@ switch ($action) {
     case 'update_user':
         $id = $_POST['id'] ?? null;
         $email = $_POST['email'] ?? null;
-        $is_admin = $_POST['is_admin'] ?? 0;
+        $role = $_POST['role'] ?? 'user';
         $password = $_POST['password'] ?? null;
 
         if ($id && $email) {
             $user_controller = new UserController($pdo);
-            $response = $user_controller->updateUser($id, $email, $is_admin);
+            $response = $user_controller->updateUser($id, $email, $role);
 
             if ($response['success'] && $password) {
                 $response = $user_controller->updatePassword($id, $password);

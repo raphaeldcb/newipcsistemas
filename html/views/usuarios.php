@@ -1,6 +1,6 @@
 <?php
 // Verificar se é admin
-if (!isset($_SESSION['user_id']) || !($_SESSION['is_admin'] ?? false)) {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
     header('Location: /newipcsistemas/index.php?page=login');
     exit;
 }
@@ -222,16 +222,21 @@ $users = $userController->listUsers();
                     <tr>
                         <td><?php echo htmlspecialchars($user['email']); ?></td>
                         <td>
-                            <?php if ($user['is_admin']): ?>
-                                <span class="badge badge-admin">👨‍💼 Admin</span>
-                            <?php else: ?>
-                                <span class="badge badge-user">👤 Usuário</span>
-                            <?php endif; ?>
+                            <?php
+                            $role = $user['role'] ?? 'user';
+                            if ($role === 'admin') {
+                                echo '<span class="badge badge-admin">👨‍💼 Admin</span>';
+                            } elseif ($role === 'viewer') {
+                                echo '<span class="badge" style="background: #FEF3C7; color: #92400E;">👁️ Visualizador</span>';
+                            } else {
+                                echo '<span class="badge badge-user">👤 Usuário</span>';
+                            }
+                            ?>
                         </td>
                         <td><?php echo date('d/m/Y H:i', strtotime($user['created_at'])); ?></td>
                         <td>
                             <div class="actions">
-                                <button class="btn" onclick="openEditModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['email']); ?>', <?php echo $user['is_admin'] ? 'true' : 'false'; ?>)">✏️ Editar</button>
+                                <button class="btn" onclick="openEditModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['email']); ?>', '<?php echo $role; ?>')">✏️ Editar</button>
                                 <button class="btn btn-danger" onclick="deleteUser(<?php echo $user['id']; ?>)">🗑️ Deletar</button>
                             </div>
                         </td>
@@ -264,9 +269,13 @@ $users = $userController->listUsers();
                     <small style="color: var(--text-secondary);">Deixe em branco para não alterar (apenas edição)</small>
                 </div>
 
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="isAdmin">
-                    <label for="isAdmin" style="margin-bottom: 0;">É Administrador?</label>
+                <div class="form-group">
+                    <label for="role">Papel (Role)</label>
+                    <select id="role" required>
+                        <option value="user">👤 Usuário</option>
+                        <option value="admin">👨‍💼 Administrador</option>
+                        <option value="viewer">👁️ Visualizador</option>
+                    </select>
                 </div>
 
                 <div class="modal-footer">
@@ -283,16 +292,17 @@ $users = $userController->listUsers();
             document.getElementById('userForm').reset();
             document.getElementById('userId').value = '';
             document.getElementById('password').required = true;
+            document.getElementById('role').value = 'user';
             document.getElementById('userModal').classList.add('active');
         }
 
-        function openEditModal(id, email, isAdmin) {
+        function openEditModal(id, email, role) {
             document.getElementById('modalTitle').textContent = 'Editar Usuário';
             document.getElementById('userId').value = id;
             document.getElementById('email').value = email;
             document.getElementById('password').value = '';
             document.getElementById('password').required = false;
-            document.getElementById('isAdmin').checked = isAdmin;
+            document.getElementById('role').value = role || 'user';
             document.getElementById('userModal').classList.add('active');
         }
 
@@ -305,12 +315,12 @@ $users = $userController->listUsers();
             const id = document.getElementById('userId').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const isAdmin = document.getElementById('isAdmin').checked;
+            const role = document.getElementById('role').value;
 
             const action = id ? 'update_user' : 'create_user';
             const params = new URLSearchParams();
             params.append('email', email);
-            params.append('is_admin', isAdmin ? 1 : 0);
+            params.append('role', role);
             if (password) params.append('password', password);
             if (id) params.append('id', id);
 
