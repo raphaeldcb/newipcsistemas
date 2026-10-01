@@ -4,7 +4,7 @@
  */
 
 require_once __DIR__ . '/config/load-env.php';
-require_once __DIR__ . '/config/config.php';
+$config = require_once __DIR__ . '/config/config.php';
 
 try {
     $pdo = new PDO(
