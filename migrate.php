@@ -22,9 +22,9 @@ try {
 
     // Add classification columns if they don't exist
     $migrations = [
-        "ALTER TABLE communications ADD COLUMN IF NOT EXISTS classification VARCHAR(50) DEFAULT 'UNKNOWN' COMMENT 'JUDICIAL, NON_JUDICIAL, UNKNOWN'",
-        "ALTER TABLE communications ADD COLUMN IF NOT EXISTS cnj_number VARCHAR(50) DEFAULT NULL COMMENT 'Número de autos CNJ'",
-        "ALTER TABLE communications ADD COLUMN IF NOT EXISTS has_complete_data BOOLEAN DEFAULT FALSE COMMENT 'Has CNJ, vara, comarca'",
+        "ALTER TABLE communications ADD COLUMN classification VARCHAR(50) DEFAULT 'UNKNOWN' COMMENT 'JUDICIAL, NON_JUDICIAL, UNKNOWN'",
+        "ALTER TABLE communications ADD COLUMN cnj_number VARCHAR(50) DEFAULT NULL COMMENT 'Número de autos CNJ'",
+        "ALTER TABLE communications ADD COLUMN has_complete_data BOOLEAN DEFAULT FALSE COMMENT 'Has CNJ, vara, comarca'",
     ];
 
     foreach ($migrations as $sql) {
