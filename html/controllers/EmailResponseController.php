@@ -104,6 +104,8 @@ EOT;
      */
     private function createDraftInOutlook($to_email, $subject, $body, $access_token)
     {
+        error_log("🔍 createDraftInOutlook - token present: " . (empty($access_token) ? 'NO' : 'YES'));
+
         $ch = curl_init('https://graph.microsoft.com/v1.0/me/messages');
 
         $payload = [
@@ -127,14 +129,20 @@ EOT;
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
+        error_log("📤 Sending to Graph API: " . json_encode(['to' => $to_email, 'subject' => $subject]));
+
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
         curl_close($ch);
+
+        error_log("📥 Graph API Response (HTTP $http_code): " . substr($response, 0, 500));
 
         if ($http_code >= 400) {
             throw new Exception("Graph API error ($http_code): " . $response);
         }
 
+        error_log("✅ Draft created successfully!");
         return json_decode($response, true);
     }
 
