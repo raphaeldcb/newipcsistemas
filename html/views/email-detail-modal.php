@@ -315,8 +315,12 @@ function openEmailModal(commId) {
                 document.getElementById('responseToEmail').textContent = comm.from_address;
                 document.getElementById('responseSubject').textContent = 'RE: ' + comm.subject;
 
-                // Set response body
-                const responseTemplate = `Prezados,
+                // Set response body based on classification and completeness
+                let responseTemplate;
+
+                if (comm.classification === 'JUDICIAL' && comm.has_complete_data) {
+                    // Full template for judicial emails with all required data
+                    responseTemplate = `Prezados,
 
 Acusamos o recebimento de sua comunicação e do(s) respectivo(s) anexo(s).
 
@@ -328,6 +332,12 @@ Para garantirmos a celeridade no processamento desta intimação e a rápida dis
 Aviso de Sistema: A ausência do número processual no formato CNJ impede a triagem automática do nosso sistema de gestão.
 
 Esta é uma mensagem automática. O e-mail original foi devidamente encaminhado para o nosso departamento administrativo.`;
+                } else {
+                    // Generic template for non-judicial or incomplete judicial emails
+                    responseTemplate = `Prezados,
+
+Acusamos o recebimento de sua comunicação e do(s) respectivo(s) anexo(s).`;
+                }
 
                 document.getElementById('responseBody').textContent = responseTemplate;
 
