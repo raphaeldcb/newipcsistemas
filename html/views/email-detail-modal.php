@@ -395,7 +395,55 @@ function classifyEmail() {
 
 function generateAutoResponse() {
     const commId = document.getElementById('emailDetailModal').dataset.commId;
-    alert('⚡ Gerando resposta automática para ID: ' + commId + '\n\n(Função em desenvolvimento)');
+    const vara = document.getElementById('modalVara').textContent;
+    const comarca = document.getElementById('modalComarca').textContent;
+    const processo = document.getElementById('modalProcess').textContent;
+    const subject = document.getElementById('modalSubject').textContent;
+    const fromAddress = document.getElementById('responseToEmail').textContent;
+
+    console.log('⚡ Gerando resposta automática...');
+    console.log('   Vara:', vara);
+    console.log('   Comarca:', comarca);
+    console.log('   Processo:', processo);
+
+    // Construir template de resposta judicial completo
+    const responseTemplate = `Prezados Senhores,
+
+Acusamos o recebimento de sua comunicação referente ao PROCESSO Nº ${processo}.
+
+DADOS DO PROCESSO:
+• Número: ${processo}
+• Vara: ${vara}
+• Comarca: ${comarca}
+
+CONFIRMAÇÃO DE RECEBIMENTO:
+✓ A intimação foi devidamente recebida e registrada em nosso sistema.
+✓ O número do processo encontra-se registrado em nossa base de dados judicial.
+✓ A documentação foi encaminhada para análise técnica e administrativa.
+
+PRÓXIMOS PASSOS:
+1. Nosso departamento administrativo analisará a documentação recebida.
+2. Caso necessário, entraremos em contato para complementações.
+3. Respeitaremos todos os prazos processuais estabelecidos.
+
+Esta é uma mensagem automática gerada pelo Sistema de Comunicações Judiciais.
+
+Atenciosamente,
+
+IPC - PERÍCIAS E CONSULTORIA
+Sistema de Comunicações Judiciais
+${new Date().toLocaleDateString('pt-BR')}`;
+
+    // Preencher resposta
+    document.getElementById('responseBody').textContent = responseTemplate;
+
+    // Preencher data (próximo dia útil)
+    const responseDate = new Date();
+    responseDate.setDate(responseDate.getDate() + 1);
+    document.getElementById('responseDate').value = responseDate.toISOString().split('T')[0];
+    document.getElementById('responseTime').value = '09:00';
+
+    alert('✅ Resposta automática gerada!\n\nAgora clique em "📧 Agendar Resposta" para confirmar o envio.');
 }
 
 function markAsAnalyzed() {

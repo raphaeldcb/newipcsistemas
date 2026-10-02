@@ -76,17 +76,54 @@ class EmailClassifierService
 
     /**
      * Classify text as JUDICIAL or NON_JUDICIAL
-     * Stricter rules - requires MULTIPLE judicial indicators
+     * Uses comprehensive list of judicial terms from Brazilian court system
      */
     private function classifyAsJudicial($text)
     {
         $judicial_keywords = [
-            'TRIBUNAL', 'JUIZ', 'SENTENÇA', 'DECISÃO', 'APELAÇÃO', 'AGRAVO',
-            'AUTOS', 'VARA', 'COMARCA', 'CNJ', 'INTIMAÇÃO',
-            'CARTÓRIO', 'MANDADO', 'PETIÇÃO', 'DESPACHO', 'ACÓRDÃO',
-            'RECURSO', 'AUDIÊNCIA', 'CITAÇÃO', 'NOTIFICAÇÃO JUDICIAL',
-            'PODER JUDICIÁRIO', 'EXECUÇÃO', 'CUMPRIMENTO SENTENÇA',
-            'PROCESSO JUDICIAL', 'AÇÃO JUDICIAL', 'OFÍCIO JUDICIAL'
+            // Tribunais
+            'TRIBUNAL DE JUSTIÇA', 'TRIBUNAL REGIONAL FEDERAL', 'TRIBUNAL REGIONAL DO TRABALHO',
+            'TRIBUNAL REGIONAL ELEITORAL', 'SUPREMO TRIBUNAL FEDERAL', 'SUPERIOR TRIBUNAL DE JUSTIÇA',
+            'TRIBUNAL SUPERIOR DO TRABALHO', 'TJ', 'TRF', 'TRT', 'TRE', 'STF', 'STJ', 'TST',
+            'TJMS', 'TJSP', 'TJPR', 'TJMT', 'TJGO', 'TJMG', 'TJRS', 'TJSC', 'TJBA', 'TJPE', 'TJCE', 'TJDFT',
+
+            // Judiciário
+            'VARA', 'VARA JUDICIAL', 'VARA CÍVEL', 'VARA CRIMINAL', 'VARA DE FAMÍLIA',
+            'VARA DA FAZENDA PÚBLICA', 'VARA DO TRABALHO', 'VARA FEDERAL',
+            'JUIZADO', 'JUIZADO ESPECIAL', 'JUIZADO ESPECIAL CÍVEL', 'JUIZADO ESPECIAL CRIMINAL',
+            'FÓRUM', 'COMARCA', 'TURMA RECURSAL', 'CÂMARA', 'CARTÓRIO', 'CARTÓRIO JUDICIAL',
+            'CENTRAL DE MANDADOS', 'PODER JUDICIÁRIO', 'JUSTIÇA ESTADUAL', 'JUSTIÇA FEDERAL',
+            'JUSTIÇA DO TRABALHO', 'SECRETARIA JUDICIAL', 'SECRETARIA DA VARA',
+
+            // Pessoas
+            'JUIZ', 'JUÍZA', 'MAGISTRADO', 'MAGISTRADA', 'MM. JUIZ', 'MM. JUÍZA',
+            'OFICIAL DE JUSTIÇA', 'DEFENSOR PÚBLICO', 'PROMOTOR DE JUSTIÇA', 'MINISTÉRIO PÚBLICO',
+
+            // Processo
+            'PROCESSO', 'PROCESSO JUDICIAL', 'NÚMERO DO PROCESSO', 'Nº DO PROCESSO',
+            'AUTOS', 'AUTOS DO PROCESSO', 'CNJ', 'PJE', 'E-SAJ', 'ESAJ', 'EPROC', 'PROJUDI',
+
+            // Atos
+            'INTIMAÇÃO', 'INTIMADO', 'INTIMADA', 'CITAÇÃO', 'CITADO', 'CITADA',
+            'NOTIFICAÇÃO JUDICIAL', 'MANDADO', 'MANDADO JUDICIAL',
+            'DESPACHO', 'DECISÃO', 'DECISÃO JUDICIAL', 'SENTENÇA', 'ACÓRDÃO',
+            'AUDIÊNCIA', 'AUDIÊNCIA JUDICIAL', 'PERÍCIA', 'PERÍCIA JUDICIAL',
+            'LAUDO', 'LAUDO PERICIAL', 'APRESENTAÇÃO DO LAUDO', 'ENTREGA DO LAUDO',
+
+            // Perícia
+            'PERITO', 'PERITA', 'PERITO JUDICIAL', 'PERITA JUDICIAL',
+            'NOMEAÇÃO', 'NOMEAÇÃO DE PERITO', 'NOMEADO', 'NOMEADA',
+            'QUESITOS', 'ASSISTENTE TÉCNICO', 'HONORÁRIOS PERICIAIS',
+
+            // Procedimentos
+            'EXECUÇÃO', 'CUMPRIMENTO DE SENTENÇA', 'PETIÇÃO', 'MANIFESTAÇÃO',
+            'DETERMINAÇÃO', 'DETERMINAÇÃO JUDICIAL', 'ORDEM JUDICIAL', 'OFÍCIO JUDICIAL',
+            'FICA VOSSA SENHORIA INTIMADO', 'POR DETERMINAÇÃO', 'DETERMINO', 'INTIME-SE',
+            'CITE-SE', 'CIENTIFIQUE-SE', 'PRAZO PROCESSUAL', 'NO PRAZO DE',
+
+            // Partes
+            'AUTOR', 'RÉU', 'REQUERENTE', 'REQUERIDO', 'EXEQUENTE', 'EXECUTADO',
+            'RECLAMANTE', 'RECLAMADO', 'ADVOGADO', 'PROCURADOR'
         ];
 
         $non_judicial_keywords = [
@@ -103,28 +140,23 @@ class EmailClassifierService
 
         foreach ($judicial_keywords as $keyword) {
             if (strpos($text, $keyword) !== false) {
-                $judicial_score += 2;
+                $judicial_score++;
             }
         }
 
         foreach ($non_judicial_keywords as $keyword) {
             if (strpos($text, $keyword) !== false) {
-                $non_judicial_score += 2;  // Increased weight for non-judicial
+                $non_judicial_score++;
             }
         }
 
-        // If no clear classification, return UNKNOWN
-        if ($judicial_score == 0 && $non_judicial_score == 0) {
-            return 'UNKNOWN';
-        }
-
-        // Require at least 2 judicial indicators or clear judicial language
-        // Non-judicial has priority if found
+        // Non-judicial has priority
         if ($non_judicial_score > 0) {
             return 'NON_JUDICIAL';
         }
 
-        return $judicial_score >= 2 ? 'JUDICIAL' : 'UNKNOWN';
+        // Require at least 1 judicial indicator
+        return $judicial_score >= 1 ? 'JUDICIAL' : 'UNKNOWN';
     }
 
     /**
@@ -178,42 +210,77 @@ class EmailClassifierService
 
     /**
      * Extract VARA (judicial unit)
+     * Handles: "VARA ÚNICA", "1ª VARA", "VARA CÍVEL", etc.
      */
     private function extractVara($text)
     {
-        $vara_patterns = [
-            '/\b(\d+)\.?ª\s+VARA\b/i' => 0,  // Return full match: "1ª VARA"
-            '/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)\s+(?:DE|DA|DO)?\s+(\w+)/i' => 1,  // Return group 1: city name
-            '/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)\s+DE\s+(\w+\s+\w+)/i' => 1,  // Handle 2-word places
-            '/VARA\s+DE\s+(\w+\s+\w+)/i' => 1,  // City with spaces
-            '/VARA\s+DE\s+(\w+)/i' => 1,  // Simple "VARA DE CITY"
-            '/(\d+)\.?ª\s+VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)/i' => 0  // "1ª VARA CÍVEL"
-        ];
-
-        foreach ($vara_patterns as $pattern => $group) {
-            if (preg_match($pattern, $text, $matches)) {
-                $result = isset($matches[$group]) ? $matches[$group] : $matches[0];
-                return trim($result);
-            }
+        // Pattern 1: "VARA ÚNICA" or just "VARA" with specific types
+        if (preg_match('/VARA\s+ÚNICA/i', $text, $matches)) {
+            return trim($matches[0]);
         }
+
+        // Pattern 2: Numbered vara like "1ª VARA CÍVEL"
+        if (preg_match('/\b(\d+)\.?ª\s+VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA|FEDERAL)?/i', $text, $matches)) {
+            return trim($matches[0]);
+        }
+
+        // Pattern 3: "VARA DE CITY" or "VARA CÍVEL DE CITY"
+        if (preg_match('/VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA)?\s+DE\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|TRIBUNAL|COMARCA|FORO)/i', $text, $matches)) {
+            return 'VARA DE ' . trim($matches[1]);
+        }
+
+        // Pattern 4: Simple type "VARA CÍVEL"
+        if (preg_match('/(VARA\s+(?:CÍVEL|CRIMINAL|TRABALHISTA|COMERCIAL|FAMÍLIA|FAZENDA|FEDERAL))/i', $text, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Pattern 5: Just "VARA"
+        if (preg_match('/\bVARA\b/i', $text)) {
+            return 'VARA';
+        }
+
         return null;
     }
 
     /**
      * Extract COMARCA (judicial district)
+     * Also looks for TRIBUNAL location
      */
     private function extractComarca($text)
     {
-        $comarca_patterns = [
-            '/COMARCA\s+(?:DE|DA|DO)?\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|VARA)/i',
-            '/FORO\s+(?:DE|DA|DO)?\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|VARA)/i',
-        ];
+        // Pattern 1: Explicit COMARCA
+        if (preg_match('/COMARCA\s+(?:DE|DA|DO)?\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|VARA|TRIBUNAL|FORO|$)/i', $text, $matches)) {
+            return trim($matches[1]);
+        }
 
-        foreach ($comarca_patterns as $pattern) {
-            if (preg_match($pattern, $text, $matches)) {
-                return trim($matches[1]);
+        // Pattern 2: FORO DE CITY
+        if (preg_match('/FORO\s+(?:DE|DA|DO)?\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|VARA|TRIBUNAL|$)/i', $text, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Pattern 3: Look for state abbreviations (TJMS, TJSP, etc.) and map to state
+        if (preg_match('/TJ([A-Z]{2})/i', $text, $matches)) {
+            $state_codes = [
+                'MS' => 'MATO GROSSO DO SUL',
+                'SP' => 'SÃO PAULO',
+                'PR' => 'PARANÁ',
+                'MT' => 'MATO GROSSO',
+                'GO' => 'GOIÁS',
+                'MG' => 'MINAS GERAIS',
+                'RS' => 'RIO GRANDE DO SUL',
+                'SC' => 'SANTA CATARINA',
+                'BA' => 'BAHIA',
+                'PE' => 'PERNAMBUCO',
+                'CE' => 'CEARÁ',
+                'RJ' => 'RIO DE JANEIRO',
+                'DF' => 'DISTRITO FEDERAL'
+            ];
+            $state = strtoupper($matches[1]);
+            if (isset($state_codes[$state])) {
+                return $state_codes[$state];
             }
         }
+
         return null;
     }
 }
