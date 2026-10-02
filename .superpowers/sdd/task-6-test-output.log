@@ -1,0 +1,47 @@
+======================================================================
+TASK 6: E2E JUDICIAL EMAIL CLASSIFICATION TEST
+======================================================================
+
+STEP 1: Database Connection & Email Insertion
+✓ Connected to PostgreSQL database
+
+✓ Test email inserted (ID: 22)
+
+STEP 2: Classification Result
+  is_judicial: True
+  confidence: 0.9800
+  reason: Número CNJ detectado
+  numero_processo: 0001234-12.2026.8.26
+  vara: ÚNICA
+  tribunal: TJ-MS
+
+STEP 3: Validation Checks
+✓ is_judicial is TRUE
+✓ Confidence >= 0.85 (0.9800)
+✓ CNJ number extracted
+✓ Vara extracted: ÚNICA
+✓ Tribunal extracted: TJ-MS
+✓ Reasoning: Número CNJ detectado
+✓ Timestamp set
+
+Validation: 7/7 checks passed
+
+======================================================================
+SUMMARY
+======================================================================
+Test Email ID: 22
+Validation: 7/7 checks passed
+
+Email State:
+{
+  "id": 22,
+  "is_judicial": true,
+  "judicial_confidence": 0.98,
+  "judicial_reason": "N\u00famero CNJ detectado",
+  "numero_processo": "0001234-12.2026.8.26",
+  "vara": "\u00daNICA",
+  "tribunal": "TJ-MS",
+  "status": "completo"
+}
+
+✓ TEST PASSED
