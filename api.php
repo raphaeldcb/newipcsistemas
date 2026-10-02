@@ -147,7 +147,16 @@ switch ($action) {
     case 'get_detail':
         $id = $_GET['id'] ?? null;
         if ($id) {
-            $stmt = $pdo->prepare('SELECT * FROM communications WHERE id = ?');
+            // Explicit select including new classification fields (confidence, reasoning, extracted_at)
+            $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+                             from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
+                             received_datetime, vara, comarca, processo_numero, pedido,
+                             has_attachments, attachment_count, status, classification,
+                             processed_at, processing_notes, is_duplicate, duplicate_of_id,
+                             user_corrected, correction_notes, synced_at, created_at, updated_at,
+                             confidence, reasoning, extracted_at
+                      FROM communications WHERE id = ?';
+            $stmt = $pdo->prepare($query);
             $stmt->execute([$id]);
             $comm = $stmt->fetch(PDO::FETCH_ASSOC);
 

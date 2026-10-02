@@ -68,10 +68,19 @@ class Communication
 
     /**
      * Get all communications with optional filters
+     * Includes new fields: confidence, reasoning, extracted_at
      */
     public function getAll($filters = [])
     {
-        $query = 'SELECT * FROM communications WHERE 1=1';
+        // Explicit select including new classification fields
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+                         from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
+                         received_datetime, vara, comarca, processo_numero, pedido,
+                         has_attachments, attachment_count, status, classification,
+                         processed_at, processing_notes, is_duplicate, duplicate_of_id,
+                         user_corrected, correction_notes, synced_at, created_at, updated_at,
+                         confidence, reasoning, extracted_at
+                  FROM communications WHERE 1=1';
         $params = [];
 
         if (!empty($filters['status'])) {
@@ -105,20 +114,38 @@ class Communication
 
     /**
      * Get communication by ID
+     * Includes new fields: confidence, reasoning, extracted_at
      */
     public function getById($id)
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM communications WHERE id = ?');
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+                         from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
+                         received_datetime, vara, comarca, processo_numero, pedido,
+                         has_attachments, attachment_count, status, classification,
+                         processed_at, processing_notes, is_duplicate, duplicate_of_id,
+                         user_corrected, correction_notes, synced_at, created_at, updated_at,
+                         confidence, reasoning, extracted_at
+                  FROM communications WHERE id = ?';
+        $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
 
     /**
      * Get communication by message ID
+     * Includes new fields: confidence, reasoning, extracted_at
      */
     public function getByMessageId($message_id)
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM communications WHERE message_id = ?');
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+                         from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
+                         received_datetime, vara, comarca, processo_numero, pedido,
+                         has_attachments, attachment_count, status, classification,
+                         processed_at, processing_notes, is_duplicate, duplicate_of_id,
+                         user_corrected, correction_notes, synced_at, created_at, updated_at,
+                         confidence, reasoning, extracted_at
+                  FROM communications WHERE message_id = ?';
+        $stmt = $this->pdo->prepare($query);
         $stmt->execute([$message_id]);
         return $stmt->fetch();
     }
