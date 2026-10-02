@@ -177,7 +177,7 @@ class MicrosoftGraphService
         $endpoint = self::GRAPH_URL . '/users/' . urlencode($this->mailbox) . '/mailFolders/inbox/messages';
 
         $params = [
-            '$select' => 'id,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,hasAttachments,attachments',
+            '$select' => 'id,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,hasAttachments,attachments',
             '$top' => 100,
         ];
 

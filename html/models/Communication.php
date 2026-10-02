@@ -27,13 +27,14 @@ class Communication
         if ($existing) {
             // Update
             $this->pdo->prepare(
-                'UPDATE communications SET subject = ?, body_preview = ?, from_address = ?,
+                'UPDATE communications SET subject = ?, body_preview = ?, body = ?, from_address = ?,
                  from_name = ?, received_datetime = ?, has_attachments = ?,
                  attachment_count = ?, status = ?, updated_at = NOW()
                  WHERE id = ?'
             )->execute([
                 $data['subject'] ?? null,
                 $data['body_preview'] ?? null,
+                $data['body'] ?? null,
                 $data['from_address'] ?? null,
                 $data['from_name'] ?? null,
                 $data['received_datetime'] ?? null,
@@ -47,14 +48,15 @@ class Communication
             // Insert
             $this->pdo->prepare(
                 'INSERT INTO communications
-                (message_id, conversation_id, subject, body_preview, from_address, from_name,
+                (message_id, conversation_id, subject, body_preview, body, from_address, from_name,
                  received_datetime, has_attachments, attachment_count, status, synced_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
             )->execute([
                 $data['message_id'],
                 $data['conversation_id'] ?? null,
                 $data['subject'] ?? null,
                 $data['body_preview'] ?? null,
+                $data['body'] ?? null,
                 $data['from_address'] ?? null,
                 $data['from_name'] ?? null,
                 $data['received_datetime'] ?? null,
@@ -68,12 +70,12 @@ class Communication
 
     /**
      * Get all communications with optional filters
-     * Includes new fields: confidence, reasoning, extracted_at
+     * Includes new fields: confidence, reasoning, extracted_at, body
      */
     public function getAll($filters = [])
     {
-        // Explicit select including new classification fields
-        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+        // Explicit select including new classification fields and full body
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview, body,
                          from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
                          received_datetime, vara, comarca, processo_numero, pedido,
                          has_attachments, attachment_count, status, classification,
@@ -114,11 +116,11 @@ class Communication
 
     /**
      * Get communication by ID
-     * Includes new fields: confidence, reasoning, extracted_at
+     * Includes new fields: confidence, reasoning, extracted_at, body
      */
     public function getById($id)
     {
-        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview, body,
                          from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
                          received_datetime, vara, comarca, processo_numero, pedido,
                          has_attachments, attachment_count, status, classification,
@@ -133,11 +135,11 @@ class Communication
 
     /**
      * Get communication by message ID
-     * Includes new fields: confidence, reasoning, extracted_at
+     * Includes new fields: confidence, reasoning, extracted_at, body
      */
     public function getByMessageId($message_id)
     {
-        $query = 'SELECT id, message_id, conversation_id, subject, body_preview,
+        $query = 'SELECT id, message_id, conversation_id, subject, body_preview, body,
                          from_address, from_name, to_addresses, cc_addresses, bcc_addresses,
                          received_datetime, vara, comarca, processo_numero, pedido,
                          has_attachments, attachment_count, status, classification,
