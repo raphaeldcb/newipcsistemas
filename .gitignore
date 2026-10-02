@@ -44,6 +44,12 @@ npm-debug.log
 *.db
 *.sqlite
 
+# Test outputs
+.superpowers/sdd/task-*-output.log
+tests/E2e*
+coverage/
+htmlcov/
+
 # Misc
 .git/
 .github/

@@ -6,6 +6,71 @@ Sistema de gestão de perícias judiciais com integração Microsoft 365 e proce
 
 ---
 
+## 🤖 AI-Powered Email Classification (v2.0)
+
+### Overview
+Emails are now classified using **Qwen 7B** AI model via Ollama (running locally on port 11434).
+
+### How It Works
+1. User clicks Extract on an email in Comunicações
+2. System sends subject + full body to Python service
+3. Qwen analyzes and returns:
+   - Classification (JUDICIAL / NON_JUDICIAL / UNKNOWN)
+   - Confidence score (0.0-1.0)
+   - Extracted fields: CNJ #, Vara, Comarca, Tribunal, Pedido summary
+   - Reasoning for the classification
+4. Database stores all results + confidence + timestamp
+5. UI shows classification with confidence badge
+
+### Confidence Interpretation
+- **0.9-1.0**: Very confident, likely accurate
+- **0.7-0.9**: Confident, occasional review recommended
+- **0.5-0.7**: Moderate, review recommended
+- **< 0.5**: Low confidence, manual review recommended
+
+### Fallback Strategy
+If Ollama/Qwen unavailable:
+- System falls back to keyword matching (original method)
+- Classification still works with lower confidence
+- No user intervention needed
+
+### Troubleshooting
+
+**Q: Emails not classified as JUDICIAL?**
+A:
+1. Check Ollama running: `curl http://localhost:11434/api/tags`
+2. Verify model: should see `perito-qwen`
+3. Ensure email body is complete (not truncated in DB)
+4. Run manual test: `python3 tests/test_qwen_classifier.py`
+
+**Q: Classification taking too long?**
+A: Qwen timeout is 30s. If Ollama is slow:
+1. Free up system RAM
+2. Check Ollama logs: `tail -f ~/.ollama/ollama.log`
+3. Reduce concurrent extractions
+
+**Q: JSON parsing error from Qwen?**
+A: This triggers fallback automatically, but:
+1. Check Qwen prompt in `QwenClassifierService.py`
+2. Verify Ollama response manually
+3. Check Ollama logs
+
+### Configuration
+
+**Qwen Model:**
+- Model: `perito-qwen` (based on Qwen 7B)
+- Port: 11434 (Ollama)
+- Timeout: 30 seconds
+- Temperature: 0.3 (low = consistent)
+
+**Database Fields:**
+- `confidence`: float (0.0-1.0)
+- `reasoning`: text (brief explanation)
+- `extracted_at`: timestamp (when classification ran)
+- `full_body`: longtext (complete email body)
+
+---
+
 ## 📋 Requisitos
 
 - **Wampserver 3.3.5** (Apache 2.4.59 + PHP 8.2.18 + MySQL 8.3.0)
