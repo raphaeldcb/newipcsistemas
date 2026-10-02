@@ -1,26 +1,56 @@
 <?php
 /**
  * Email Classifier Service
- * Classifies emails as JUDICIAL or NON_JUDICIAL
- * Extracts CNJ number, vara, comarca
+ * Classifies emails as JUDICIAL or NON_JUDICIAL using Qwen AI (with fallback to keyword matching)
+ * Extracts CNJ number, vara, comarca, and stores confidence + reasoning
  */
 
 class EmailClassifierService
 {
     private $pdo;
+    private $qwen_classifier = null;
 
-    public function __construct($pdo)
+    public function __construct($pdo, $qwen_classifier = null)
     {
         $this->pdo = $pdo;
+
+        // Optionally inject Qwen classifier (for testing or custom config)
+        if ($qwen_classifier !== null) {
+            $this->qwen_classifier = $qwen_classifier;
+        }
+    }
+
+    /**
+     * Initialize Qwen classifier if not already done
+     */
+    private function initQwenClassifier()
+    {
+        if ($this->qwen_classifier === null) {
+            try {
+                require_once dirname(__FILE__) . '/QwenClassifierServicePHP.php';
+                $this->qwen_classifier = new QwenClassifierServicePHP();
+            } catch (Exception $e) {
+                // Log but don't fail - will use fallback
+                error_log("Failed to initialize Qwen classifier: " . $e->getMessage());
+                $this->qwen_classifier = false; // Mark as failed
+            }
+        }
+        return $this->qwen_classifier !== false ? $this->qwen_classifier : null;
     }
 
     /**
      * Classify email and extract judicial data
+     * Uses Qwen AI with fallback to keyword matching
      */
     public function classifyEmail($communication_id)
     {
         try {
-            $stmt = $this->pdo->prepare('SELECT subject, body_preview, from_name FROM communications WHERE id = ?');
+            // Fetch email data
+            $stmt = $this->pdo->prepare('
+                SELECT id, subject, body_preview, body, from_name
+                FROM communications
+                WHERE id = ?
+            ');
             $stmt->execute([$communication_id]);
             $comm = $stmt->fetch();
 
@@ -28,28 +58,68 @@ class EmailClassifierService
                 return ['success' => false, 'error' => 'Communication not found'];
             }
 
-            $text = strtoupper($comm['subject'] . ' ' . $comm['body_preview']);
+            // Prefer full body, fall back to preview
+            $body = !empty($comm['body']) ? $comm['body'] : $comm['body_preview'];
+            $subject = $comm['subject'] ?? '';
 
-            // Classify: JUDICIAL or NON_JUDICIAL
-            $classification = $this->classifyAsJudicial($text);
+            // Try Qwen classification first
+            $qwen = $this->initQwenClassifier();
+            $qwen_result = null;
+            $use_fallback = false;
+            $confidence = 0.0;
+            $reasoning = '';
 
-            // Extract data if judicial
-            $cnj_number = null;
-            $vara = null;
-            $comarca = null;
-            $has_complete_data = false;
+            if ($qwen !== null) {
+                $qwen_result = $qwen->classifyEmail($subject, $body);
 
-            if ($classification === 'JUDICIAL') {
-                $cnj_number = $this->extractCNJNumber($text);
-                $vara = $this->extractVara($text);
-                $comarca = $this->extractComarca($text);
-                $has_complete_data = (!empty($cnj_number) && !empty($vara) && !empty($comarca));
+                if ($qwen_result && isset($qwen_result['success']) && $qwen_result['success']) {
+                    // Qwen succeeded
+                    $classification = $qwen_result['classification'] ?? 'UNKNOWN';
+                    $cnj_number = $qwen_result['cnj_number'] ?? null;
+                    $vara = $qwen_result['vara'] ?? null;
+                    $comarca = $qwen_result['comarca'] ?? null;
+                    $confidence = floatval($qwen_result['confidence'] ?? 0.0);
+                    $reasoning = $qwen_result['reasoning'] ?? '';
+                } else {
+                    // Qwen failed or returned error, use fallback
+                    $use_fallback = true;
+                    $confidence = 0.0;
+                    $reasoning = $qwen_result['error'] ?? 'Qwen classification failed, using fallback';
+                }
+            } else {
+                // Qwen not available, use fallback
+                $use_fallback = true;
+                $reasoning = 'Qwen classifier unavailable, using keyword fallback';
             }
 
-            // Update database
+            // If using fallback, apply keyword-based classification
+            if ($use_fallback) {
+                $text = strtoupper($subject . ' ' . $body);
+                $classification = $this->classifyAsJudicialFallback($text);
+                $cnj_number = $this->extractCNJNumberFallback($text);
+                $vara = $this->extractVaraFallback($text);
+                $comarca = $this->extractComarcaFallback($text);
+                $confidence = 0.5; // Lower confidence for fallback
+                if (empty($reasoning)) {
+                    $reasoning = 'Keyword fallback classification';
+                }
+            }
+
+            // Ensure values are properly set
+            $classification = $classification ?? 'UNKNOWN';
+            $has_complete_data = !empty($cnj_number) && !empty($vara) && !empty($comarca);
+
+            // Update database with all 7 fields
             $update = $this->pdo->prepare('
                 UPDATE communications
-                SET classification = ?, cnj_number = ?, vara = ?, comarca = ?, has_complete_data = ?
+                SET classification = ?,
+                    cnj_number = ?,
+                    vara = ?,
+                    comarca = ?,
+                    has_complete_data = ?,
+                    confidence = ?,
+                    reasoning = ?,
+                    extracted_at = NOW()
                 WHERE id = ?
             ');
             $update->execute([
@@ -58,6 +128,8 @@ class EmailClassifierService
                 $vara,
                 $comarca,
                 $has_complete_data ? 1 : 0,
+                $confidence,
+                $reasoning,
                 $communication_id
             ]);
 
@@ -67,7 +139,10 @@ class EmailClassifierService
                 'cnj_number' => $cnj_number,
                 'vara' => $vara,
                 'comarca' => $comarca,
-                'has_complete_data' => $has_complete_data
+                'has_complete_data' => $has_complete_data,
+                'confidence' => $confidence,
+                'reasoning' => $reasoning,
+                'used_fallback' => $use_fallback
             ];
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
@@ -75,10 +150,11 @@ class EmailClassifierService
     }
 
     /**
-     * Classify text as JUDICIAL or NON_JUDICIAL
+     * Classify text as JUDICIAL or NON_JUDICIAL (Fallback)
      * Uses comprehensive list of judicial terms from Brazilian court system
+     * Called when Qwen is unavailable or fails
      */
-    private function classifyAsJudicial($text)
+    private function classifyAsJudicialFallback($text)
     {
         $judicial_keywords = [
             // Tribunais
@@ -160,17 +236,18 @@ class EmailClassifierService
     }
 
     /**
-     * Extract and validate CNJ number: 0000000-00.0000.0.00.0000
+     * Extract and validate CNJ number: 0000000-00.0000.0.00.0000 (Fallback)
      * Strict validation - must match exact pattern and pass check digits
+     * Called when Qwen is unavailable or fails
      */
-    private function extractCNJNumber($text)
+    private function extractCNJNumberFallback($text)
     {
         // Strict regex: 7 digits - 2 digits . 4 digits . 1 digit . 2 digits . 4 digits
         if (preg_match('/\b(\d{7})-(\d{2})\.(\d{4})\.(\d{1})\.(\d{2})\.(\d{4})\b/', $text, $matches)) {
             $cnj = $matches[0];
 
             // Validate CNJ structure
-            if ($this->isValidCNJ($cnj)) {
+            if ($this->isValidCNJFallback($cnj)) {
                 return $cnj;
             }
         }
@@ -178,10 +255,10 @@ class EmailClassifierService
     }
 
     /**
-     * Validate CNJ number: checks format and business rules
+     * Validate CNJ number: checks format and business rules (Fallback)
      * Format: NNNNNNN-DD.AAAA.J.TT.OOOO
      */
-    private function isValidCNJ($cnj)
+    private function isValidCNJFallback($cnj)
     {
         if (!preg_match('/^(\d{7})-(\d{2})\.(\d{4})\.(\d{1})\.(\d{2})\.(\d{4})$/', $cnj, $matches)) {
             return false;
@@ -209,10 +286,11 @@ class EmailClassifierService
     }
 
     /**
-     * Extract VARA (judicial unit)
+     * Extract VARA (judicial unit) (Fallback)
      * Handles: "VARA ÚNICA", "1ª VARA", "VARA CÍVEL", etc.
+     * Called when Qwen is unavailable or fails
      */
-    private function extractVara($text)
+    private function extractVaraFallback($text)
     {
         // Pattern 1: "VARA ÚNICA" or just "VARA" with specific types
         if (preg_match('/VARA\s+ÚNICA/i', $text, $matches)) {
@@ -243,10 +321,11 @@ class EmailClassifierService
     }
 
     /**
-     * Extract COMARCA (judicial district)
+     * Extract COMARCA (judicial district) (Fallback)
      * Also looks for TRIBUNAL location
+     * Called when Qwen is unavailable or fails
      */
-    private function extractComarca($text)
+    private function extractComarcaFallback($text)
     {
         // Pattern 1: Explicit COMARCA
         if (preg_match('/COMARCA\s+(?:DE|DA|DO)?\s+([A-ZÁÉÍÓÚ\s]+?)(?:\s+[-–]|\n|,|VARA|TRIBUNAL|FORO|$)/i', $text, $matches)) {
