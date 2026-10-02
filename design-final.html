@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novos Sistemas IPC - Design Final</title>
+    <style>
+        :root {
+          --color-primary: #132F4A;
+          --color-primary-light: #1A4A6F;
+          --color-primary-dark: #0D1F2D;
+          --color-accent: #10B981;
+          --color-gray-50: #F9FAFB;
+          --color-gray-100: #F3F4F6;
+          --color-gray-200: #E5E7EB;
+          --color-gray-300: #D1D5DB;
+          --color-gray-400: #9CA3AF;
+          --color-gray-500: #6B7280;
+          --color-gray-600: #4B5563;
+          --color-gray-700: #374151;
+          --color-gray-800: #1F2937;
+          --color-gray-900: #111827;
+          --color-success: #10B981;
+          --color-warning: #F59E0B;
+          --color-error: #EF4444;
+          --color-info: #3B82F6;
+          --bg-primary: #FFFFFF;
+          --bg-secondary: #F9FAFB;
+          --bg-tertiary: #F3F4F6;
+          --bg-card: #FFFFFF;
+          --text-primary: #1F2937;
+          --text-secondary: #6B7280;
+          --text-muted: #9CA3AF;
+          --border-color: #E5E7EB;
+          --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+          --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+          --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+          --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.12);
+          --spacing-xs: 0.25rem;
+          --spacing-sm: 0.5rem;
+          --spacing-md: 1rem;
+          --spacing-lg: 1.5rem;
+          --spacing-xl: 2rem;
+          --spacing-2xl: 3rem;
+          --radius-sm: 6px;
+          --radius-md: 8px;
+          --radius-lg: 12px;
+          --radius-xl: 16px;
+          --transition: all 0.2s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1A2332;
+            --bg-tertiary: #243447;
+            --bg-card: #1F2937;
+            --text-primary: #F3F4F6;
+            --text-secondary: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --border-color: #374151;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+          }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; transition: var(--transition); }
+
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: var(--spacing-md); }
+        h2 { font-size: 2rem; font-weight: 600; margin-bottom: var(--spacing-md); }
+        h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: var(--spacing-md); }
+        p { margin-bottom: var(--spacing-md); color: var(--text-secondary); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-2xl); }
+
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: var(--radius-md);
+          font-size: 0.95rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition);
+          text-decoration: none;
+          margin-right: var(--spacing-md);
+          margin-bottom: var(--spacing-md);
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+          color: white;
+          box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-lg);
+        }
+
+        .btn-success {
+          background-color: var(--color-success);
+          color: white;
+          box-shadow: var(--shadow-md);
+        }
+
+        .btn-success:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-lg);
+        }
+
+        .card {
+          background-color: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
+          transition: var(--transition);
+          margin-bottom: var(--spacing-xl);
+        }
+
+        .card:hover {
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+
+        .card-header {
+          padding: var(--spacing-lg);
+          background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+          color: white;
+        }
+
+        .card-header h2 {
+          margin-bottom: 0;
+          color: white;
+        }
+
+        .card-body {
+          padding: var(--spacing-lg);
+        }
+
+        .form-group {
+          margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+          font-weight: 600;
+          margin-bottom: var(--spacing-sm);
+          color: var(--text-primary);
+          display: block;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border: 1.5px solid var(--border-color);
+          border-radius: var(--radius-md);
+          background-color: var(--bg-card);
+          color: var(--text-primary);
+          font-size: 1rem;
+          font-family: inherit;
+          transition: var(--transition);
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3px rgba(19, 47, 74, 0.1);
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 0.4rem 0.8rem;
+          border-radius: 9999px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          white-space: nowrap;
+          margin-right: var(--spacing-md);
+        }
+
+        .badge-success {
+          background-color: rgba(16, 185, 129, 0.1);
+          color: var(--color-success);
+        }
+
+        .badge-warning {
+          background-color: rgba(245, 158, 11, 0.1);
+          color: var(--color-warning);
+        }
+
+        .badge-error {
+          background-color: rgba(239, 68, 68, 0.1);
+          color: var(--color-error);
+        }
+
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: var(--spacing-lg);
+        }
+
+        .text-center { text-align: center; }
+        .mt-2xl { margin-top: var(--spacing-2xl); }
+
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card { animation: slideUp 0.3s ease; }
+
+        .sidebar {
+          background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+          color: white;
+          padding: var(--spacing-xl);
+          border-radius: var(--radius-lg);
+          margin-bottom: var(--spacing-2xl);
+        }
+
+        .sidebar h2 { color: white; margin-top: 0; }
+
+        .menu { list-style: none; }
+        .menu li { margin-bottom: var(--spacing-md); }
+        .menu a { color: rgba(255, 255, 255, 0.9); text-decoration: none; font-weight: 500; transition: var(--transition); }
+        .menu a:hover { color: white; }
+
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          background-color: var(--bg-card);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+          box-shadow: var(--shadow-sm);
+        }
+
+        .table th {
+          background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+          color: white;
+          padding: var(--spacing-md);
+          text-align: left;
+          font-weight: 600;
+        }
+
+        .table td {
+          padding: var(--spacing-md);
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+          background-color: var(--bg-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>🏛️ Novos Sistemas IPC</h2>
+            <ul class="menu">
+                <li><a href="#">📊 Painel</a></li>
+                <li><a href="#">📧 Comunicações</a></li>
+                <li><a href="#">⚙️ Configurações</a></li>
+                <li><a href="#">📋 Relatórios</a></li>
+            </ul>
+        </div>
+
+        <h1>✅ Novo Design - Completamente Funcional</h1>
+        <p>Este é o novo design profissional e moderno que está sendo implementado no sistema.</p>
+
+        <div style="margin-bottom: var(--spacing-2xl);">
+            <h2>Botões</h2>
+            <button class="btn btn-primary">📊 Primário com Gradiente</button>
+            <button class="btn btn-success">✓ Sucesso</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📧 Comunicações</h2>
+                </div>
+                <div class="card-body">
+                    <p>Gerencie emails recebidos de tribunais e varas com segurança, eficiência e profissionalismo.</p>
+                    <div style="margin-top: var(--spacing-lg);">
+                        <span class="badge badge-success">12 Novas</span>
+                        <span class="badge badge-warning">3 Processando</span>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: var(--spacing-lg);">Ver Detalhes</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Painel</h2>
+                </div>
+                <div class="card-body">
+                    <p>Visualize estatísticas, métricas e analytics do sistema em tempo real com gráficos interativos.</p>
+                    <div style="margin-top: var(--spacing-lg);">
+                        <p><strong>Status do Sistema:</strong> <span class="badge badge-success">Online</span></p>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: var(--spacing-lg);">Abrir Painel</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚙️ Configurações</h2>
+                </div>
+                <div class="card-body">
+                    <p>Configure as preferências, integrações e permissões do seu sistema de forma intuitiva.</p>
+                    <div style="margin-top: var(--spacing-lg);">
+                        <p><strong>Tema:</strong> <span class="badge badge-success">Automático</span></p>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: var(--spacing-lg);">Configurar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-2xl">
+            <div class="card-header">
+                <h2>📝 Formulário de Login</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="seu@email.com" value="teste@ipcms.com.br">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" class="form-input" placeholder="••••••••" value="••••••••">
+                </div>
+                <button class="btn btn-primary">🔐 Entrar no Sistema</button>
+            </div>
+        </div>
+
+        <div class="card mt-2xl">
+            <div class="card-header">
+                <h2>📋 Tabela de Exemplo</h2>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Remetente</th>
+                            <th>Status</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>30/09/2026</td>
+                            <td>Tribunal de Justiça</td>
+                            <td><span class="badge badge-success">Processado</span></td>
+                            <td><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Ver</button></td>
+                        </tr>
+                        <tr>
+                            <td>29/09/2026</td>
+                            <td>TJMS</td>
+                            <td><span class="badge badge-warning">Novo</span></td>
+                            <td><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Ver</button></td>
+                        </tr>
+                        <tr>
+                            <td>28/09/2026</td>
+                            <td>Procuradora Geral</td>
+                            <td><span class="badge badge-success">Processado</span></td>
+                            <td><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Ver</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top: var(--spacing-2xl); padding: var(--spacing-xl); background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); border-radius: var(--radius-lg); color: white; text-align: center;">
+            <h2 style="color: white;">🎉 Design Novo Pronto Para Produção!</h2>
+            <p style="color: rgba(255,255,255,0.9);">Este é exatamente o design que será aplicado em toda a aplicação Novos Sistemas IPC.</p>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: var(--spacing-md);">✨ Paleta Perito v6 • 🌙 Dark/Light Mode • 📱 Design Responsivo • ⚡ Performance Otimizada</p>
+        </div>
+    </div>
+</body>
+</html>
