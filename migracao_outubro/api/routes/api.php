@@ -43,6 +43,19 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('creditos', CreditosController::class);
 
+        // Créditos com métodos especializados
+        Route::group(['prefix' => 'creditos/{credito}'], function () {
+            Route::post('/registrar-pagamento', [CreditosController::class, 'registrarPagamento'])->name('creditos.registrar-pagamento');
+            Route::post('/cancelar', [CreditosController::class, 'cancelar'])->name('creditos.cancelar');
+            Route::post('/reverter', [CreditosController::class, 'reverter'])->name('creditos.reverter');
+            Route::get('/parcelas', [CreditosController::class, 'parcelas'])->name('creditos.parcelas');
+        });
+        Route::post('/creditos/simular', [CreditosController::class, 'simular']);
+        Route::get('/creditos/pendentes', [CreditosController::class, 'pendentes']);
+        Route::get('/creditos/atrasadas', [CreditosController::class, 'atrasadas']);
+        Route::get('/creditos/tabela-fatores', [CreditosController::class, 'tabelaFatores']);
+        Route::post('/creditos/por-caso', [CreditosController::class, 'porCaso']);
+
         // Kits com rastreamento
         Route::apiResource('kits', KitsController::class);
         Route::group(['prefix' => 'kits/{kit}'], function () {
