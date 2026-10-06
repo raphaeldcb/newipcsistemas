@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ComarcasController;
 use App\Http\Controllers\Api\VarasController;
 use App\Http\Controllers\Api\JuizesController;
 use App\Http\Controllers\Api\CasosController;
+use App\Http\Controllers\Api\KitsController;
 use App\Http\Controllers\Api\CreditosController;
 
 Route::prefix('v1')->group(function () {
@@ -40,6 +41,18 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::apiResource('creditos', CreditosController::class);
+
+        // Kits com rastreamento
+        Route::apiResource('kits', KitsController::class);
+        Route::group(['prefix' => 'kits/{kit}'], function () {
+            Route::post('/rastrear', [KitsController::class, 'rastrear'])->name('kits.rastrear');
+            Route::get('/rastreamento', [KitsController::class, 'rastreamento'])->name('kits.rastreamento');
+            Route::get('/estados-validos', [KitsController::class, 'estadosValidos'])->name('kits.estados-validos');
+        });
+        Route::get('/kits/verificar-vencimentos', [KitsController::class, 'verificarVencimentos']);
+        Route::post('/kits/por-local', [KitsController::class, 'porLocal']);
+        Route::post('/kits/por-coletador', [KitsController::class, 'porColetador']);
+        Route::get('/kits/contagem-por-status', [KitsController::class, 'contagemPorStatus']);
 
         // Health check
         Route::get('/health', function () {
