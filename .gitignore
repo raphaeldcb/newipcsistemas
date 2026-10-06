@@ -1,8 +1,12 @@
 # Secrets & Credentials
-config/config.php
 .env
 .env.local
+.env.backup
 secrets.json
+
+# Legado (código antigo não versionado)
+legado/delphi/
+migracao_outubro/
 
 # Logs
 logs/*

@@ -1,34 +1,143 @@
-# Migração SCPG: Delphi/Firebird → PHP/API/MySQL
+# Novos Sistemas IPC — Unificação Completa
 
-> Este arquivo é lido automaticamente no início de cada sessão. Mantenha-o CURTO.
-> Detalhes ficam em docs/. Estado atual e próximos passos: @docs/PROGRESSO.md
+> Migração do App Comunicações (PHP puro) + SCPG (Laravel) em uma aplicação única.
+> Este arquivo é lido automaticamente no início de cada sessão.
 
-## Objetivo
-Migrar o sistema legado Delphi + Firebird 2.5 para PHP (API REST) + MySQL 8.3.
-Domínio (inferido do schema, CONFIRMAR): laboratório / processos (casos), pessoas, coletas, kits, alelos e marcadores, laudos.
+## 📌 Contexto
 
-## Regras de trabalho
-- Responda sempre em português do Brasil.
-- `legado/delphi/` é SOMENTE LEITURA. Nunca altere o código legado.
-- Antes de implementar um módulo: ler o código Delphi correspondente e registrar as regras de negócio em docs/.
-- Paridade: o comportamento novo deve bater com o legado (comparar saídas com o Firebird quando possível).
-- Nada de credenciais no repositório. Use `.env` (já no .gitignore). NUNCA enviar/commitar dados reais (LGPD): só estrutura e amostras anonimizadas.
-- Decisões de arquitetura/banco vão em docs/DECISOES.md (formato ADR curto).
-- Ao final de cada bloco de trabalho: rodar /encerrar (atualiza PROGRESSO.md, DECISOES.md e faz commit).
-- Ao começar uma sessão: rodar /retomar.
-- Pedir confirmação antes de ações destrutivas (apagar arquivos, DROP, reset de banco, reescrever histórico git).
+**Status**: Em unificação (Etapa 2/8)  
+**Stack**: Laravel 13 + PHP 8.3 + MySQL 8.3  
+**Bancos**: `sgbd_scpg` único (59 tabelas SCPG + 6 tabelas Comunicações)  
+**Módulos**: Comunicações, Casos, Pessoas, Kits, Extrações, SCEI, Créditos, Alelos, Relatórios, Admin
 
-## Banco (já convertido)
-- Origem: banco/firebird/estrutura.sql  → Destino: banco/mysql/estrutura_mysql.sql
-- MySQL 8.3, schema `sgbd_scpg`, utf8mb4 / utf8mb4_0900_ai_ci, InnoDB, nomes em minúsculo.
-- Detalhes e armadilhas: @docs/banco/CONVERSAO-FIREBIRD-MYSQL.md
+## 🎯 Regras de Trabalho
 
-## Stack alvo (PREENCHER após definir a arquitetura, ver docs/ARQUITETURA.md)
-- PHP: <versão> | Framework: <a definir> | Autenticação: <a definir>
-- Comandos: instalar `composer install` | testes `<a definir>` | servidor local `<a definir>`
+- **Português do Brasil** sempre.
+- **Sem credenciais** no repositório (`.env` no `.gitignore`).
+- **Sem dados reais** (LGPD): estrutura e amostras anonimizadas apenas.
+- **Decisões** em `docs/DECISOES.md` (ADRs).
+- **Regras de negócio** em `docs/REGRAS-NEGOCIO-*.md`.
+- **Testes**: `composer test` deve passar (banco separado `sgbd_scpg_test`).
+- **NUNCA** `php artisan migrate:fresh/reset` contra `sgbd_scpg`.
+- Confirmação antes de ações destrutivas (DROP, rm -rf, rewrite git).
 
-## Mapa do repositório
-- legado/delphi/   código-fonte Delphi (somente leitura)
-- banco/           scripts Firebird, MySQL e de migração de dados
-- api/             nova API PHP
-- docs/            arquitetura, decisões, progresso, mapeamentos
+## 📁 Estrutura de Pastas
+
+```
+newipcsistemas/
+├── api/                    ← Laravel (raiz, ex.: migracao_outubro/api)
+│   ├── app/ (Models, Controllers, Services, Repositories, ...)
+│   ├── database/migrations/ (18+ migrations)
+│   ├── resources/views/    (Blade: auth, dashboard, comunicacoes, casos, ...)
+│   ├── routes/             (web.php, api.php)
+│   ├── .env.example        (variáveis: GRAPH_*, OLLAMA_*, DB_*, ...)
+│   └── composer.json, artisan, vite.config.js, phpunit.xml, ...
+│
+├── python/                 ← Serviço auxiliar (Ollama/Qwen)
+│   ├── QwenClassifierService.py
+│   ├── extraction_service.py
+│   └── requirements.txt
+│
+├── banco/                  ← Scripts de banco
+│   ├── mysql/estrutura_mysql.sql
+│   ├── migracao/, firebird/
+│   └── converter_migrations.py
+│
+├── docs/                   ← Documentação consolidada
+│   ├── ARQUITETURA.md
+│   ├── DECISOES.md (15 ADRs)
+│   ├── REGRAS-NEGOCIO-*.md
+│   ├── PROGRESSO.md
+│   ├── banco/CONVERSAO-FIREBIRD-MYSQL.md
+│   └── superpowers/
+│
+├── _antigo/                ← App Comunicações (temporário, será deletado)
+│   ├── html/ (views antigo)
+│   ├── config-comunicacoes.php
+│   ├── index.php, api.php
+│   └── ...
+│
+├── CLAUDE.md               ← Este arquivo
+├── README.md               ← Setup + troubleshooting
+├── .env.example            ← Variáveis de ambiente
+├── .gitignore              ← Legado, migracao_outubro, .env, etc.
+└── backup-bancos.sh        ← Script de backup (Etapa 1)
+```
+
+## 🔧 Stack Técnico
+
+| Componente | Tecnologia |
+|---|---|
+| **Linguagem** | PHP 8.3+ |
+| **Framework** | Laravel 13 |
+| **Banco** | MySQL 8.3 (InnoDB) |
+| **ORM** | Eloquent |
+| **Autenticação** | Laravel Sanctum (JWT 24h, refresh 7d) + sessão web |
+| **Front-end** | Blade + Vite |
+| **Classificação** | Qwen 7B (Ollama, timeout 30s) + fallback keyword matching |
+| **PDF/Excel** | TCPDF, PhpSpreadsheet |
+| **Testes** | PHPUnit + Pest (80%+ coverage) |
+| **Cache** | Redis (opcional) |
+| **Logging** | Monolog (Laravel padrão) |
+
+## 📋 Etapas de Unificação (8 total)
+
+1. ✅ **Preparação**: tag pre-unificacao, branch unificacao, backup bancos
+2. ⏳ **Estrutura** (esta etapa): mover Laravel, consolidar docs/banco, remover legado
+3. ⏳ **Banco**: migrations unificadas, merge users
+4. ⏳ **Back-end**: portar Comunicações para Laravel
+5. ⏳ **Front-end**: Blade + Vite, menu único, MVP
+6. ⏳ **Testes**: portar tests, cobertura 80%+
+7. ⏳ **Limpeza**: remover scripts soltos, documentação final
+8. ⏳ **GitHub**: push, PR, merge em main
+
+## 🚀 Quick Start (Depois da Unificação)
+
+```bash
+# Instalar dependências
+composer install
+npm install
+
+# Configurar ambiente
+cp api/.env.example .env
+# Editar .env: DB_*, GRAPH_*, OLLAMA_*, etc.
+
+# Migrations (NÃO usar migrate:fresh contra sgbd_scpg)
+php artisan migrate
+
+# Seed admin
+php artisan db:seed --class=AdminSeeder
+
+# Servidor
+php artisan serve          # http://localhost:8000
+npm run dev                # Vite (assets)
+
+# Testes
+composer test              # PHPUnit
+```
+
+## 📍 Documentação Chave
+
+- **docs/ARQUITETURA.md** — Stack, padrões, estrutura Laravel
+- **docs/DECISOES.md** — 15 ADRs (Laravel 11, Sanctum, Eloquent, soft deletes, etc.)
+- **docs/REGRAS-NEGOCIO-*.md** — Casos, Créditos, Extrações, SCEI
+- **docs/banco/CONVERSAO-FIREBIRD-MYSQL.md** — Migração Firebird→MySQL, armadilhas
+- **docs/PROGRESSO.md** — Estado atual, próximos passos
+- **README.md** — Setup, troubleshooting, deploy
+
+## 🔐 Segurança
+
+- ✅ Senhas: bcrypt (Laravel padrão)
+- ✅ API: Sanctum JWT + HTTPS (produção)
+- ✅ Validação: Form Requests, input sanitização
+- ✅ LGPD: soft deletes, auditoria, event sourcing
+- ✅ NUNCA: credenciais no git, dados reais em code, SQL injection
+
+## 🎬 Próximos Passos (Após Aprovação)
+
+Ao fim de cada etapa, executar `/encerrar` (não implementado ainda; será `git commit` + atualizar PROGRESSO.md).
+
+---
+
+**Última atualização**: 2026-10-06 (Etapa 2)  
+**Responsável**: Unificação em progresso
