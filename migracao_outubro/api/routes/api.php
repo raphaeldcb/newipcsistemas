@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\SceisController;
 use App\Http\Controllers\Api\CreditosController;
 use App\Http\Controllers\Api\AlelosController;
 use App\Http\Controllers\Api\RelatoriosController;
+use App\Http\Controllers\Api\UsuariosController;
+use App\Http\Controllers\Api\AuditoriaController;
 
 Route::prefix('v1')->group(function () {
     // Public endpoints
@@ -98,6 +100,21 @@ Route::prefix('v1')->group(function () {
         Route::post('/relatorios/creditos-faturamento', [RelatoriosController::class, 'creditosFaturamento']);
         Route::get('/relatorios/kits', [RelatoriosController::class, 'kits']);
         Route::post('/relatorios/auditoria', [RelatoriosController::class, 'auditoria']);
+
+        // Admin (Usuários)
+        Route::apiResource('usuarios', UsuariosController::class);
+        Route::post('/usuarios/{usuario}/alterar-senha', [UsuariosController::class, 'alterarSenha']);
+        Route::get('/usuarios/ativos', [UsuariosController::class, 'ativos']);
+        Route::get('/usuarios/por-role', [UsuariosController::class, 'porRole']);
+        Route::get('/usuarios/{usuario}/ultimo-acesso', [UsuariosController::class, 'ultimoAcesso']);
+
+        // Auditoria
+        Route::get('/auditoria', [AuditoriaController::class, 'index']);
+        Route::get('/auditoria/{auditoria}', [AuditoriaController::class, 'show']);
+        Route::post('/auditoria/por-usuario', [AuditoriaController::class, 'porUsuario']);
+        Route::post('/auditoria/resumo-diario', [AuditoriaController::class, 'resumoDiario']);
+        Route::get('/auditoria/entidades-modificadas', [AuditoriaController::class, 'entidadesModificadas']);
+        Route::get('/auditoria/ultimas/{limit?}', [AuditoriaController::class, 'ultimas']);
 
         // Health check
         Route::get('/health', function () {
