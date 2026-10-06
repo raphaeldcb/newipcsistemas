@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    'ollama' => [
+        'host' => env('OLLAMA_HOST', 'http://localhost:11434'),
+        'model' => env('OLLAMA_MODEL', 'qwen:7b'),
+        'timeout' => env('OLLAMA_TIMEOUT', 30),
+    ],
+
+    'microsoft' => [
+        'graph' => [
+            'client_id' => env('GRAPH_CLIENT_ID'),
+            'client_secret' => env('GRAPH_CLIENT_SECRET'),
+            'tenant_id' => env('GRAPH_TENANT_ID'),
+            'mailbox' => env('GRAPH_MAILBOX'),
+            'redirect_uri' => env('GRAPH_REDIRECT_URI', 'http://localhost:8000/auth/microsoft/callback'),
+        ],
+    ],
+
 ];

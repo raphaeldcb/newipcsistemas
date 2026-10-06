@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\AlelosController;
 use App\Http\Controllers\Api\RelatoriosController;
 use App\Http\Controllers\Api\UsuariosController;
 use App\Http\Controllers\Api\AuditoriaController;
+use App\Http\Controllers\Api\ComunicacoesController;
 
 Route::prefix('v1')->group(function () {
     // Public endpoints
@@ -115,6 +116,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/auditoria/resumo-diario', [AuditoriaController::class, 'resumoDiario']);
         Route::get('/auditoria/entidades-modificadas', [AuditoriaController::class, 'entidadesModificadas']);
         Route::get('/auditoria/ultimas/{limit?}', [AuditoriaController::class, 'ultimas']);
+
+        // Comunicações (Novo)
+        Route::apiResource('comunicacoes', ComunicacoesController::class);
+        Route::group(['prefix' => 'comunicacoes/{comunicacao}'], function () {
+            Route::post('/classificar', [ComunicacoesController::class, 'classificar'])->name('comunicacoes.classificar');
+            Route::post('/responder', [ComunicacoesController::class, 'responder'])->name('comunicacoes.responder');
+            Route::get('/attachments', [ComunicacoesController::class, 'attachments'])->name('comunicacoes.attachments');
+        });
+        Route::post('/comunicacoes/sincronizar', [ComunicacoesController::class, 'sincronizar'])->name('comunicacoes.sincronizar');
 
         // Health check
         Route::get('/health', function () {
