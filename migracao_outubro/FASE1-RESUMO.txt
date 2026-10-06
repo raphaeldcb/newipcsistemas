@@ -153,23 +153,33 @@
     1. Qual biblioteca Delphi para relatórios?
        → QuickReport? FastReport? Crystal Reports? Nativo?
        ⚠️ Impacto: Como gerar PDFs/Word em PHP
+	   
+	 Resposta: QuickReport e Fortes Report CE
 
     2. Qual o workflow completo de um Caso?
        → Status intermediários? Validações? Aprovações? Roles?
        ⚠️ Impacto: State machine, workflow, middleware de autorização
 
+     Resposta: As integração são manuais no primeiro momento, depois vamos automatizar algumas tarefas 
+	 
     3. SCEI é separado ou integrado?
        → Módulo independente? "Bridge" entre SCPG e SCEI?
        ⚠️ Impacto: Microserviços vs Monolito, DMI/DMRI isolamento
+	   
+	   Resposta: Integrado
 
     4. Segurança: Como migrar senhas de tb_hosts?
        → São para quê? Máquinas? APIs externas?
        → Descartar? Criptografar? Certificado?
        ⚠️ Impacto: Segurança da API, compliance
 
+     Resposta: Migrar os usuários e criptografar 
+
     5. Autenticação: Local ou LDAP/AD?
        → Só username/password? Directory? SSO?
        ⚠️ Impacto: AuthController, JWT vs Session, LDAP integration
+
+    Resposta: Local
 
   🟡 MÉDIA PRIORIDADE (refina regras de negócio):
 
