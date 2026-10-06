@@ -31,6 +31,14 @@ Route::prefix('v1')->group(function () {
         // Core (Pessoas, Casos, Créditos)
         Route::apiResource('pessoas', PessoasController::class);
         Route::apiResource('casos', CasosController::class);
+
+        // Casos com métodos especializados
+        Route::group(['prefix' => 'casos/{caso}'], function () {
+            Route::post('/transicionar', [CasosController::class, 'transicionar'])->name('casos.transicionar');
+            Route::get('/historico', [CasosController::class, 'historico'])->name('casos.historico');
+            Route::get('/estados-validos', [CasosController::class, 'estadosValidos'])->name('casos.estados-validos');
+        });
+
         Route::apiResource('creditos', CreditosController::class);
 
         // Health check
