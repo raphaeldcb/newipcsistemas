@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\KitsController;
 use App\Http\Controllers\Api\SceisController;
 use App\Http\Controllers\Api\CreditosController;
 use App\Http\Controllers\Api\AlelosController;
+use App\Http\Controllers\Api\RelatoriosController;
 
 Route::prefix('v1')->group(function () {
     // Public endpoints
@@ -88,6 +89,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/alelos/contagem-por-tipo', [AlelosController::class, 'contagemPorTipo']);
         Route::get('/alelos/marcadores-unicos', [AlelosController::class, 'marcadoresUnicos']);
         Route::post('/alelos/frequencia-populacao', [AlelosController::class, 'frequenciaPopulacao']);
+
+        // Relatórios
+        Route::get('/relatorios/tipos', [RelatoriosController::class, 'listarTipos']);
+        Route::post('/relatorios/caso-completo', [RelatoriosController::class, 'casosCompletosPDF']);
+        Route::post('/relatorios/extracao', [RelatoriosController::class, 'extracao']);
+        Route::post('/relatorios/comparacao-alelos', [RelatoriosController::class, 'comparacaoAlelos']);
+        Route::post('/relatorios/creditos-faturamento', [RelatoriosController::class, 'creditosFaturamento']);
+        Route::get('/relatorios/kits', [RelatoriosController::class, 'kits']);
+        Route::post('/relatorios/auditoria', [RelatoriosController::class, 'auditoria']);
 
         // Health check
         Route::get('/health', function () {
