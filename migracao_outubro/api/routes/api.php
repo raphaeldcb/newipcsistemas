@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\VarasController;
 use App\Http\Controllers\Api\JuizesController;
 use App\Http\Controllers\Api\CasosController;
 use App\Http\Controllers\Api\KitsController;
+use App\Http\Controllers\Api\SceisController;
 use App\Http\Controllers\Api\CreditosController;
 
 Route::prefix('v1')->group(function () {
@@ -53,6 +54,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/kits/por-local', [KitsController::class, 'porLocal']);
         Route::post('/kits/por-coletador', [KitsController::class, 'porColetador']);
         Route::get('/kits/contagem-por-status', [KitsController::class, 'contagemPorStatus']);
+
+        // SCEI (Laboratório integrado)
+        Route::apiResource('sceis', SceisController::class);
+        Route::group(['prefix' => 'sceis/{scei}'], function () {
+            Route::post('/registrar-fase', [SceisController::class, 'registrarFase'])->name('sceis.registrar-fase');
+            Route::get('/estados-validos', [SceisController::class, 'estadosValidos'])->name('sceis.estados-validos');
+        });
+        Route::post('/sceis/por-caso', [SceisController::class, 'porCaso']);
+        Route::get('/sceis/contagem-por-fase', [SceisController::class, 'contagemPorFase']);
+        Route::get('/sceis/em-analise', [SceisController::class, 'emAnalise']);
 
         // Health check
         Route::get('/health', function () {
