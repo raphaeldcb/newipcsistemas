@@ -7,6 +7,14 @@ secrets.json
 # Legado (código antigo não versionado)
 legado/delphi/
 migracao_outubro/
+_antigo/
+
+# Scripts de desenvolvimento (debug, test, fix)
+debug-*.php
+test-*.php
+fix-*.php
+check-*.php
+cleanup-*.php
 
 # Logs
 logs/*
