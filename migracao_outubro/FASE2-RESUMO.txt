@@ -1,0 +1,286 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    FASE 2 — ARQUITETURA (✅ CONCLUÍDO)                      ║
+║                    2026-10-06 — Decisões Arquiteturais                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🎯 BASE: RESPOSTAS DO NEGÓCIO (Fase 1)
+
+  Pergunta 1: Qual biblioteca relatórios?
+  └─ Resposta: QuickReport e Fortes Report CE
+  └─ Ação: PHP usará TCPDF (PDF) + PhpSpreadsheet (Excel)
+
+  Pergunta 2: Workflow de casos?
+  └─ Resposta: Integrações manuais agora, automação depois
+  └─ Ação: MVP com transições de status manuais, job queues para future
+
+  Pergunta 3: SCEI separado ou integrado?
+  └─ Resposta: Integrado
+  └─ Ação: Monolito único, endpoints /api/v1/scei/... como subdomain
+
+  Pergunta 4: Como migrar senhas (texto plano)?
+  └─ Resposta: Migrar usuários e criptografar
+  └─ Ação: Bcrypt (Laravel hash), rotation via artisan command
+
+  Pergunta 5: Autenticação local ou LDAP?
+  └─ Resposta: Local
+  └─ Ação: JWT tokens via Laravel Sanctum, 24h expiry, refresh tokens 7d
+
+═════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO GERADA (Fase 2)
+
+  ARQUITETURA.md (12 KB)
+  ├─ Stack Técnico
+  │  ├─ PHP 8.2+
+  │  ├─ Laravel 11 (framework)
+  │  ├─ MySQL 8.3 (banco)
+  │  ├─ Eloquent ORM
+  │  ├─ Sanctum JWT (autenticação)
+  │  ├─ TCPDF (PDF) + PhpSpreadsheet (Excel)
+  │  ├─ Redis (cache + queue)
+  │  ├─ PHPUnit + Pest (testes)
+  │  └─ Docker (deployment)
+  │
+  ├─ Estrutura de Diretórios (Laravel 11)
+  │  ├─ app/Http/Controllers/Api/ (endpoints)
+  │  ├─ app/Services/ (regra de negócio)
+  │  ├─ app/Repositories/ (acesso dados)
+  │  ├─ app/Models/ (Eloquent)
+  │  ├─ app/Events/ (event sourcing)
+  │  ├─ app/Jobs/ (background tasks)
+  │  ├─ database/migrations/ (DDL)
+  │  ├─ tests/ (PHPUnit/Pest)
+  │  └─ routes/api.php (endpoints REST)
+  │
+  ├─ Padrões de Design
+  │  ├─ Service Layer (lógica isolada)
+  │  ├─ Repository Pattern (acesso dados)
+  │  ├─ Form Requests (validação)
+  │  ├─ Resources (serialização JSON)
+  │  ├─ Events & Listeners (desacoplamento)
+  │  └─ State Machine (workflow)
+  │
+  ├─ REST API v1 (/api/v1/)
+  │  ├─ Autenticação: /auth/login, /auth/logout, /auth/refresh
+  │  ├─ Casos: GET/POST/PUT/DELETE /casos
+  │  ├─ Pessoas: GET /pessoas, /juizes, /varas, /comarcas, /estados
+  │  ├─ Kits: GET/POST /kits + status
+  │  ├─ Extrações: GET/POST /extracos + /extracos/{id}/casos
+  │  ├─ Créditos: GET/POST /creditos
+  │  ├─ SCEI: GET/POST /scei/exames, /scei/procedimentos, /scei/laudos
+  │  ├─ Relatórios: POST /relatorios/gerar
+  │  ├─ Admin: GET/POST /admin/usuarios, /admin/auditoria
+  │  └─ Health: GET /health
+  │
+  ├─ Banco de Dados
+  │  ├─ MySQL 8.3, schema sgbd_scpg
+  │  ├─ Migrations (Eloquent)
+  │  ├─ Soft deletes em todas tabelas
+  │  ├─ Timestamps (created_at, updated_at)
+  │  ├─ Relationships (belongs/has/many-to-many)
+  │  └─ Índices para performance
+  │
+  ├─ Segurança
+  │  ├─ JWT tokens (Sanctum)
+  │  ├─ Bcrypt password hashing
+  │  ├─ CORS configurável
+  │  ├─ Rate limiting (100 req/min)
+  │  ├─ Middleware: Authenticate, Authorize, LogAudit
+  │  └─ Gates + Policies para roles/permissions
+  │
+  ├─ Testes
+  │  ├─ PHPUnit + Pest
+  │  ├─ Feature tests (API endpoints)
+  │  ├─ Unit tests (Services, Repositories)
+  │  ├─ Coverage target: 80%
+  │  ├─ Database in-memory SQLite para testes
+  │  └─ CI/CD via GitHub Actions
+  │
+  └─ Deployment
+     ├─ Docker (Dockerfile + docker-compose.yml)
+     ├─ Laravel serve local
+     ├─ PHP-FPM + Nginx em produção
+     ├─ Redis para cache + jobs
+     └─ Migrations automáticas
+
+═════════════════════════════════════════════════════════════════════════════
+
+  REGRAS-NEGOCIO-CASOS.md (10 KB)
+  ├─ Workflow Completo de Casos
+  │  ├─ 10 Estados: PENDENTE → ... → CASO_FINALIZADO ou CANCELADO
+  │  ├─ Transições Manuais (MVP): usuário avança status via API
+  │  ├─ Validações por Estado: condições antes permitir transição
+  │  └─ Exemplo Fim-a-Fim: caso do ajuizamento até crédito gerado
+  │
+  ├─ Banco de Dados (Schema)
+  │  ├─ tb_casos: processo, vara, juiz, status, datas, pessoas
+  │  └─ tb_historicos: auditoria de cada ação (quem, quando, o quê)
+  │
+  ├─ Validações
+  │  ├─ Criação: processo_id único, vara obrigatória, data válida
+  │  ├─ PENDENTE → COLETA_AGENDADA: deve ter responsável e coletador
+  │  ├─ COLETA_REALIZADA → AMOSTRA_RECEBIDA: amostra não vencida
+  │  ├─ EM_EXTRACAO → EXTRACAO_CONCLUIDA: validador aprova, alelos documentados
+  │  ├─ EXTRACAO_CONCLUIDA → EM_ANALISE: médico designado
+  │  ├─ EM_ANALISE → LAUDO_EMITIDO: parecer + comparação genética
+  │  └─ LAUDO_EMITIDO → CASO_FINALIZADO: créditos gerados
+  │
+  ├─ Permissões (Roles)
+  │  ├─ admin: criar, atualizar, deletar, cancelar qualquer caso
+  │  ├─ gestor_casos: criar, atualizar, cancelar, avançar status
+  │  ├─ coletador: confirmar coleta realizada
+  │  ├─ tech_extracao: iniciar extração, validar resultado
+  │  ├─ medico: emitir laudo, finalizar análise
+  │  └─ usuario_comum: apenas visualizar (próprios)
+  │
+  ├─ Histórico & Auditoria
+  │  ├─ Cada ação gera registro em tb_historicos
+  │  ├─ Tipos: CRIACAO, STATUS_ALTERADO, COLETA_CONFIRMADA, ..., CANCELAMENTO
+  │  ├─ Rastreia: quem, quando, o quê, antes/depois (se status)
+  │  └─ Permite reverter ações (audit trail completo)
+  │
+  ├─ Créditos (Gatilho)
+  │  ├─ Quando caso → CASO_FINALIZADO, gera parcelas para cobrança
+  │  ├─ Crédito para: Coletador, Técnico Extração, Médico Analista
+  │  ├─ Valores por tipo análise (DNA, Paternidade, etc)
+  │  ├─ Aplicar descontos/taxas (juiz, vara, categoria)
+  │  └─ Reverter se caso cancelado
+  │
+  ├─ Notificações
+  │  ├─ Caso Criado → Responsável
+  │  ├─ Coleta Agendada → Coletador
+  │  ├─ Amostra Recebida → Tech Extração
+  │  ├─ Extração Concluída → Médico
+  │  ├─ Laudo Emitido → Gestor
+  │  └─ Caso Finalizado → Todos (créditos gerados)
+  │
+  ├─ Casos Especiais
+  │  ├─ Caso sem coletador: avisar, agendar lembrança
+  │  ├─ Amostra vencida: marcar cancelado, motivo "AMOSTRA_VENCIDA"
+  │  ├─ Extração inconclusiva: permitir nova coleta ou cancelar
+  │  └─ Laudo com conflito genético: aviso + email para juiz/advogados
+  │
+  └─ Queries Comuns (Repository)
+     ├─ findById, findByProcessoId, findAll
+     ├─ findByVara, findPendentes, findEmAndamento, findFinalizados
+     ├─ search(filtros), create, update, cancel
+
+═════════════════════════════════════════════════════════════════════════════
+
+✅ DECISÕES CONFIRMADAS
+
+  ✓ Monolito único (não microserviços)
+    └─ SCEI como "bounded context" dentro da mesma aplicação
+
+  ✓ Transições manuais no MVP
+    └─ Automação de tarefas é "future" com job queues
+
+  ✓ Auditoria completa via events + histórico
+    └─ Rastrear todas as ações de usuário
+
+  ✓ JWT tokens com Sanctum
+    └─ 24h expiração, 7d refresh tokens
+
+  ✓ Bcrypt para senhas
+    └─ Migration helper: criptografa senhas antigas do Firebird
+
+  ✓ Validações em Form Requests
+    └─ Não em models (separação de responsabilidades)
+
+  ✓ Service Layer para regra de negócio
+    └─ Controllers → Services → Repositories (3 camadas)
+
+═════════════════════════════════════════════════════════════════════════════
+
+📁 ARQUIVOS CRIADOS (FASE 2)
+
+  docs/
+  ├── ARQUITETURA.md          (12 KB) ← Stack, estrutura, padrões, API
+  └── REGRAS-NEGOCIO-CASOS.md (10 KB) ← Workflow, validações, créditos
+
+  Commit: 9a164fc
+  "docs: Phase 2 complete — Architecture + Business Rules (Cases)"
+
+═════════════════════════════════════════════════════════════════════════════
+
+🎯 ESTRUTURA DE IMPLEMENTAÇÃO (Confirmada)
+
+  Fatia 1: PESSOAS (foundations)
+    └─ Controllers, Services, Repositories, Tests
+    └─ Tabelas: pessoas, juizes, varas, comarcas, estados
+    └─ Endpoints: /pessoas, /juizes, /varas, /comarcas, /estados
+
+  Fatia 2: CASOS (core)
+    └─ State Machine, Workflow, Histórico
+    └─ Tabelas: casos, historicos
+    └─ Endpoints: /casos, /casos/{id}/historico
+    └─ Events: CasoCriado, CasoAtualizado, CasoFinalizado
+
+  Fatia 3: KITS (coletas)
+    └─ Kit management, rastreamento
+    └─ Endpoints: /kits, /locais-coleta
+
+  Fatia 4: EXTRACAO (análise DNA)
+    └─ 3 fases (MVP sequencial)
+    └─ Endpoints: /extracos, /extracos/{id}/casos
+
+  Fatia 5: SCEI (laboratório)
+    └─ Exames, Procedimentos, Laudos
+    └─ Endpoints: /scei/exames, /scei/procedimentos, /scei/laudos
+
+  Fatia 6: CREDITOS (finanças)
+    └─ Parcelamento, geração automática
+    └─ Endpoints: /creditos, /creditos/gerar-por-juiz
+
+  Fatia 7: ALELOS (genética)
+    └─ Marcadores, análise
+    └─ Endpoints: /alelos/gerar-documento, /alelos/exportar
+
+  Fatia 8: RELATORIOS (reporting)
+    └─ PDF/Excel generation
+    └─ Endpoints: /relatorios/{tipo}/gerar
+
+  Fatia 9: ADMIN (config)
+    └─ Usuários, parâmetros, auditoria
+    └─ Endpoints: /admin/usuarios, /admin/parametros, /admin/auditoria
+
+═════════════════════════════════════════════════════════════════════════════
+
+⏭️ PRÓXIMOS PASSOS (FASE 3)
+
+  [ ] Documentar regras de negócio para:
+      ├─ REGRAS-NEGOCIO-CREDITOS.md (parcelamento, cálculos)
+      ├─ REGRAS-NEGOCIO-EXTRACOS.md (3 fases, validadores)
+      └─ REGRAS-NEGOCIO-SCEI.md (laboratório integrado)
+
+  [ ] Criar DECISOES.md (decisions log)
+      └─ Por quê cada decisão foi tomada (decisões → rationale)
+
+  [ ] Considerar documentação SCEI
+      └─ Integração com Casos? Workflow paralelo? Relacionamentos?
+
+═════════════════════════════════════════════════════════════════════════════
+
+✅ CHECKLIST: STATUS GERAL
+
+  Fase 1 (Inventário)               ✅ CONCLUÍDO
+  Fase 2 (Arquitetura)              ✅ CONCLUÍDO
+  Fase 3 (Regras Negócio Completas) ⏳ PRÓXIMO
+  Fase 4 (Laravel Scaffolding)      ⏳ DEPOIS
+  Fase 5 (Implementação Fatias)     ⏳ DEPOIS
+
+═════════════════════════════════════════════════════════════════════════════
+
+📊 PROGRESSO GERAL
+
+  Fase 1 (Inventário)     ████████████████████ 100%  ✅
+  Fase 2 (Arquitetura)    ████████████████████ 100%  ✅
+  Fase 3 (Regras Negócio) ████░░░░░░░░░░░░░░░  20%   ⏳
+  Fase 4 (Scaffolding)    ░░░░░░░░░░░░░░░░░░░░  0%   ⏳
+  Fase 5 (Implementação)  ░░░░░░░░░░░░░░░░░░░░  0%   ⏳
+
+═════════════════════════════════════════════════════════════════════════════
+
+Gerado automaticamente | Fase 2 — Decisões Arquiteturais & Workflow
+Pronto para fase 3: Regras de Negócio ✅
+
