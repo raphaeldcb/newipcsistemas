@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\CasosController;
 use App\Http\Controllers\Api\KitsController;
 use App\Http\Controllers\Api\SceisController;
 use App\Http\Controllers\Api\CreditosController;
+use App\Http\Controllers\Api\AlelosController;
 
 Route::prefix('v1')->group(function () {
     // Public endpoints
@@ -77,6 +78,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/sceis/por-caso', [SceisController::class, 'porCaso']);
         Route::get('/sceis/contagem-por-fase', [SceisController::class, 'contagemPorFase']);
         Route::get('/sceis/em-analise', [SceisController::class, 'emAnalise']);
+
+        // Alelos (Marcadores genéticos)
+        Route::apiResource('alelos', AlelosController::class);
+        Route::post('/alelos/registrar-batch', [AlelosController::class, 'registrarBatch']);
+        Route::post('/alelos/comparar-extracos', [AlelosController::class, 'compararExtracos']);
+        Route::post('/alelos/por-extracao', [AlelosController::class, 'porExtracao']);
+        Route::post('/alelos/por-marcador', [AlelosController::class, 'porMarcador']);
+        Route::get('/alelos/contagem-por-tipo', [AlelosController::class, 'contagemPorTipo']);
+        Route::get('/alelos/marcadores-unicos', [AlelosController::class, 'marcadoresUnicos']);
+        Route::post('/alelos/frequencia-populacao', [AlelosController::class, 'frequenciaPopulacao']);
 
         // Health check
         Route::get('/health', function () {
