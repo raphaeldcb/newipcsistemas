@@ -18,7 +18,26 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+
+            // Campos do App Comunicações
+            $table->string('microsoft_id')->nullable()->unique()->comment('Microsoft Graph user ID');
+
+            // Roles unificados (admin, user, viewer, auditor)
+            $table->enum('role', ['admin', 'user', 'viewer', 'auditor'])->default('viewer');
+
+            // Status
+            $table->boolean('is_active')->default(true);
+            $table->dateTime('last_login_at')->nullable();
+
+            // Metadata
             $table->timestamps();
+            $table->softDeletes();
+
+            // Índices
+            $table->index('email');
+            $table->index('microsoft_id');
+            $table->index('role');
+            $table->index('is_active');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
