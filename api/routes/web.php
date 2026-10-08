@@ -18,6 +18,11 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
+// Debug: test POST
+Route::post('/test-post', function () {
+    return response()->json(['status' => 'POST funciona', 'data' => request()->all()]);
+});
+
 Route::middleware('web')->group(function () {
     // Auth Routes
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
