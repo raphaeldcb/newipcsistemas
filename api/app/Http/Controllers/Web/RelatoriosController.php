@@ -16,16 +16,12 @@ class RelatoriosController extends Controller
      */
     public function index()
     {
-        $casos = Caso::select('cas_contr', 'pro_numero')->limit(100)->get();
+        $casos = Caso::limit(100)->get();
         $totalComunicacoes = Comunicacao::count();
-        $comunicacoesJudicial = Comunicacao::judicial()->count();
-        $comunicacoesNaoJudicial = Comunicacao::nonJudicial()->count();
 
         return view('relatorios.index', compact(
             'casos',
-            'totalComunicacoes',
-            'comunicacoesJudicial',
-            'comunicacoesNaoJudicial'
+            'totalComunicacoes'
         ));
     }
 
