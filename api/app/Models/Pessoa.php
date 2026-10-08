@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Models;
-
-class Pessoa extends BaseModel
-{
+use Illuminate\Database\Eloquent\Model;
+class Pessoa extends Model {
     protected $table = 'tb_pessoas';
     protected $primaryKey = 'pes_cod';
-    protected $guarded = [];
-
+    public $timestamps = false;
+    protected $fillable = ['pro_cod', 'pes_nome', 'pes_iniciais'];
 }

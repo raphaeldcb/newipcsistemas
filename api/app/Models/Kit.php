@@ -1,18 +1,9 @@
 <?php
-
 namespace App\Models;
-
-class Kit extends BaseModel
-{
+use Illuminate\Database\Eloquent\Model;
+class Kit extends Model {
     protected $table = 'tb_kits';
     protected $primaryKey = 'kit_cod';
-    protected $guarded = [];
-
-    protected $casts = [
-        'kit_denv' => 'date',
-        'kit_dret' => 'date',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    public $timestamps = false;
+    protected $fillable = ['kit_num', 'col_cod'];
 }
