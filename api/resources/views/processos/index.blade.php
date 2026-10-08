@@ -8,7 +8,7 @@
       <h1 style="margin: 0; color: #2c3e50; font-size: 28px;">⚖️ Processos</h1>
       <p style="margin: 5px 0 0 0; color: #7f8c8d;">{{ $processos->total() }} processos no sistema</p>
     </div>
-    <a href="{{ route('processos.create') }}" style="background: #27ae60; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 600;">+ Novo Processo</a>
+    <a href="{{ route('processos.create') }}" style="background: #3498db; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 600;">+ Novo Processo</a>
   </div>
 
   <!-- Filtros -->
@@ -63,7 +63,7 @@
                 @method('DELETE')
                 <button type="submit" style="width: 100%; background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">🗑️ Deletar</button>
               </form>
-              <a href="{{ route('processos.edit', $p->pro_cod) }}" style="flex: 1; background: #f39c12; color: white; padding: 8px; border-radius: 4px; text-align: center; text-decoration: none; font-size: 12px; font-weight: 600;">✏️ Editar</a>
+              <a href="{{ route('processos.edit', $p->pro_cod) }}" style="flex: 1; background: #3498db; color: white; padding: 8px; border-radius: 4px; text-align: center; text-decoration: none; font-size: 12px; font-weight: 600;">✏️ Editar</a>
             </div>
           </div>
         </a>
