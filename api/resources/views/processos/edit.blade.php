@@ -34,13 +34,18 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Data Cadastro</label>
-      <input type="date" name="pro_dcad" class="form-control" value="{{ $processo->pro_dcad }}">
+      <label class="form-label">Data Coleta</label>
+      <input type="date" name="pro_dcole" class="form-control" value="{{ $processo->pro_dcole }}">
     </div>
 
     <div class="mb-3">
       <label class="form-label">Data Recebimento</label>
       <input type="date" name="pro_drec" class="form-control" value="{{ $processo->pro_drec }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Data Resultado</label>
+      <input type="date" name="pro_dresu" class="form-control" value="{{ $processo->pro_dresu }}">
     </div>
 
     <div class="d-flex gap-2">

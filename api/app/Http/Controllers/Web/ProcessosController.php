@@ -22,7 +22,7 @@ class ProcessosController extends Controller {
         }
 
         if ($filtro === 'data') {
-            $query->orderByDesc('pro_dcad');
+            $query->orderByDesc('pro_drec');
         } elseif ($filtro === 'numero') {
             $query->orderBy('pro_nperc');
         } else {

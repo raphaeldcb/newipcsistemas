@@ -33,13 +33,18 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Data Cadastro</label>
-      <input type="date" name="pro_dcad" class="form-control">
+      <label class="form-label">Data Coleta</label>
+      <input type="date" name="pro_dcole" class="form-control">
     </div>
 
     <div class="mb-3">
       <label class="form-label">Data Recebimento</label>
       <input type="date" name="pro_drec" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Data Resultado</label>
+      <input type="date" name="pro_dresu" class="form-control">
     </div>
 
     <div class="d-flex gap-2">
