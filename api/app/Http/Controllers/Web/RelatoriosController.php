@@ -16,11 +16,11 @@ class RelatoriosController extends Controller
      */
     public function index()
     {
-        $casos = Caso::limit(100)->get();
+        $totalCasos = Caso::count();
         $totalComunicacoes = Comunicacao::count();
 
         return view('relatorios.index', compact(
-            'casos',
+            'totalCasos',
             'totalComunicacoes'
         ));
     }

@@ -8,7 +8,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total de Casos</h5>
-          <p class="card-text display-4">{{ $casos->total() ?? 0 }}</p>
+          <p class="card-text display-4">{{ $totalCasos ?? 0 }}</p>
         </div>
       </div>
     </div>
