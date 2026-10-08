@@ -28,7 +28,9 @@ class LoginController extends Controller
         if ($user && $user->hos_senha === $credentials['hos_senha']) {
             Auth::login($user);
             $request->session()->regenerate();
-            return redirect('/dashboard');
+
+            return response()->view('redirect', ['url' => '/dashboard'], 200)
+                ->header('Content-Type', 'text/html; charset=utf-8');
         }
 
         return back()->withErrors(['hos_usua' => 'Usuário ou senha incorretos'])->onlyInput('hos_usua');
