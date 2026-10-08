@@ -14,8 +14,22 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Tipo</label>
-      <input type="number" name="pro_tipo" class="form-control" value="{{ $processo->pro_tipo }}">
+      <label class="form-label">Tipo do Processo</label>
+      <select name="pro_tipo" class="form-control">
+        <option value="">-- Selecione --</option>
+        <option value="1" {{ $processo->pro_tipo == 1 ? 'selected' : '' }}>Judicial</option>
+        <option value="2" {{ $processo->pro_tipo == 2 ? 'selected' : '' }}>ExtraJudicial</option>
+        <option value="3" {{ $processo->pro_tipo == 3 ? 'selected' : '' }}>Ministério Público</option>
+        <option value="4" {{ $processo->pro_tipo == 4 ? 'selected' : '' }}>Defensoria Pública</option>
+        <option value="5" {{ $processo->pro_tipo == 5 ? 'selected' : '' }}>Delegacia de Polícia</option>
+        <option value="6" {{ $processo->pro_tipo == 6 ? 'selected' : '' }}>Justiça Comunitária</option>
+        <option value="7" {{ $processo->pro_tipo == 7 ? 'selected' : '' }}>Conselho Tutelar</option>
+        <option value="8" {{ $processo->pro_tipo == 8 ? 'selected' : '' }}>Promotoria de Justiça</option>
+        <option value="9" {{ $processo->pro_tipo == 9 ? 'selected' : '' }}>Paternidade Responsável</option>
+        <option value="10" {{ $processo->pro_tipo == 10 ? 'selected' : '' }}>Núcleo de Prática Forense</option>
+        <option value="11" {{ $processo->pro_tipo == 11 ? 'selected' : '' }}>Direção do Foro</option>
+        <option value="12" {{ $processo->pro_tipo == 12 ? 'selected' : '' }}>Autoridade Solicitante</option>
+      </select>
     </div>
 
     <div class="mb-3">

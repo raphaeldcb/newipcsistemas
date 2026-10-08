@@ -13,8 +13,22 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Tipo</label>
-      <input type="number" name="pro_tipo" class="form-control">
+      <label class="form-label">Tipo do Processo</label>
+      <select name="pro_tipo" class="form-control">
+        <option value="">-- Selecione --</option>
+        <option value="1">Judicial</option>
+        <option value="2">ExtraJudicial</option>
+        <option value="3">Ministério Público</option>
+        <option value="4">Defensoria Pública</option>
+        <option value="5">Delegacia de Polícia</option>
+        <option value="6">Justiça Comunitária</option>
+        <option value="7">Conselho Tutelar</option>
+        <option value="8">Promotoria de Justiça</option>
+        <option value="9">Paternidade Responsável</option>
+        <option value="10">Núcleo de Prática Forense</option>
+        <option value="11">Direção do Foro</option>
+        <option value="12">Autoridade Solicitante</option>
+      </select>
     </div>
 
     <div class="mb-3">

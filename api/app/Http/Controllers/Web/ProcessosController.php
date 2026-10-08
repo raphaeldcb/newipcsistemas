@@ -62,4 +62,48 @@ class ProcessosController extends Controller {
         $processo->delete();
         return redirect()->route('processos.index')->with('success', 'Processo deletado!');
     }
+
+    // Pessoas
+    public function storePessoa(Request $request, Processo $processo) {
+        Pessoa::create([
+            'pro_cod' => $processo->pro_cod,
+            'pes_nome' => $request->input('pes_nome'),
+            'pes_iniciais' => $request->input('pes_iniciais'),
+            'pes_sit' => $request->input('pes_sit'),
+            'pes_dtnas' => $request->input('pes_dtnas'),
+        ]);
+        return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Pessoa adicionada!');
+    }
+
+    public function destroyPessoa(Processo $processo, $pes_cod) {
+        Pessoa::where('pro_cod', $processo->pro_cod)->where('pes_cod', $pes_cod)->delete();
+        return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Pessoa removida!');
+    }
+
+    // Históricos
+    public function storeHistorico(Request $request, Processo $processo) {
+        Historico::create([
+            'pro_cod' => $processo->pro_cod,
+            'ite_cod' => $request->input('ite_cod'),
+            'his_data' => $request->input('his_data'),
+            'his_doc' => $request->input('his_doc'),
+            'his_obs' => $request->input('his_obs'),
+        ]);
+        return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Histórico adicionado!');
+    }
+
+    public function updateHistorico(Request $request, Processo $processo, $his_contr) {
+        Historico::where('pro_cod', $processo->pro_cod)->where('his_contr', $his_contr)->update([
+            'ite_cod' => $request->input('ite_cod'),
+            'his_data' => $request->input('his_data'),
+            'his_doc' => $request->input('his_doc'),
+            'his_obs' => $request->input('his_obs'),
+        ]);
+        return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Histórico atualizado!');
+    }
+
+    public function destroyHistorico(Processo $processo, $his_contr) {
+        Historico::where('pro_cod', $processo->pro_cod)->where('his_contr', $his_contr)->delete();
+        return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Histórico removido!');
+    }
 }

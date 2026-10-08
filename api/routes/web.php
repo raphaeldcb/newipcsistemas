@@ -44,6 +44,11 @@ Route::middleware('web')->group(function () {
 
         // Processos
         Route::resource('processos', WebProcessosController::class);
+        Route::post('/processos/{processo}/pessoas', [WebProcessosController::class, 'storePessoa'])->name('processos.pessoas.store');
+        Route::delete('/processos/{processo}/pessoas/{pes_cod}', [WebProcessosController::class, 'destroyPessoa'])->name('processos.pessoas.destroy');
+        Route::post('/processos/{processo}/historicos', [WebProcessosController::class, 'storeHistorico'])->name('processos.historicos.store');
+        Route::put('/processos/{processo}/historicos/{his_contr}', [WebProcessosController::class, 'updateHistorico'])->name('processos.historicos.update');
+        Route::delete('/processos/{processo}/historicos/{his_contr}', [WebProcessosController::class, 'destroyHistorico'])->name('processos.historicos.destroy');
 
         // Pessoas
         Route::resource('pessoas', WebPessoasController::class);
