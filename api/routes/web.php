@@ -18,19 +18,6 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-// Debug: test POST
-Route::post('/test-post', function () {
-    return response()->json(['status' => 'POST funciona', 'data' => request()->all()]);
-});
-
-// Debug: check auth
-Route::get('/check-auth', function () {
-    return response()->json([
-        'autenticado' => auth()->check(),
-        'usuário' => auth()->user() ? auth()->user()->hos_usua : null,
-        'sessão' => session()->all(),
-    ]);
-});
 
 Route::middleware('web')->group(function () {
     // Auth Routes
