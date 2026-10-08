@@ -253,7 +253,7 @@
                 <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'sceis')) active @endif">🏥 SCEI</a></li>
                 <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'creditos')) active @endif">💰 Créditos</a></li>
                 <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'alelos')) active @endif">🔍 Alelos</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'relatorios')) active @endif">📄 Relatórios</a></li>
+                <li><a href="{{ route('relatorios.index') }}" class="@if(str_contains(Route::currentRouteName(), 'relatorios')) active @endif">📄 Relatórios</a></li>
                 @if(auth()->user() && auth()->user()->role === 'admin')
                 <li style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <a href="{{ route('admin.index') }}" class="@if(str_contains(Route::currentRouteName(), 'admin')) active @endif">⚙️ Admin</a>

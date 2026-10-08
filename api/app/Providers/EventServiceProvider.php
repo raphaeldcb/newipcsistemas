@@ -9,6 +9,7 @@ use App\Events\CasoCriado;
 use App\Events\CasoTransicionado;
 use App\Listeners\RegistrarHistoricoCaso;
 use App\Listeners\GerarCreditosCaso;
+use App\Listeners\RegistrarTransicaoCaso;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,7 @@ class EventServiceProvider extends ServiceProvider
         CasoTransicionado::class => [
             RegistrarHistoricoCaso::class,
             GerarCreditosCaso::class,
+            RegistrarTransicaoCaso::class,
         ],
     ];
 

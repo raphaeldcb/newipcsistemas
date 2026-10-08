@@ -3,11 +3,16 @@
 namespace App\Services;
 
 use App\Models\Caso;
+use App\Models\Comunicacao;
 use App\Models\Extracao;
 use App\Models\Alelo;
 use App\Models\Scei;
 use App\Enums\TipoRelatorio;
 use Carbon\Carbon;
+use TCPDF;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Storage;
 
 class RelatorioService
 {
@@ -182,5 +187,211 @@ class RelatorioService
             ])->sortByDesc('data_hora')->values(),
             'total_transicoes' => $caso->historicos->count(),
         ];
+    }
+
+    /**
+     * Gerar relatório de Comunicações por classificação
+     */
+    public function gerarRelatorioComunicacoes(?\DateTime $dataInicio = null, ?\DateTime $dataFim = null): array
+    {
+        $query = Comunicacao::query();
+
+        if ($dataInicio) {
+            $query->where('received_at', '>=', $dataInicio);
+        }
+
+        if ($dataFim) {
+            $query->where('received_at', '<=', $dataFim);
+        }
+
+        $comunicacoes = $query->get();
+        $porClassificacao = $comunicacoes->groupBy('classification');
+        $porConfidencia = $comunicacoes->where('confidence', '>=', 0.8)->count();
+
+        return [
+            'titulo' => 'Relatório de Comunicações',
+            'data_geracao' => now()->format('d/m/Y H:i:s'),
+            'periodo' => [
+                'inicio' => $dataInicio?->format('d/m/Y') ?? 'N/A',
+                'fim' => $dataFim?->format('d/m/Y') ?? 'N/A',
+            ],
+            'resumo' => [
+                'total_comunicacoes' => $comunicacoes->count(),
+                'por_classificacao' => $porClassificacao->map(fn($grupo) => [
+                    'classificacao' => $grupo[0]->classification,
+                    'quantidade' => $grupo->count(),
+                    'percentual' => round(($grupo->count() / $comunicacoes->count()) * 100, 2),
+                ])->values(),
+                'alta_confianca' => $porConfidencia,
+                'confianca_media' => round($comunicacoes->avg('confidence'), 4),
+            ],
+            'detalhes' => $comunicacoes->map(fn($c) => [
+                'id' => $c->id,
+                'caso_id' => $c->caso_id,
+                'de' => $c->email_from,
+                'para' => $c->email_to,
+                'assunto' => $c->subject,
+                'classificacao' => $c->classification,
+                'confianca' => round($c->confidence, 4),
+                'data_recebimento' => $c->received_at?->format('d/m/Y H:i'),
+                'status_sync' => $c->sync_status,
+            ])->values(),
+        ];
+    }
+
+    /**
+     * Gerar PDF de um relatório
+     */
+    public function gerarPDF(array $dados, string $nomeArquivo = 'relatorio.pdf'): string
+    {
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_PAGE_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('Sistema IPC');
+        $pdf->SetTitle($dados['titulo'] ?? 'Relatório');
+        $pdf->SetSubject($dados['titulo'] ?? 'Relatório');
+
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(15, 15, 15);
+        $pdf->SetAutoPageBreak(TRUE, 15);
+
+        $pdf->AddPage();
+
+        // Cabeçalho
+        $pdf->SetFont('helvetica', 'B', 16);
+        $pdf->Cell(0, 10, $dados['titulo'] ?? 'Relatório', 0, 1, 'C');
+
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->Cell(0, 5, 'Gerado em: ' . ($dados['data_geracao'] ?? now()->format('d/m/Y H:i:s')), 0, 1, 'R');
+        $pdf->Ln(5);
+
+        // Conteúdo
+        $pdf->SetFont('helvetica', '', 10);
+
+        if (isset($dados['resumo'])) {
+            $pdf->SetFont('helvetica', 'B', 12);
+            $pdf->Cell(0, 8, 'Resumo', 0, 1);
+            $pdf->SetFont('helvetica', '', 10);
+
+            foreach ($dados['resumo'] as $chave => $valor) {
+                if (is_array($valor)) {
+                    $pdf->Cell(0, 6, $chave . ':', 0, 1);
+                    foreach ($valor as $item) {
+                        if (is_array($item)) {
+                            $desc = implode(' | ', array_values($item));
+                            $pdf->Cell(0, 5, '  • ' . $desc, 0, 1);
+                        } else {
+                            $pdf->Cell(0, 5, '  • ' . $item, 0, 1);
+                        }
+                    }
+                } else {
+                    $pdf->Cell(0, 6, ucfirst(str_replace('_', ' ', $chave)) . ': ' . $valor, 0, 1);
+                }
+            }
+        }
+
+        // Salvar arquivo
+        $caminhoArquivo = storage_path('app/relatorios/' . $nomeArquivo);
+        if (!is_dir(dirname($caminhoArquivo))) {
+            mkdir(dirname($caminhoArquivo), 0755, true);
+        }
+
+        $pdf->Output($caminhoArquivo, 'F');
+        return $caminhoArquivo;
+    }
+
+    /**
+     * Gerar Excel de um relatório
+     */
+    public function gerarExcel(array $dados, string $nomeArquivo = 'relatorio.xlsx'): string
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Título
+        $sheet->setCellValue('A1', $dados['titulo'] ?? 'Relatório');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        // Data de geração
+        $sheet->setCellValue('A2', 'Gerado em: ' . ($dados['data_geracao'] ?? now()->format('d/m/Y H:i:s')));
+
+        $linha = 4;
+
+        // Resumo
+        if (isset($dados['resumo'])) {
+            $sheet->setCellValue('A' . $linha, 'Resumo');
+            $sheet->getStyle('A' . $linha)->getFont()->setBold(true);
+            $linha++;
+
+            foreach ($dados['resumo'] as $chave => $valor) {
+                if (is_array($valor)) {
+                    $sheet->setCellValue('A' . $linha, ucfirst(str_replace('_', ' ', $chave)));
+                    $sheet->getStyle('A' . $linha)->getFont()->setBold(true);
+                    $linha++;
+
+                    foreach ($valor as $item) {
+                        if (is_array($item)) {
+                            $col = 'A';
+                            foreach ($item as $k => $v) {
+                                $sheet->setCellValue($col . $linha, $v);
+                                $col++;
+                            }
+                        } else {
+                            $sheet->setCellValue('A' . $linha, $item);
+                        }
+                        $linha++;
+                    }
+                } else {
+                    $sheet->setCellValue('A' . $linha, ucfirst(str_replace('_', ' ', $chave)));
+                    $sheet->setCellValue('B' . $linha, $valor);
+                    $linha++;
+                }
+            }
+        }
+
+        // Detalhes (se houver)
+        if (isset($dados['detalhes']) && is_array($dados['detalhes'])) {
+            $linha += 2;
+            $sheet->setCellValue('A' . $linha, 'Detalhes');
+            $sheet->getStyle('A' . $linha)->getFont()->setBold(true);
+            $linha++;
+
+            // Cabeçalhos
+            if (!empty($dados['detalhes'])) {
+                $headers = array_keys($dados['detalhes'][0]);
+                $col = 'A';
+                foreach ($headers as $header) {
+                    $sheet->setCellValue($col . $linha, ucfirst(str_replace('_', ' ', $header)));
+                    $sheet->getStyle($col . $linha)->getFont()->setBold(true);
+                    $col++;
+                }
+                $linha++;
+
+                // Dados
+                foreach ($dados['detalhes'] as $item) {
+                    $col = 'A';
+                    foreach ($item as $valor) {
+                        $sheet->setCellValue($col . $linha, $valor);
+                        $col++;
+                    }
+                    $linha++;
+                }
+            }
+        }
+
+        // Auto-ajustar colunas
+        foreach ($sheet->getColumnIterator() as $column) {
+            $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+        }
+
+        // Salvar arquivo
+        $caminhoArquivo = storage_path('app/relatorios/' . $nomeArquivo);
+        if (!is_dir(dirname($caminhoArquivo))) {
+            mkdir(dirname($caminhoArquivo), 0755, true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($caminhoArquivo);
+
+        return $caminhoArquivo;
     }
 }

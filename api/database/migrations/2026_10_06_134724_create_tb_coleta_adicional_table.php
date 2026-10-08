@@ -27,4 +27,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('tb_coleta_adicional');
     }
-}
+};

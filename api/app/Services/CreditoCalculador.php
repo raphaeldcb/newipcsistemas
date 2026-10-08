@@ -122,4 +122,31 @@ class CreditoCalculador
     {
         return self::VALOR_BASE;
     }
+
+    /**
+     * Calculate installment plan for a credit
+     */
+    public function calcularParcelas(float $valorTotal, int $numParcelas = 3): array
+    {
+        $parcelas = [];
+        $valorPorParcela = $valorTotal / $numParcelas;
+        $diasPorParcela = 10;
+
+        for ($i = 1; $i <= $numParcelas; $i++) {
+            // Last installment gets remainder to ensure exact total
+            $valor = $i === $numParcelas
+                ? $valorTotal - array_sum(array_column($parcelas, 'valor'))
+                : round($valorPorParcela, 2);
+
+            $parcelas[] = [
+                'numero' => $i,
+                'valor' => $valor,
+                'dias_vencimento' => $i * $diasPorParcela,
+                'data_vencimento' => now()->addDays($i * $diasPorParcela),
+                'percentual' => round(($valor / $valorTotal) * 100, 2),
+            ];
+        }
+
+        return $parcelas;
+    }
 }

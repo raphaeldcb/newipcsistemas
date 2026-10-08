@@ -10,19 +10,28 @@ class CreditoResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $status = CreditoStatus::from($this->cre_status);
-        $saldo = $this->cre_vlr - ($this->cre_vlr_pago ?? 0);
+        $status = CreditoStatus::from($this->status ?? $this->cre_status ?? 'pendente');
+        $valorCalculado = $this->valor_calculado ?? $this->cre_vlr ?? 0;
+        $valorPago = $this->valor_pago ?? $this->cre_vlr_pago ?? 0;
+        $saldo = $valorCalculado - $valorPago;
 
         return [
             'id' => $this->id_credito,
             'caso_id' => $this->caso_id,
-            'valor_total' => (float) $this->cre_vlr,
-            'valor_pago' => (float) ($this->cre_vlr_pago ?? 0),
+            'valor_base' => (float) ($this->valor_base ?? 1000.00),
+            'fator_1' => (float) ($this->fator_1 ?? 1.0),
+            'fator_2' => (float) ($this->fator_2 ?? 1.0),
+            'fator_3' => (float) ($this->fator_3 ?? 1.0),
+            'fator_4' => (float) ($this->fator_4 ?? 1.0),
+            'fator_5' => (float) ($this->fator_5 ?? 1.0),
+            'valor_calculado' => (float) $valorCalculado,
+            'valor_pago' => (float) $valorPago,
             'saldo' => (float) $saldo,
-            'percentual_pago' => $this->cre_vlr > 0 ? round(($this->cre_vlr_pago ?? 0) / $this->cre_vlr * 100, 2) : 0,
+            'percentual_pago' => $valorCalculado > 0 ? round(($valorPago / $valorCalculado) * 100, 2) : 0,
+            'num_parcelas' => (int) ($this->num_parcelas ?? 3),
             'status' => $status->value,
             'status_label' => $status->label(),
-            'data_geracao' => $this->data_geracao,
+            'data_geracao' => $this->data_geracao ?? $this->created_at,
             'data_pagamento' => $this->data_pagamento,
             'data_cancelamento' => $this->data_cancelamento,
             'data_reversao' => $this->data_reversao,

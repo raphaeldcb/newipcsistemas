@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\CasosController as WebCasosController;
 use App\Http\Controllers\Web\PessoasController as WebPessoasController;
 use App\Http\Controllers\Web\KitsController as WebKitsController;
 use App\Http\Controllers\Web\SceisController as WebSceisController;
+use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -56,6 +57,20 @@ Route::middleware('web')->group(function () {
 
         // SCEI — Laboratório
         Route::resource('sceis', WebSceisController::class);
+
+        // Relatórios
+        Route::prefix('relatorios')->name('relatorios.')->group(function () {
+            Route::get('/', [WebRelatoriosController::class, 'index'])->name('index');
+            Route::get('/comunicacoes', [WebRelatoriosController::class, 'comunicacoes'])->name('comunicacoes');
+            Route::get('/comunicacoes/pdf', [WebRelatoriosController::class, 'comunicacoesPDF'])->name('comunicacoes.pdf');
+            Route::get('/comunicacoes/excel', [WebRelatoriosController::class, 'comunicacoesExcel'])->name('comunicacoes.excel');
+            Route::get('/caso/pdf', [WebRelatoriosController::class, 'casoPDF'])->name('caso.pdf');
+            Route::get('/caso/excel', [WebRelatoriosController::class, 'casoExcel'])->name('caso.excel');
+            Route::get('/extracao/pdf', [WebRelatoriosController::class, 'extracaoPDF'])->name('extracao.pdf');
+            Route::get('/extracao/excel', [WebRelatoriosController::class, 'extracaoExcel'])->name('extracao.excel');
+            Route::get('/creditos/excel', [WebRelatoriosController::class, 'creditosExcel'])->name('creditos.excel');
+            Route::get('/auditoria/excel', [WebRelatoriosController::class, 'auditoriaExcel'])->name('auditoria.excel');
+        });
 
         // Admin
         Route::prefix('admin')->name('admin.')->group(function () {

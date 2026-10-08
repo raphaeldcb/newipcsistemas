@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('com_sigla', 2)->nullable();
             $table->primary(['uf_sigla', 'com_cod']);
 
-            $table->primary(['uf_sigla', 'com_cod']);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,4 +24,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('tb_comarca');
     }
-}
+};

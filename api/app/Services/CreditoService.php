@@ -47,23 +47,16 @@ class CreditoService extends BaseService
         }
     }
 
-    protected function criarParcelas(Credito $credito, float $valorTotal): void
+    public function criarParcelas(Credito $credito, float $valorTotal, int $numParcelas = 3): void
     {
-        $parcelas = [
-            ['numero' => 1, 'dias' => 10, 'percentual' => 0.333333],
-            ['numero' => 2, 'dias' => 20, 'percentual' => 0.333333],
-            ['numero' => 3, 'dias' => 30, 'percentual' => 0.333334],
-        ];
+        $parcelas = $this->calculador->calcularParcelas($valorTotal, $numParcelas);
 
         foreach ($parcelas as $parcela) {
-            $valor = round($valorTotal * $parcela['percentual'], 2);
-            $dataVencimento = now()->addDays($parcela['dias']);
-
             $this->parcelaRepository->create([
                 'id_credito' => $credito->id_credito,
                 'par_nparc' => $parcela['numero'],
-                'par_vlr' => $valor,
-                'par_data_vencimento' => $dataVencimento,
+                'par_vlr' => $parcela['valor'],
+                'par_data_vencimento' => $parcela['data_vencimento'],
                 'par_status' => 'aberta',
                 'par_data_criacao' => now(),
             ]);
