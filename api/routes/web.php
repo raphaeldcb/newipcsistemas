@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\ComunicacoesController as WebComunicacoesController
 use App\Http\Controllers\Web\CasosController as WebCasosController;
 use App\Http\Controllers\Web\PessoasController as WebPessoasController;
 use App\Http\Controllers\Web\KitsController as WebKitsController;
+use App\Http\Controllers\Web\SceisController as WebSceisController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -52,6 +53,9 @@ Route::middleware('web')->group(function () {
 
         // Kits
         Route::resource('kits', WebKitsController::class);
+
+        // SCEI — Laboratório
+        Route::resource('sceis', WebSceisController::class);
 
         // Admin
         Route::prefix('admin')->name('admin.')->group(function () {
