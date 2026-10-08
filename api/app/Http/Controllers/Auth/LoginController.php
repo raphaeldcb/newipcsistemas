@@ -28,12 +28,10 @@ class LoginController extends Controller
         if ($user && $user->hos_senha === $credentials['hos_senha']) {
             Auth::login($user);
             $request->session()->regenerate();
-            return redirect('/dashboard');
+            return response()->json(['status' => 'ok', 'message' => 'Login bem-sucedido', 'redirect' => '/dashboard']);
         }
 
-        return back()->withErrors([
-            'hos_usua' => 'Usuário ou senha incorretos',
-        ])->onlyInput('hos_usua');
+        return response()->json(['status' => 'erro', 'message' => 'Usuário ou senha incorretos'], 401);
     }
 
     public function logout(Request $request)
