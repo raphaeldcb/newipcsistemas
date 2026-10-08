@@ -197,7 +197,7 @@
             @foreach($historicos as $h)
               <tr style="border-bottom: 1px solid #ecf0f1; transition: background 0.2s;">
                 <td style="padding: 12px;"><strong>{{ $h->his_data ? \Carbon\Carbon::parse($h->his_data)->format('d/m/Y') : '-' }}</strong></td>
-                <td style="padding: 12px;"><span style="background: #e8f4f8; padding: 4px 8px; border-radius: 4px;">{{ $h->ite_cod }}</span></td>
+                <td style="padding: 12px;"><span style="background: #e8f4f8; padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ $h->item ? $h->item->ite_desc : ($h->ite_cod ?? '-') }}</span></td>
                 <td style="padding: 12px;">{{ $h->his_doc ?? '-' }}</td>
                 <td style="padding: 12px;">{{ $h->his_obs ?? '-' }}</td>
                 <td style="padding: 12px; text-align: center;">

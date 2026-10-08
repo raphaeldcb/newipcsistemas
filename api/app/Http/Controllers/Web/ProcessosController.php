@@ -46,7 +46,7 @@ class ProcessosController extends Controller {
     }
 
     public function show(Processo $processo) {
-        $historicos = Historico::where('pro_cod', $processo->pro_cod)->get();
+        $historicos = Historico::where('pro_cod', $processo->pro_cod)->with('item')->get();
         $pessoas = Pessoa::where('pro_cod', $processo->pro_cod)->get();
         $caso = Caso::where('cas_codigo', $processo->cas_codigo)->first();
         $items = Item::all();
