@@ -152,8 +152,7 @@
             </div>
         @endif
 
-        <form id="loginForm">
-            @csrf
+        <div id="loginForm">
             <div class="form-group">
                 <label for="hos_usua">Usuário</label>
                 <input type="text" id="hos_usua" name="hos_usua" autocomplete="username" required autofocus>
@@ -162,38 +161,47 @@
                 <label for="hos_senha">Senha</label>
                 <input type="password" id="hos_senha" name="hos_senha" autocomplete="current-password" required>
             </div>
-            <button type="submit" class="btn-login">Entrar</button>
-        </form>
+            <div class="btn-login" onclick="fazerLogin()" style="cursor: pointer;">Entrar</div>
+        </div>
 
         <script>
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                console.log('Form submitted');
+            async function fazerLogin() {
+                console.log('fazerLogin called');
+                const hos_usua = document.getElementById('hos_usua').value;
+                const hos_senha = document.getElementById('hos_senha').value;
 
-                const formData = new FormData(document.getElementById('loginForm'));
-                console.log('FormData ready');
+                if (!hos_usua || !hos_senha) {
+                    alert('Preencha usuário e senha');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('hos_usua', hos_usua);
+                formData.append('hos_senha', hos_senha);
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
 
                 try {
-                    console.log('Enviando POST para:', '{{ route("login") }}');
                     const response = await fetch('{{ route("login") }}', {
                         method: 'POST',
                         body: formData
                     });
 
-                    console.log('Response status:', response.status);
                     const data = await response.json();
-                    console.log('Response data:', data);
+                    console.log('Response:', data);
 
                     if (data.status === 'ok') {
-                        console.log('Login ok, redirecionando');
-                        window.location.href = data.redirect;
+                        window.location.href = '/dashboard';
                     } else {
                         alert(data.message);
                     }
                 } catch (error) {
                     console.error('Erro:', error);
-                    alert('Erro ao fazer login: ' + error.message);
+                    alert('Erro: ' + error.message);
                 }
+            }
+
+            document.getElementById('hos_senha').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') fazerLogin();
             });
         </script>
 
