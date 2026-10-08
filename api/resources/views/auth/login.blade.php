@@ -161,7 +161,7 @@
                 <label for="hos_senha">Senha</label>
                 <input type="password" id="hos_senha" name="hos_senha" autocomplete="current-password" required>
             </div>
-            <div class="btn-login" onclick="fazerLogin()" style="cursor: pointer;">Entrar</div>
+            <button type="button" class="btn-login" onclick="fazerLogin()">Entrar</button>
         </div>
 
         <script>
