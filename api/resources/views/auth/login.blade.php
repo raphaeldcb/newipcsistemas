@@ -78,49 +78,6 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102,126,234,0.4);
         }
-        .btn-microsoft {
-            width: 100%;
-            padding: 12px;
-            background: #0078d4;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            transition: all 0.3s;
-            margin-top: 15px;
-        }
-        .btn-microsoft:hover {
-            background: #005a9e;
-        }
-        .login-divider {
-            text-align: center;
-            margin: 20px 0;
-            color: #bbb;
-            font-size: 14px;
-        }
-        .login-divider:before {
-            content: '';
-            display: inline-block;
-            width: 30%;
-            height: 1px;
-            background: #ddd;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        .login-divider:after {
-            content: '';
-            display: inline-block;
-            width: 30%;
-            height: 1px;
-            background: #ddd;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
         .alert {
             padding: 12px;
             margin-bottom: 20px;
@@ -128,14 +85,6 @@
             background: #f8d7da;
             color: #721c24;
             border-left: 4px solid #dc3545;
-        }
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 25px;
-            }
-            .login-header h1 {
-                font-size: 24px;
-            }
         }
     </style>
 </head>
@@ -152,64 +101,18 @@
             </div>
         @endif
 
-        <div id="loginForm">
+        <form method="POST" action="/login">
+            @csrf
             <div class="form-group">
                 <label for="hos_usua">Usuário</label>
-                <input type="text" id="hos_usua" name="hos_usua" autocomplete="username" required autofocus>
+                <input type="text" id="hos_usua" name="hos_usua" value="{{ old('hos_usua') }}" autocomplete="username" required autofocus>
             </div>
             <div class="form-group">
                 <label for="hos_senha">Senha</label>
                 <input type="password" id="hos_senha" name="hos_senha" autocomplete="current-password" required>
             </div>
-            <button type="button" class="btn-login" onclick="fazerLogin()">Entrar</button>
-        </div>
-
-        <script>
-            async function fazerLogin() {
-                console.log('fazerLogin called');
-                const hos_usua = document.getElementById('hos_usua').value;
-                const hos_senha = document.getElementById('hos_senha').value;
-
-                if (!hos_usua || !hos_senha) {
-                    alert('Preencha usuário e senha');
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('hos_usua', hos_usua);
-                formData.append('hos_senha', hos_senha);
-                formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
-
-                try {
-                    const response = await fetch('{{ route("login") }}', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await response.json();
-                    console.log('Response:', data);
-
-                    if (data.status === 'ok') {
-                        window.location.href = '/dashboard';
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Erro: ' + error.message);
-                }
-            }
-
-            document.getElementById('hos_senha').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') fazerLogin();
-            });
-        </script>
-
-        <div class="login-divider">ou</div>
-
-        <a href="{{ route('auth.microsoft') }}" class="btn-microsoft">
-            🔐 Entrar com Microsoft
-        </a>
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
     </div>
 </body>
 </html>
