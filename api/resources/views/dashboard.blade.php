@@ -4,75 +4,97 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
-    <!-- Card: Comunicações -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">Comunicações</p>
-                <p style="font-size: 32px; font-weight: 700; color: #3498db;">-</p>
-                <p style="color: #95a5a6; font-size: 12px; margin-top: 10px;">Últimos 30 dias</p>
-            </div>
-            <div style="font-size: 40px;">📧</div>
-        </div>
-        <a href="{{ route('comunicacoes.index') }}" class="btn btn-primary" style="margin-top: 15px; width: 100%; text-align: center;">Ver</a>
-    </div>
+<h2 class="mb-4">Módulos</h2>
 
-    <!-- Card: Casos -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">Casos</p>
-                <p style="font-size: 32px; font-weight: 700; color: #2ecc71;">-</p>
-                <p style="color: #95a5a6; font-size: 12px; margin-top: 10px;">Em andamento</p>
-            </div>
-            <div style="font-size: 40px;">📋</div>
-        </div>
-        <a href="{{ route('casos.index') }}" class="btn btn-primary" style="margin-top: 15px; width: 100%; text-align: center;">Ver</a>
-    </div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+    <!-- Processos -->
+    <a href="{{ route('processos.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">⚖️</div>
+        <h5>Processos</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Cadastros e histórico</p>
+      </div>
+    </a>
 
-    <!-- Card: Pessoas -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">Pessoas</p>
-                <p style="font-size: 32px; font-weight: 700; color: #9b59b6;">-</p>
-                <p style="color: #95a5a6; font-size: 12px; margin-top: 10px;">Cadastradas</p>
-            </div>
-            <div style="font-size: 40px;">👥</div>
-        </div>
-        <a href="{{ route('pessoas.index') }}" class="btn btn-primary" style="margin-top: 15px; width: 100%; text-align: center;">Ver</a>
-    </div>
+    <!-- Comunicações -->
+    <a href="{{ route('comunicacoes.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📧</div>
+        <h5>Comunicações</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Emails e mensagens</p>
+      </div>
+    </a>
 
-    <!-- Card: Créditos -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">Créditos</p>
-                <p style="font-size: 32px; font-weight: 700; color: #e74c3c;">-</p>
-                <p style="color: #95a5a6; font-size: 12px; margin-top: 10px;">Pendentes</p>
-            </div>
-            <div style="font-size: 40px;">💰</div>
-        </div>
-        <a href="javascript:void(0)" class="btn btn-primary" style="margin-top: 15px; width: 100%; text-align: center;">Ver</a>
-    </div>
-</div>
+    <!-- Casos -->
+    <a href="{{ route('casos.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📋</div>
+        <h5>Casos</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Tipos de casos</p>
+      </div>
+    </a>
 
-<!-- Últimas Comunicações -->
-<div class="card">
-    <div class="card-header">
-        📧 Últimas Comunicações
-        <a href="{{ route('comunicacoes.index') }}" style="float: right; font-size: 14px; text-decoration: none; color: #3498db;">Ver todas →</a>
-    </div>
-    <p style="color: #95a5a6; font-size: 14px; text-align: center; padding: 30px 0;">Nenhuma comunicação registrada</p>
-</div>
+    <!-- Pessoas -->
+    <a href="{{ route('pessoas.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">👥</div>
+        <h5>Pessoas</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Cadastro de pessoas</p>
+      </div>
+    </a>
 
-<!-- Últimos Casos -->
-<div class="card">
-    <div class="card-header">
-        📋 Últimos Casos
-        <a href="{{ route('casos.index') }}" style="float: right; font-size: 14px; text-decoration: none; color: #3498db;">Ver todas →</a>
-    </div>
-    <p style="color: #95a5a6; font-size: 14px; text-align: center; padding: 30px 0;">Nenhum caso registrado</p>
+    <!-- Kits -->
+    <a href="{{ route('kits.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
+        <h5>Kits</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Kits de coleta</p>
+      </div>
+    </a>
+
+    <!-- Alelos -->
+    <a href="{{ route('alelos.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🧬</div>
+        <h5>Alelos</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Dados genéticos</p>
+      </div>
+    </a>
+
+    <!-- Créditos -->
+    <a href="{{ route('creditos.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
+        <h5>Créditos</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Créditos de faturamento</p>
+      </div>
+    </a>
+
+    <!-- Extrações -->
+    <a href="{{ route('extracos.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🧪</div>
+        <h5>Extrações</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Extrações de DNA</p>
+      </div>
+    </a>
+
+    <!-- SCEI -->
+    <a href="{{ route('sceis.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🏥</div>
+        <h5>SCEI</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Laboratório</p>
+      </div>
+    </a>
+
+    <!-- Relatórios -->
+    <a href="{{ route('relatorios.index') }}" style="text-decoration: none; color: inherit;">
+      <div class="card" style="cursor: pointer; transition: all 0.3s;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📊</div>
+        <h5>Relatórios</h5>
+        <p style="color: #7f8c8d; font-size: 14px;">Análises e dados</p>
+      </div>
+    </a>
 </div>
 @endsection

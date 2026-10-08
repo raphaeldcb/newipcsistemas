@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\KitsController as WebKitsController;
 use App\Http\Controllers\Web\ExtracoesController as WebExtracoesController;
 use App\Http\Controllers\Web\SceisController as WebSceisController;
 use App\Http\Controllers\Web\AlelosController as WebAlelosController;
+use App\Http\Controllers\Web\CreditosController as WebCreditosController;
 use App\Http\Controllers\Web\ProcessosController as WebProcessosController;
 use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
 use App\Http\Controllers\Auth\LoginController;
@@ -55,6 +56,9 @@ Route::middleware('web')->group(function () {
 
         // Alelos
         Route::resource('alelos', WebAlelosController::class);
+
+        // Créditos
+        Route::resource('creditos', WebCreditosController::class);
 
         // SCEI — Laboratório
         Route::resource('sceis', WebSceisController::class);
