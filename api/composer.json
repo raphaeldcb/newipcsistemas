@@ -10,7 +10,6 @@
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
-        "tcpdf/tcpdf": "^6.7",
         "phpoffice/phpspreadsheet": "^1.30"
     },
     "require-dev": {
