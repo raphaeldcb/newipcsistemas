@@ -168,23 +168,30 @@
         <script>
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                console.log('Form submitted');
 
                 const formData = new FormData(document.getElementById('loginForm'));
+                console.log('FormData ready');
 
                 try {
+                    console.log('Enviando POST para:', '{{ route("login") }}');
                     const response = await fetch('{{ route("login") }}', {
                         method: 'POST',
                         body: formData
                     });
 
+                    console.log('Response status:', response.status);
                     const data = await response.json();
+                    console.log('Response data:', data);
 
                     if (data.status === 'ok') {
+                        console.log('Login ok, redirecionando');
                         window.location.href = data.redirect;
                     } else {
                         alert(data.message);
                     }
                 } catch (error) {
+                    console.error('Erro:', error);
                     alert('Erro ao fazer login: ' + error.message);
                 }
             });
