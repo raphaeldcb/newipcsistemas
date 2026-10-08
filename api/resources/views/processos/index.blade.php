@@ -75,7 +75,7 @@
   <!-- Lista de Processos em Grid -->
   @if($processos->count())
     <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <div style="display: grid; grid-template-columns: 60px 1.2fr 120px 80px 80px 100px; gap: 0; border-bottom: 2px solid #3498db;">
+      <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 70px 90px; gap: 0; border-bottom: 2px solid #3498db;">
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; text-align: center; font-size: 12px;">ID</div>
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; font-size: 12px;">Número / Tipo</div>
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; font-size: 12px;">Autos</div>
@@ -85,7 +85,7 @@
       </div>
 
       @foreach($processos as $p)
-        <div style="display: grid; grid-template-columns: 60px 1.2fr 120px 80px 80px 100px; gap: 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
+        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 70px 90px; gap: 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
           <div style="padding: 12px 15px; text-align: center; color: #7f8c8d; font-weight: 600; font-size: 12px;">{{ $p->pro_cod }}</div>
 
           <div style="padding: 12px 15px;">
