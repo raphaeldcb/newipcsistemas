@@ -23,7 +23,10 @@ class LoginController extends Controller
             'hos_senha.required' => 'Senha obrigatória',
         ]);
 
-        if (Auth::attempt(['hos_usua' => $credentials['hos_usua'], 'password' => $credentials['hos_senha']])) {
+        $user = \App\Models\Host::where('hos_usua', $credentials['hos_usua'])->first();
+
+        if ($user && $user->hos_senha === $credentials['hos_senha']) {
+            Auth::login($user);
             $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
