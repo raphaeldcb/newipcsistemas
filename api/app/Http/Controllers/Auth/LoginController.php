@@ -23,9 +23,19 @@ class LoginController extends Controller
             'hos_senha.required' => 'Senha obrigatória',
         ]);
 
-        $user = \App\Models\Host::where('hos_usua', $credentials['hos_usua'])->first();
+        $host = \App\Models\Host::where('hos_usua', $credentials['hos_usua'])->first();
 
-        if ($user && $user->hos_senha === $credentials['hos_senha']) {
+        if ($host && $host->hos_senha === $credentials['hos_senha']) {
+            // Sincronizar com tabela users
+            $user = \App\Models\User::updateOrCreate(
+                ['email' => $host->hos_usua],
+                [
+                    'name' => $host->hos_nome ?? $host->hos_usua,
+                    'email' => $host->hos_usua,
+                    'password' => bcrypt($host->hos_senha),
+                ]
+            );
+
             Auth::login($user);
             $request->session()->regenerate();
 
