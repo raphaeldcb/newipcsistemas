@@ -2,9 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\ComunicacoesController as WebComunicacoesController;
 use App\Http\Controllers\Web\CasosController as WebCasosController;
 use App\Http\Controllers\Web\PessoasController as WebPessoasController;
+use App\Http\Controllers\Web\KitsController as WebKitsController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -46,9 +48,17 @@ Route::middleware('web')->group(function () {
         });
 
         // Pessoas
-        Route::prefix('pessoas')->name('pessoas.')->group(function () {
-            Route::get('/', [WebPessoasController::class, 'index'])->name('index');
-            Route::get('/{pessoa}', [WebPessoasController::class, 'show'])->name('show');
+        Route::resource('pessoas', WebPessoasController::class);
+
+        // Kits
+        Route::resource('kits', WebKitsController::class);
+
+        // Admin
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/', [AdminController::class, 'index'])->name('index');
+            Route::get('/menu-testes', [AdminController::class, 'menu_testes'])->name('menu_testes');
+            Route::post('/gerar-dados-teste', [AdminController::class, 'gerar_dados_teste'])->name('gerar_dados_teste');
+            Route::post('/limpar-dados-teste', [AdminController::class, 'limpar_dados_teste'])->name('limpar_dados_teste');
         });
     });
 });
