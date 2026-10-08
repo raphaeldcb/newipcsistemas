@@ -33,40 +33,47 @@
     </form>
   </div>
 
-  <!-- Lista de Processos -->
+  <!-- Lista de Processos em Grid -->
   @if($processos->count())
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <div style="display: grid; grid-template-columns: 80px 1fr 120px 150px 100px auto; gap: 0; border-bottom: 2px solid #3498db;">
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db; text-align: center;">ID</div>
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db;">Número / Tipo</div>
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db;">Autora</div>
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db;">UF / Caso</div>
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db; text-align: center;">Data</div>
+        <div style="padding: 15px; font-weight: 600; color: white; background: #3498db; text-align: center;">Ações</div>
+      </div>
+
       @foreach($processos as $p)
-        <a href="{{ route('processos.show', $p->pro_cod) }}" style="text-decoration: none; color: inherit;">
-          <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-left: 4px solid #3498db; display: flex; flex-direction: column; height: 100%;">
-            <div style="margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div>
-                  <p style="margin: 0; color: #7f8c8d; font-size: 12px; font-weight: 600;">PROCESSO #{{ $p->pro_cod }}</p>
-                  <h3 style="margin: 4px 0 0 0; color: #2c3e50; font-size: 16px;">{{ $p->pro_nperc ?? '-' }}</h3>
-                </div>
-                <span style="background: #e8f4f8; color: #3498db; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">{{ $p->pro_tipo ? ['Judicial', 'ExtraJudicial', 'Min. Público', 'Def. Pública', 'Deleg. Polícia', 'Just. Comunitária', 'Cons. Tutelar', 'Prom. Justiça', 'Paternidade Resp.', 'Núcleo Prática', 'Dir. Foro', 'Aut. Solicitante'][$p->pro_tipo - 1] ?? 'N/A' : '-' }}</span>
-              </div>
-            </div>
+        <div style="display: grid; grid-template-columns: 80px 1fr 120px 150px 100px auto; gap: 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
+          <div style="padding: 15px; text-align: center; color: #7f8c8d; font-weight: 600;">{{ $p->pro_cod }}</div>
 
-            <div style="margin-bottom: 12px; flex: 1;">
-              <p style="margin: 0 0 6px 0; color: #555; font-size: 13px;"><strong>Autora:</strong> {{ $p->pro_auto ?? '-' }}</p>
-              <p style="margin: 0 0 6px 0; color: #555; font-size: 13px;"><strong>UF:</strong> {{ $p->uf_sigla ?? '-' }} | <strong>Caso:</strong> {{ $p->cas_codigo ?? '-' }}</p>
-              <p style="margin: 0; color: #7f8c8d; font-size: 12px;">
-                📅 {{ $p->pro_drec ? \Carbon\Carbon::parse($p->pro_drec)->format('d/m/Y') : 'Sem data' }}
-              </p>
-            </div>
-
-            <div style="display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid #ecf0f1; margin-top: auto;">
-              <form action="{{ route('processos.destroy', $p->pro_cod) }}" method="POST" style="flex: 1;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" style="width: 100%; background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">🗑️ Deletar</button>
-              </form>
-              <a href="{{ route('processos.edit', $p->pro_cod) }}" style="flex: 1; background: #3498db; color: white; padding: 8px; border-radius: 4px; text-align: center; text-decoration: none; font-size: 12px; font-weight: 600;">✏️ Editar</a>
-            </div>
+          <div style="padding: 15px;">
+            <p style="margin: 0 0 4px 0; font-weight: 600; color: #2c3e50;">{{ $p->pro_nperc ?? '-' }}</p>
+            <span style="background: #e8f4f8; color: #3498db; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600;">{{ $p->pro_tipo ? ['Judicial', 'ExtraJudicial', 'Min. Público', 'Def. Pública', 'Deleg. Polícia', 'Just. Comunitária', 'Cons. Tutelar', 'Prom. Justiça', 'Paternidade Resp.', 'Núcleo Prática', 'Dir. Foro', 'Aut. Solicitante'][$p->pro_tipo - 1] ?? 'N/A' : '-' }}</span>
           </div>
-        </a>
+
+          <div style="padding: 15px; font-size: 13px; color: #555;">{{ $p->pro_auto ?? '-' }}</div>
+
+          <div style="padding: 15px; font-size: 13px; color: #555;">
+            <strong>{{ $p->uf_sigla ?? '-' }}</strong> / {{ $p->cas_codigo ?? '-' }}
+          </div>
+
+          <div style="padding: 15px; text-align: center; font-size: 12px; color: #7f8c8d;">
+            {{ $p->pro_drec ? \Carbon\Carbon::parse($p->pro_drec)->format('d/m/Y') : '-' }}
+          </div>
+
+          <div style="padding: 15px; display: flex; gap: 6px; justify-content: center;">
+            <a href="{{ route('processos.show', $p->pro_cod) }}" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600;">👁️</a>
+            <a href="{{ route('processos.edit', $p->pro_cod) }}" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600;">✏️</a>
+            <form action="{{ route('processos.destroy', $p->pro_cod) }}" method="POST" style="display: inline;">
+              @csrf
+              @method('DELETE')
+              <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">🗑️</button>
+            </form>
+          </div>
+        </div>
       @endforeach
     </div>
 
