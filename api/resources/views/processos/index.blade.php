@@ -75,7 +75,7 @@
   <!-- Lista de Processos em Grid -->
   @if($processos->count())
     <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 70px 90px; gap: 0; border-bottom: 2px solid #3498db;">
+      <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 90px 100px; gap: 0; border-bottom: 2px solid #3498db;">
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; text-align: center; font-size: 12px;">ID</div>
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; font-size: 12px;">Número / Tipo</div>
         <div style="padding: 12px 15px; font-weight: 600; color: white; background: #3498db; font-size: 12px;">Autos</div>
@@ -85,7 +85,7 @@
       </div>
 
       @foreach($processos as $p)
-        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 70px 90px; gap: 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
+        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 70px 90px 100px; gap: 0; border-bottom: 1px solid #ecf0f1; align-items: center;">
           <div style="padding: 12px 15px; text-align: center; color: #7f8c8d; font-weight: 600; font-size: 12px;">{{ $p->pro_cod }}</div>
 
           <div style="padding: 12px 15px;">
@@ -104,12 +104,12 @@
           </div>
 
           <div style="padding: 12px 15px; display: flex; gap: 4px; justify-content: center;">
-            <a href="{{ route('processos.show', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 5px 8px; border-radius: 3px; text-decoration: none; font-size: 10px; font-weight: 600;">👁️</a>
-            <a href="{{ route('processos.edit', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 5px 8px; border-radius: 3px; text-decoration: none; font-size: 10px; font-weight: 600;">✏️</a>
+            <a href="{{ route('processos.show', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Visualizar">▶</a>
+            <a href="{{ route('processos.edit', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Editar">◎</a>
             <form action="{{ route('processos.destroy', $p->pro_cod) }}" method="POST" style="display: inline;">
               @csrf
               @method('DELETE')
-              <button type="submit" class="btn btn-sm" style="background: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 600;" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">🗑️</button>
+              <button type="submit" class="btn btn-sm" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Deletar" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">✕</button>
             </form>
           </div>
         </div>
