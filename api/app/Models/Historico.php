@@ -1,16 +1,11 @@
 <?php
-
 namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
 
-class Historico extends BaseModel
-{
+class Historico extends Model {
     protected $table = 'tb_historico';
     protected $primaryKey = 'his_contr';
-    protected $guarded = [];
-
-    public function caso()
-    {
-        return $this->belongsTo(Caso::class, 'pro_cod', 'pro_cod');
-    }
-
+    public $timestamps = false;
+    
+    protected $fillable = ['pro_cod', 'ite_cod', 'his_data', 'his_doc', 'his_obs'];
 }

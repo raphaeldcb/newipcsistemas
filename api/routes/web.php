@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\KitsController as WebKitsController;
 use App\Http\Controllers\Web\ExtracoesController as WebExtracoesController;
 use App\Http\Controllers\Web\SceisController as WebSceisController;
 use App\Http\Controllers\Web\AlelosController as WebAlelosController;
+use App\Http\Controllers\Web\ProcessosController as WebProcessosController;
 use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
 use App\Http\Controllers\Auth\LoginController;
 
@@ -39,6 +40,9 @@ Route::middleware('web')->group(function () {
 
         // Casos
         Route::resource('casos', WebCasosController::class);
+
+        // Processos
+        Route::resource('processos', WebProcessosController::class);
 
         // Pessoas
         Route::resource('pessoas', WebPessoasController::class);
