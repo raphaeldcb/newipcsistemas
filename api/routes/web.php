@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\ExtracoesController as WebExtracoesController;
 use App\Http\Controllers\Web\SceisController as WebSceisController;
 use App\Http\Controllers\Web\AlelosController as WebAlelosController;
 use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
+use App\Http\Controllers\Auth\LoginController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -19,16 +20,9 @@ Route::get('/', function () {
 
 Route::middleware('web')->group(function () {
     // Auth Routes
-    Route::get('/login', fn() => view('auth.login'))->name('login')->middleware('guest');
-    Route::post('/login', function (\Illuminate\Http\Request $request) {
-        // Stub: implementar autenticação real em Etapa 6
-        return back()->withErrors(['email' => 'Credenciais inválidas']);
-    })->middleware('guest');
-
-    Route::post('/logout', function (\Illuminate\Http\Request $request) {
-        auth()->logout();
-        return redirect()->route('login');
-    })->name('logout')->middleware('auth');
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
+    Route::post('/login', [LoginController::class, 'login'])->name('login')->middleware('guest');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
     // Microsoft OAuth (Stub)
     Route::get('/auth/microsoft', fn() => 'Redirect para Microsoft Auth')->name('auth.microsoft');

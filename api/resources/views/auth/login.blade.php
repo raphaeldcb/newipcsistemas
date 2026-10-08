@@ -155,12 +155,12 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
+                <label for="hos_usua">Usuário</label>
+                <input type="text" id="hos_usua" name="hos_usua" value="{{ old('hos_usua') }}" required autofocus>
             </div>
             <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" required>
+                <label for="hos_senha">Senha</label>
+                <input type="password" id="hos_senha" name="hos_senha" required>
             </div>
             <button type="submit" class="btn-login">Entrar</button>
         </form>
