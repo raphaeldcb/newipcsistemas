@@ -53,11 +53,51 @@
     <div id="form-pessoa" style="display: none; margin-bottom: 20px; padding: 15px; background: #f0f9f4; border-radius: 4px; border-left: 4px solid #27ae60;">
       <form action="{{ route('processos.pessoas.store', $processo->pro_cod) }}" method="POST">
         @csrf
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: flex-end;">
-          <input type="text" name="pes_nome" placeholder="Nome da Pessoa" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
-          <input type="text" name="pes_iniciais" placeholder="Iniciais" maxlength="10" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <input type="date" name="pes_dtnas" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Salvar</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Nome</label>
+            <input type="text" name="pes_nome" placeholder="Nome completo" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" required>
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Iniciais</label>
+            <input type="text" name="pes_iniciais" placeholder="Iniciais" maxlength="10" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Data Nascimento</label>
+            <input type="date" name="pes_dtnas" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Local Nascimento</label>
+            <input type="text" name="pes_lcnas" placeholder="Cidade/Estado" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Sexo</label>
+            <select name="pes_sexo" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <option value="">--</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Situação</label>
+            <input type="number" name="pes_sit" placeholder="Situação" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Tipo de Documento</label>
+            <input type="text" name="pes_tdoc" placeholder="CPF, RG, etc" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Número do Documento</label>
+            <input type="text" name="pes_ndoc" placeholder="Número do documento" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">✓ Salvar</button>
+          <button type="button" onclick="document.getElementById('form-pessoa').style.display = 'none'" style="background: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">✕ Cancelar</button>
         </div>
       </form>
     </div>
@@ -70,6 +110,8 @@
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Nome</th>
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Iniciais</th>
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Data Nasc.</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Sexo</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Documento</th>
               <th style="padding: 12px; text-align: center; border-bottom: 1px solid #ddd;">Ação</th>
             </tr>
           </thead>
@@ -79,6 +121,8 @@
                 <td style="padding: 12px;">{{ $pessoa->pes_nome }}</td>
                 <td style="padding: 12px;">{{ $pessoa->pes_iniciais }}</td>
                 <td style="padding: 12px;">{{ $pessoa->pes_dtnas ? \Carbon\Carbon::parse($pessoa->pes_dtnas)->format('d/m/Y') : '-' }}</td>
+                <td style="padding: 12px;">{{ $pessoa->pes_sexo ?? '-' }}</td>
+                <td style="padding: 12px;">{{ $pessoa->pes_ndoc ?? '-' }}</td>
                 <td style="padding: 12px; text-align: center;">
                   <form action="{{ route('processos.pessoas.destroy', [$processo->pro_cod, $pessoa->pes_cod]) }}" method="POST" style="display: inline;">
                     @csrf
@@ -107,17 +151,32 @@
     <div id="form-historico" style="display: none; margin-bottom: 20px; padding: 15px; background: #fef5f5; border-radius: 4px; border-left: 4px solid #e74c3c;">
       <form action="{{ route('processos.historicos.store', $processo->pro_cod) }}" method="POST">
         @csrf
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: flex-end;">
-          <input type="date" name="his_data" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
-          <select name="ite_cod" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-            <option value="">-- Selecionar Item --</option>
-            @foreach($items as $item)
-              <option value="{{ $item->ite_cod }}">{{ $item->ite_desc }}</option>
-            @endforeach
-          </select>
-          <input type="text" name="his_doc" placeholder="Documento" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <input type="text" name="his_obs" placeholder="Observação" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-          <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Salvar</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Data</label>
+            <input type="date" name="his_data" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" required>
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Item</label>
+            <select name="ite_cod" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <option value="">-- Selecionar Item --</option>
+              @foreach($items as $item)
+                <option value="{{ $item->ite_cod }}">{{ $item->ite_desc }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Documento</label>
+            <input type="text" name="his_doc" placeholder="Número ou ref." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 12px; color: #333; margin-bottom: 4px;">Observação</label>
+            <input type="text" name="his_obs" placeholder="Obs." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">✓ Salvar</button>
+          <button type="button" onclick="document.getElementById('form-historico').style.display = 'none'" style="background: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">✕ Cancelar</button>
         </div>
       </form>
     </div>

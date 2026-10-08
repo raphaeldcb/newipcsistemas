@@ -75,6 +75,10 @@ class ProcessosController extends Controller {
             'pes_iniciais' => $request->input('pes_iniciais'),
             'pes_sit' => $request->input('pes_sit'),
             'pes_dtnas' => $request->input('pes_dtnas'),
+            'pes_lcnas' => $request->input('pes_lcnas'),
+            'pes_sexo' => $request->input('pes_sexo'),
+            'pes_tdoc' => $request->input('pes_tdoc'),
+            'pes_ndoc' => $request->input('pes_ndoc'),
         ]);
         return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Pessoa adicionada!');
     }
