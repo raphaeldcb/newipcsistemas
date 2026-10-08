@@ -7,7 +7,9 @@ use App\Http\Controllers\Web\ComunicacoesController as WebComunicacoesController
 use App\Http\Controllers\Web\CasosController as WebCasosController;
 use App\Http\Controllers\Web\PessoasController as WebPessoasController;
 use App\Http\Controllers\Web\KitsController as WebKitsController;
+use App\Http\Controllers\Web\ExtracoesController as WebExtracoesController;
 use App\Http\Controllers\Web\SceisController as WebSceisController;
+use App\Http\Controllers\Web\AlelosController as WebAlelosController;
 use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
 
 // Redirect root to dashboard or login
@@ -54,6 +56,12 @@ Route::middleware('web')->group(function () {
 
         // Kits
         Route::resource('kits', WebKitsController::class);
+
+        // Extrações
+        Route::resource('extracos', WebExtracoesController::class);
+
+        // Alelos
+        Route::resource('alelos', WebAlelosController::class);
 
         // SCEI — Laboratório
         Route::resource('sceis', WebSceisController::class);
