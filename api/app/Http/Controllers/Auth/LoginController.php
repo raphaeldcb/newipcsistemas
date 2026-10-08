@@ -26,16 +26,11 @@ class LoginController extends Controller
         $user = \App\Models\Host::where('hos_usua', $credentials['hos_usua'])->first();
 
         if ($user && $user->hos_senha === $credentials['hos_senha']) {
-            dd([
-                'usuário encontrado' => $user->hos_usua,
-                'senha match' => $user->hos_senha === $credentials['hos_senha'],
-                'autenticado' => Auth::check(),
-                'tentando login' => Auth::login($user),
-                'autenticado após login' => Auth::check(),
-            ]);
+            Auth::login($user);
+            $request->session()->regenerate();
+            return redirect('/dashboard');
         }
 
-        \Log::warning('Falha de login para: ' . $credentials['hos_usua']);
         return back()->withErrors([
             'hos_usua' => 'Usuário ou senha incorretos',
         ])->onlyInput('hos_usua');
