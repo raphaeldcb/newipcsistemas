@@ -104,12 +104,12 @@
           </div>
 
           <div style="padding: 12px 15px; display: flex; gap: 4px; justify-content: center;">
-            <a href="{{ route('processos.show', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Visualizar">▶</a>
-            <a href="{{ route('processos.edit', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Editar">◎</a>
+            <a href="{{ route('processos.show', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; cursor: pointer;" title="Visualizar">🔍</a>
+            <a href="{{ route('processos.edit', $p->pro_cod) }}" class="btn btn-sm" style="background: #3498db; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; cursor: pointer;" title="Editar">📝</a>
             <form action="{{ route('processos.destroy', $p->pro_cod) }}" method="POST" style="display: inline;">
               @csrf
               @method('DELETE')
-              <button type="submit" class="btn btn-sm" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" title="Deletar" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">✕</button>
+              <button type="submit" class="btn btn-sm" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;" title="Deletar" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">⊗</button>
             </form>
           </div>
         </div>
