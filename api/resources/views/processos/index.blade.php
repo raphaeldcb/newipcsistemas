@@ -1,5 +1,44 @@
 @extends('layouts.app')
 @section('title', 'Processos')
+
+@push('styles')
+<style>
+  .pagination {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pagination li {
+    list-style: none;
+  }
+  .pagination a, .pagination span {
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    color: #333;
+    transition: all 0.2s;
+  }
+  .pagination a:hover {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+  }
+  .pagination .active span {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+  }
+  .pagination .disabled span {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+</style>
+@endpush
+
 @section('content')
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
   <!-- Header -->
@@ -78,8 +117,13 @@
     </div>
 
     <!-- Paginação -->
-    <div style="display: flex; justify-content: center; margin-top: 40px;">
-      {{ $processos->appends(request()->query())->links() }}
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 40px; gap: 20px;">
+      <div style="color: #7f8c8d; font-size: 12px;">
+        Mostrando {{ $processos->firstItem() }} a {{ $processos->lastItem() }} de {{ $processos->total() }} processos
+      </div>
+      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;">
+        {{ $processos->appends(request()->query())->links('pagination::bootstrap-4') }}
+      </div>
     </div>
   @else
     <div style="background: white; border-radius: 8px; padding: 60px 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
