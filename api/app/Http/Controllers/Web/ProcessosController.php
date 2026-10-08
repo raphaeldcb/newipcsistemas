@@ -7,9 +7,31 @@ use App\Models\Pessoa;
 use Illuminate\Http\Request;
 
 class ProcessosController extends Controller {
-    public function index() {
-        $processos = Processo::paginate(15);
-        return view('processos.index', compact('processos'));
+    public function index(Request $request) {
+        $busca = $request->input('busca');
+        $filtro = $request->input('filtro', 'data');
+
+        $query = Processo::query();
+
+        if ($busca) {
+            $query->where(function($q) use ($busca) {
+                $q->where('pro_nperc', 'like', "%$busca%")
+                  ->orWhere('pro_auto', 'like', "%$busca%")
+                  ->orWhere('cas_codigo', 'like', "%$busca%");
+            });
+        }
+
+        if ($filtro === 'data') {
+            $query->orderByDesc('pro_dcad');
+        } elseif ($filtro === 'numero') {
+            $query->orderBy('pro_nperc');
+        } else {
+            $query->orderByDesc('pro_cod');
+        }
+
+        $processos = $query->paginate(15);
+
+        return view('processos.index', compact('processos', 'busca', 'filtro'));
     }
 
     public function create() {
