@@ -152,11 +152,11 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form id="loginForm">
             @csrf
             <div class="form-group">
                 <label for="hos_usua">Usuário</label>
-                <input type="text" id="hos_usua" name="hos_usua" value="{{ old('hos_usua') }}" autocomplete="username" required autofocus>
+                <input type="text" id="hos_usua" name="hos_usua" autocomplete="username" required autofocus>
             </div>
             <div class="form-group">
                 <label for="hos_senha">Senha</label>
@@ -164,6 +164,31 @@
             </div>
             <button type="submit" class="btn-login">Entrar</button>
         </form>
+
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(document.getElementById('loginForm'));
+
+                try {
+                    const response = await fetch('{{ route("login") }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'ok') {
+                        window.location.href = data.redirect;
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    alert('Erro ao fazer login: ' + error.message);
+                }
+            });
+        </script>
 
         <div class="login-divider">ou</div>
 
