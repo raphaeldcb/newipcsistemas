@@ -104,12 +104,12 @@
           </div>
 
           <div style="padding: 12px 15px; display: flex; gap: 5px; justify-content: center;">
-            <a href="{{ route('processos.show', $p->pro_cod) }}" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: #3498db; color: white; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s; line-height: 1;" title="Visualizar">▶</a>
-            <a href="{{ route('processos.edit', $p->pro_cod) }}" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: #3498db; color: white; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s; line-height: 1;" title="Editar">⚒</a>
+            <a href="{{ route('processos.show', $p->pro_cod) }}" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: #3498db; color: white; border-radius: 4px; text-decoration: none; font-size: 16px; transition: all 0.2s; line-height: 1;" title="Visualizar">📁</a>
+            <a href="{{ route('processos.edit', $p->pro_cod) }}" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: #3498db; color: white; border-radius: 4px; text-decoration: none; font-size: 16px; transition: all 0.2s; line-height: 1;" title="Editar">📄</a>
             <form action="{{ route('processos.destroy', $p->pro_cod) }}" method="POST" style="display: inline;">
               @csrf
               @method('DELETE')
-              <button type="submit" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; line-height: 1;" title="Deletar" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">✕</button>
+              <button type="submit" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.2s; line-height: 1;" title="Deletar" onclick="return confirm('Deletar processo #{{ $p->pro_cod }}?')">🗑</button>
             </form>
           </div>
         </div>
