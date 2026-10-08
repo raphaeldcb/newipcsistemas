@@ -4,6 +4,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Processo;
 use App\Models\Historico;
 use App\Models\Pessoa;
+use App\Models\Caso;
+use App\Models\Item;
 use Illuminate\Http\Request;
 
 class ProcessosController extends Controller {
@@ -46,7 +48,9 @@ class ProcessosController extends Controller {
     public function show(Processo $processo) {
         $historicos = Historico::where('pro_cod', $processo->pro_cod)->get();
         $pessoas = Pessoa::where('pro_cod', $processo->pro_cod)->get();
-        return view('processos.show', compact('processo', 'historicos', 'pessoas'));
+        $caso = Caso::where('cas_codigo', $processo->cas_codigo)->first();
+        $items = Item::all();
+        return view('processos.show', compact('processo', 'historicos', 'pessoas', 'caso', 'items'));
     }
 
     public function edit(Processo $processo) {
