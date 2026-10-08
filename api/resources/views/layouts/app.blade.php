@@ -19,48 +19,7 @@
             display: flex;
             min-height: 100vh;
         }
-        .sidebar {
-            width: 260px;
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .sidebar-header h1 {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        .sidebar-menu {
-            list-style: none;
-        }
-        .sidebar-menu li {
-            margin: 5px 0;
-        }
-        .sidebar-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border-left-color: #3498db;
-        }
         .main-content {
-            margin-left: 260px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -237,31 +196,6 @@
 </head>
 <body>
     <div class="container-main">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1>IPC</h1>
-                <p style="font-size: 12px; margin-top: 5px;">Sistemas</p>
-            </div>
-            <ul class="sidebar-menu">
-                <li><a href="{{ route('dashboard') }}" class="@if(Route::currentRouteName() === 'dashboard') active @endif">📊 Dashboard</a></li>
-                <li><a href="{{ route('comunicacoes.index') }}" class="@if(str_contains(Route::currentRouteName(), 'comunicacoes')) active @endif">📧 Comunicações</a></li>
-                <li><a href="{{ route('casos.index') }}" class="@if(str_contains(Route::currentRouteName(), 'casos')) active @endif">📋 Casos</a></li>
-                <li><a href="{{ route('pessoas.index') }}" class="@if(str_contains(Route::currentRouteName(), 'pessoas')) active @endif">👥 Pessoas</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'kits')) active @endif">🔬 Kits</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'extracos')) active @endif">🧬 Extrações</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'sceis')) active @endif">🏥 SCEI</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'creditos')) active @endif">💰 Créditos</a></li>
-                <li><a href="javascript:void(0)" class="@if(str_contains(Route::currentRouteName(), 'alelos')) active @endif">🔍 Alelos</a></li>
-                <li><a href="{{ route('relatorios.index') }}" class="@if(str_contains(Route::currentRouteName(), 'relatorios')) active @endif">📄 Relatórios</a></li>
-                @if(auth()->user() && auth()->user()->role === 'admin')
-                <li style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <a href="{{ route('admin.index') }}" class="@if(str_contains(Route::currentRouteName(), 'admin')) active @endif">⚙️ Admin</a>
-                </li>
-                @endif
-            </ul>
-        </aside>
-
         <!-- Main Content -->
         <div class="main-content">
             <!-- Navbar -->
