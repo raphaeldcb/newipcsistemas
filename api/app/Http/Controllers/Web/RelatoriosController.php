@@ -10,10 +10,6 @@ use Illuminate\Http\Request;
 
 class RelatoriosController extends Controller
 {
-    public function __construct(
-        private RelatorioService $relatorioService
-    ) {
-    }
 
     /**
      * Exibir página de índice de relatórios

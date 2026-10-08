@@ -7,11 +7,6 @@ use App\Models\Caso;
 
 class CasosController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index()
     {
         $casos = Caso::paginate(15);

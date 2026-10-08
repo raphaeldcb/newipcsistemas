@@ -12,11 +12,6 @@ class ComunicacoesController extends Controller
 {
     protected $classificacao;
 
-    public function __construct(ClassificacaoService $classificacao)
-    {
-        $this->middleware('auth');
-        $this->classificacao = $classificacao;
-    }
 
     public function index()
     {

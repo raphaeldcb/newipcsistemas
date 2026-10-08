@@ -14,11 +14,6 @@ use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('admin'); // Será criado próximo
-    }
 
     /**
      * Dashboard Admin — Exibe estatísticas gerais
