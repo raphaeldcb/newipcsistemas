@@ -1,15 +1,15 @@
 @extends('layouts.app')
-@section('title', 'Pessoas')
+@section('title', 'Créditos')
 @section('content')
 <div class="container mt-5">
-  <h2>Pessoas</h2>
+  <h2>Créditos</h2>
   <table class="table table-bordered">
     <thead class="table-dark">
-      <tr><th>Código</th><th>Nome</th><th>Iniciais</th><th>Situação</th></tr>
+      <tr><th>ID</th><th>Juiz</th><th>Processo</th><th>Quantidade</th></tr>
     </thead>
     <tbody>
-      @forelse($pessoas as $p)
-        <tr><td>{{ $p->pes_cod }}</td><td>{{ $p->pes_nome }}</td><td>{{ $p->pes_iniciais }}</td><td>{{ $p->pes_sit }}</td></tr>
+      @forelse($creditos as $cr)
+        <tr><td>{{ $cr->id_credito }}</td><td>{{ $cr->jui_cod }}</td><td>{{ $cr->pro_cod }}</td><td>{{ $cr->cred_qdcre }}</td></tr>
       @empty
         <tr><td colspan="4" class="text-center">Nenhum registro</td></tr>
       @endforelse
