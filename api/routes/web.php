@@ -35,16 +35,10 @@ Route::middleware('web')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Comunicações
-        Route::prefix('comunicacoes')->name('comunicacoes.')->group(function () {
-            Route::get('/', [WebComunicacoesController::class, 'index'])->name('index');
-            Route::get('/{comunicacao}', [WebComunicacoesController::class, 'show'])->name('show');
-        });
+        Route::resource('comunicacoes', WebComunicacoesController::class);
 
         // Casos
-        Route::prefix('casos')->name('casos.')->group(function () {
-            Route::get('/', [WebCasosController::class, 'index'])->name('index');
-            Route::get('/{caso}', [WebCasosController::class, 'show'])->name('show');
-        });
+        Route::resource('casos', WebCasosController::class);
 
         // Pessoas
         Route::resource('pessoas', WebPessoasController::class);
