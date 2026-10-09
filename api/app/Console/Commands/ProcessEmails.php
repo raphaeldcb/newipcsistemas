@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\ImapEmailService;
+use App\Services\MicrosoftGraphEmailService;
 use App\Services\QwenClassificationService;
 use App\Models\Comunicacao;
 
@@ -12,9 +12,9 @@ class ProcessEmails extends Command {
     protected $description = 'Processar e-mails não lidos, classificar e gerar respostas';
 
     public function handle() {
-        $this->info('Iniciando processamento de e-mails...');
+        $this->info('Iniciando processamento de e-mails via Microsoft Graph...');
 
-        $emailService = new ImapEmailService();
+        $emailService = new MicrosoftGraphEmailService();
         $classificationService = new QwenClassificationService();
 
         $emails = $emailService->getUnreadEmails(10);
@@ -52,10 +52,10 @@ class ProcessEmails extends Command {
             ]);
 
             // Marcar como lido
-            $emailService->markAsRead($email['number']);
+            $emailService->markAsRead($email['id']);
 
-            // Adicionar label
-            $emailService->addLabel($email['number'], $classification);
+            // Mover para pasta
+            $emailService->moveToFolder($email['id'], $classification);
 
             $this->info("✓ Processado: $classification");
         }
