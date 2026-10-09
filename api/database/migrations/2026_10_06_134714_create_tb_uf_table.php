@@ -8,13 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tb_uf', function (Blueprint $table) {
-            $table->char('uf_sigla', 2)->primary();
-            $table->string('uf_desc', 20)->nullable();
+        if (!Schema::hasTable('tb_uf')) {
+            Schema::create('tb_uf', function (Blueprint $table) {
+                $table->char('uf_sigla', 2)->primary();
+                $table->string('uf_desc', 20)->nullable();
 
-            $table->softDeletes();
-            $table->timestamps();
-        });
+                $table->softDeletes();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

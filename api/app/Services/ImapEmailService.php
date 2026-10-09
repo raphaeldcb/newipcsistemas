@@ -32,6 +32,11 @@ class ImapEmailService {
     }
 
     public function getUnreadEmails($limit = 10) {
+        if (!$this->password || !$this->email) {
+            Log::warning('IMAP não configurado (EMAIL_PASSWORD não definido em .env)');
+            return [];
+        }
+
         $mbox = $this->connect();
         if (!$mbox) return [];
 
