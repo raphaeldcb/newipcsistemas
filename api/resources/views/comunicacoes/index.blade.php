@@ -11,8 +11,12 @@
     </div>
 
     <div style="margin-bottom: 20px; padding: 15px;">
-        <form method="GET" action="{{ route('comunicacoes.index') }}">
-            <input type="text" name="busca" placeholder="Buscar por assunto, remetente..." value="{{ $busca ?? '' }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <form method="GET" action="{{ route('comunicacoes.index') }}" style="display: flex; gap: 10px;">
+            <input type="text" name="busca" placeholder="Buscar por assunto, remetente..." value="{{ $busca ?? '' }}" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            @if($busca)
+                <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary">Limpar</a>
+            @endif
         </form>
     </div>
 
@@ -32,7 +36,7 @@
                 <tr>
                     <td>{{ $c->subject ?? '-' }}</td>
                     <td>{{ $c->email_from ?? '-' }}</td>
-                    <td>{{ $c->classification ?? '-' }}</td>
+                    <td><span class="badge badge-info">{{ $c->classification ?? '-' }}</span></td>
                     <td>{{ $c->confidence ?? '-' }}</td>
                     <td>{{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d/m/Y H:i') : '-' }}</td>
                     <td>
@@ -47,8 +51,8 @@
         </tbody>
     </table>
 
-    @if($comunicacoes->hasPages())
-        <div style="padding: 15px;">
+    @if($comunicacoes && $comunicacoes->hasPages())
+        <div style="padding: 15px; display: flex; justify-content: center;">
             {{ $comunicacoes->appends(request()->query())->links() }}
         </div>
     @endif
