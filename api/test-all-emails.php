@@ -49,7 +49,7 @@ echo "Buscando e-mails em: $mailbox\n\n";
 
 $ch = curl_init();
 curl_setopt_array($ch, [
-    CURLOPT_URL => "https://graph.microsoft.com/v1.0/users/{$mailbox}/mailFolders/inbox/messages?\$top=20&\$orderby=receivedDateTime desc",
+    CURLOPT_URL => "https://graph.microsoft.com/v1.0/users/{$mailbox}/mailFolders/inbox/messages?%24top=20&%24orderby=receivedDateTime%20desc",
     CURLOPT_HTTPHEADER => [
         "Authorization: Bearer $token",
         "Content-Type: application/json",
