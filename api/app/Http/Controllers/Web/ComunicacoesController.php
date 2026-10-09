@@ -42,6 +42,7 @@ class ComunicacoesController extends Controller {
     }
 
     public function show(Comunicacao $comunicacao) {
+        \Log::info('ComunicacoesController@show - Comunicacao:', ['id' => $comunicacao->id, 'subject' => $comunicacao->subject]);
         return view('comunicacoes.show', compact('comunicacao'));
     }
 
