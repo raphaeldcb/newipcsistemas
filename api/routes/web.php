@@ -36,12 +36,12 @@ Route::middleware('web')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Comunicações
+        // Comunicações (sync e categorize ANTES do resource para evitar conflito)
+        Route::get('comunicacoes/sync', [WebComunicacoesController::class, 'sync'])->name('comunicacoes.sync');
+        Route::get('comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'categorize'])->name('comunicacoes.categorize');
+        Route::post('comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'storeCategory'])->name('comunicacoes.store-category');
         Route::resource('comunicacoes', WebComunicacoesController::class);
-        Route::get('/comunicacoes/sync', [WebComunicacoesController::class, 'sync'])->name('comunicacoes.sync');
-        Route::post('/comunicacoes/{comunicacao}/mark-read', [WebComunicacoesController::class, 'markRead'])->name('comunicacoes.mark-read');
-        Route::get('/comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'categorize'])->name('comunicacoes.categorize');
-        Route::post('/comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'storeCategory'])->name('comunicacoes.store-category');
+        Route::post('comunicacoes/{comunicacao}/mark-read', [WebComunicacoesController::class, 'markRead'])->name('comunicacoes.mark-read');
 
         // Casos
         Route::resource('casos', WebCasosController::class);

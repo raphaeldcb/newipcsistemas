@@ -37,7 +37,7 @@
                     <strong>Confiança:</strong> <span style="font-weight: 600; color: #f39c12;">{{ round($comunicacao->confidence * 100) }}%</span>
                 </p>
                 @endif
-                <a href="{{ route('comunicacoes.categorize', $comunicacao->id) }}" class="btn btn-primary" style="width: 100%; margin-top: 10px; text-decoration: none; display: block; text-align: center;">🏷️ Reclassificar</a>
+                <a href="{{ route('comunicacoes.categorize', $comunicacao) }}" class="btn btn-primary" style="width: 100%; margin-top: 10px; text-decoration: none; display: block; text-align: center;">🏷️ Reclassificar</a>
             </div>
 
             <!-- Resposta Sugerida -->
