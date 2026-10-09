@@ -60,8 +60,13 @@ class ComunicacoesController extends Controller {
     }
 
     public function sync() {
-        \Artisan::call('email:process');
-        return redirect()->route('comunicacoes.index')->with('success', 'Sincronização concluída! Verifique os e-mails importados.');
+        try {
+            \Artisan::call('email:process');
+            $output = \Artisan::output();
+            return redirect()->route('comunicacoes.index')->with('success', 'Sincronização concluída! E-mails importados do financeiro@ipcms.com.br');
+        } catch (\Exception $e) {
+            return redirect()->route('comunicacoes.index')->with('error', 'Erro na sincronização: ' . $e->getMessage());
+        }
     }
 
     public function markRead(Comunicacao $comunicacao) {
