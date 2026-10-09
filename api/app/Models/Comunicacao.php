@@ -20,5 +20,9 @@ class Comunicacao extends Model
         'classification',
         'confidence',
         'caso_id',
+        'suggested_response',
+        'final_response',
+        'status',
+        'response_sent_at',
     ];
 }
