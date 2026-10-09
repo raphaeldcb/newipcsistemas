@@ -5,15 +5,25 @@ $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 echo "=== Testando Microsoft Graph ===\n\n";
 
+echo "Credenciais carregadas:\n";
+echo "- GRAPH_CLIENT_ID: " . (env('GRAPH_CLIENT_ID') ? '✅' : '❌') . "\n";
+echo "- GRAPH_CLIENT_SECRET: " . (env('GRAPH_CLIENT_SECRET') ? '✅' : '❌') . "\n";
+echo "- GRAPH_TENANT_ID: " . (env('GRAPH_TENANT_ID') ? '✅' : '❌') . "\n";
+echo "- GRAPH_MAILBOX: " . env('GRAPH_MAILBOX') . "\n\n";
+
 $svc = new \App\Services\MicrosoftGraphEmailService();
 
 echo "1. Obtendo token...\n";
 $token = $svc->getAccessToken();
 if (!$token) {
     echo "❌ Erro ao obter token\n";
+    echo "Verificar:\n";
+    echo "- Credenciais corretas?\n";
+    echo "- Conexão com internet?\n";
+    echo "- Firewall bloqueando?\n";
     exit(1);
 }
-echo "✅ Token obtido!\n\n";
+echo "✅ Token obtido: " . substr($token, 0, 50) . "...\n\n";
 
 echo "2. Buscando e-mails não lidos...\n";
 $emails = $svc->getUnreadEmails(10);
