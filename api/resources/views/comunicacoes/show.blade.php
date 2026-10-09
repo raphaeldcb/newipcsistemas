@@ -4,13 +4,21 @@
 @section('page-title', 'Detalhe da Comunicação')
 
 @section('content')
-@if(!isset($comunicacao))
+@if(!isset($comunicacao) || $comunicacao === null)
     <div class="alert alert-danger">
         <h4>❌ Erro: Comunicação não encontrada</h4>
-        <p>A variável $comunicacao não foi passada pelo controller.</p>
+        <p>A variável $comunicacao não foi passada ou é nula pelo controller.</p>
+        <p style="font-size: 12px; color: #666;">isset($comunicacao) = {{ isset($comunicacao) ? 'true' : 'false' }}</p>
         <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary">← Voltar para lista</a>
     </div>
 @else
+    @if(!$comunicacao)
+    <div class="alert alert-warning">
+        <h4>⚠️ Aviso: Comunicação vazia</h4>
+        <p>O objeto $comunicacao existe mas não tem dados.</p>
+        <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary">← Voltar para lista</a>
+    </div>
+    @else
 <div style="max-width: 1200px; margin: 0 auto;">
     <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary" style="margin-bottom: 20px;">← Voltar</a>
 
@@ -83,5 +91,6 @@
         </div>
     </div>
 </div>
+    @endif
 @endif
 @endsection

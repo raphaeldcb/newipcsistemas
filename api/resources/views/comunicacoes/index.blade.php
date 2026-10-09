@@ -21,38 +21,43 @@
         </form>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Assunto</th>
-                <th>Remetente</th>
-                <th>Classificação</th>
-                <th>Confiança</th>
-                <th>Data</th>
-                <th>Ação</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($comunicacoes as $c)
-                <tr>
-                    <td>{{ $c->subject ?? '-' }}</td>
-                    <td>{{ $c->email_from ?? '-' }}</td>
-                    <td><span class="badge badge-info">{{ $c->classification ?? '-' }}</span></td>
-                    <td>{{ $c->confidence ?? '-' }}</td>
-                    <td>{{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d/m/Y H:i') : '-' }}</td>
-                    <td style="display: flex; gap: 5px; flex-wrap: wrap;">
-                        <a href="{{ route('comunicacoes.show', $c->id) }}" class="btn btn-sm btn-info" title="Visualizar e-mail">📧</a>
-                        <a href="{{ route('comunicacoes.mark-read', $c->id) }}" class="btn btn-sm btn-warning" title="Marcar como Lido">✓</a>
-                        <a href="{{ route('comunicacoes.categorize', $c->id) }}" class="btn btn-sm btn-secondary" title="Categorizar">🏷️</a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 30px; color: #95a5a6;">Nenhuma comunicação registrada</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div style="padding: 15px;">
+        @forelse($comunicacoes as $c)
+            <div style="display: grid; grid-template-columns: 1fr 150px 100px 100px 80px; gap: 15px; align-items: center; padding: 12px; border-bottom: 1px solid #eee;">
+                <!-- Assunto + Remetente -->
+                <div>
+                    <div style="font-weight: 600; color: #2c3e50;">{{ substr($c->subject ?? '-', 0, 60) }}</div>
+                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">{{ substr($c->email_from ?? '-', 0, 40) }}</div>
+                </div>
+                <!-- Classificação -->
+                <div style="text-align: center;">
+                    <span class="badge badge-info">{{ $c->classification ?? 'Outro' }}</span>
+                </div>
+                <!-- Confiança -->
+                <div style="text-align: center; font-size: 13px;">
+                    @if($c->confidence)
+                        {{ round($c->confidence * 100) }}%
+                    @else
+                        -
+                    @endif
+                </div>
+                <!-- Data -->
+                <div style="text-align: center; font-size: 12px; color: #7f8c8d;">
+                    {{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d/m H:i') : '-' }}
+                </div>
+                <!-- Ações -->
+                <div style="display: flex; gap: 5px; justify-content: flex-end;">
+                    <a href="{{ route('comunicacoes.show', $c->id) }}" class="btn btn-sm btn-info" title="Visualizar">📧</a>
+                    <a href="{{ route('comunicacoes.categorize', $c->id) }}" class="btn btn-sm btn-secondary" title="Categorizar">🏷️</a>
+                </div>
+            </div>
+        @empty
+            <div style="text-align: center; padding: 40px; color: #95a5a6;">
+                <p>📭 Nenhuma comunicação registrada</p>
+                <p style="font-size: 12px;">Clique em 🔄 Sincronizar para importar e-mails</p>
+            </div>
+        @endforelse
+    </div>
 
     @if($comunicacoes && $comunicacoes->hasPages())
         <div style="padding: 15px; display: flex; justify-content: center;">
