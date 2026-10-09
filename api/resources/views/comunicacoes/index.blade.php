@@ -7,6 +7,7 @@
 <div class="card">
     <div class="card-header">
         📧 Lista de Comunicações
+        <a href="{{ route('comunicacoes.sync') }}" class="btn btn-success" style="float: right; margin-left: 10px;">🔄 Sincronizar</a>
         <a href="javascript:void(0)" class="btn btn-primary" style="float: right;">+ Nova</a>
     </div>
 
@@ -39,8 +40,10 @@
                     <td><span class="badge badge-info">{{ $c->classification ?? '-' }}</span></td>
                     <td>{{ $c->confidence ?? '-' }}</td>
                     <td>{{ $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d/m/Y H:i') : '-' }}</td>
-                    <td>
-                        <a href="{{ route('comunicacoes.show', $c->id) }}" class="btn btn-sm btn-info">Ver</a>
+                    <td style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <a href="{{ route('comunicacoes.show', $c->id) }}" class="btn btn-sm btn-info" title="Visualizar e-mail">📧</a>
+                        <a href="{{ route('comunicacoes.mark-read', $c->id) }}" class="btn btn-sm btn-warning" title="Marcar como Lido">✓</a>
+                        <a href="{{ route('comunicacoes.categorize', $c->id) }}" class="btn btn-sm btn-secondary" title="Categorizar">🏷️</a>
                     </td>
                 </tr>
             @empty

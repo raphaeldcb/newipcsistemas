@@ -58,4 +58,26 @@ class ComunicacoesController extends Controller {
         $comunicacao->delete();
         return redirect()->route('comunicacoes.index')->with('success', 'Comunicação deletada!');
     }
+
+    public function sync() {
+        \Artisan::call('email:process');
+        return redirect()->route('comunicacoes.index')->with('success', 'Sincronização concluída! Verifique os e-mails importados.');
+    }
+
+    public function markRead(Comunicacao $comunicacao) {
+        $comunicacao->update(['status' => 'lido']);
+        return redirect()->route('comunicacoes.index')->with('success', 'Marcado como lido!');
+    }
+
+    public function categorize(Comunicacao $comunicacao) {
+        return view('comunicacoes.categorize', compact('comunicacao'));
+    }
+
+    public function storeCategory(Request $request, Comunicacao $comunicacao) {
+        $comunicacao->update([
+            'classification' => $request->input('classification'),
+            'status' => 'categorizado'
+        ]);
+        return redirect()->route('comunicacoes.index')->with('success', 'Comunicação categorizada!');
+    }
 }
