@@ -52,12 +52,14 @@ class MicrosoftGraphEmailService {
         }
 
         try {
+            $url = "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/mailFolders/inbox/messages";
+            $url .= "?%24filter=isRead%20eq%20false";
+            $url .= "&%24top={$limit}";
+            $url .= "&%24orderby=receivedDateTime%20desc";
+
             $response = Http::withToken($token)
-                ->get("https://graph.microsoft.com/v1.0/users/{$this->mailbox}/mailFolders/inbox/messages", [
-                    '$filter' => 'isRead eq false',
-                    '$top' => $limit,
-                    '$orderby' => 'receivedDateTime desc',
-                ]);
+                ->withoutVerifying()
+                ->get($url);
 
             if ($response->failed()) {
                 Log::error('Falha ao buscar e-mails: ' . $response->body());
