@@ -37,6 +37,7 @@ Route::middleware('web')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Comunicações (sync e categorize ANTES do resource para evitar conflito)
+        Route::model('comunicacao', \App\Models\Comunicacao::class);
         Route::get('comunicacoes/sync', [WebComunicacoesController::class, 'sync'])->name('comunicacoes.sync');
         Route::get('comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'categorize'])->name('comunicacoes.categorize');
         Route::post('comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'storeCategory'])->name('comunicacoes.store-category');
