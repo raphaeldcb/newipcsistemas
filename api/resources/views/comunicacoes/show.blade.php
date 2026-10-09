@@ -1,9 +1,16 @@
 @extends('layouts.app')
 
-@section('title', $comunicacao->subject ?? 'Comunicação')
+@section('title', isset($comunicacao) ? ($comunicacao->subject ?? 'Comunicação') : 'Comunicação')
 @section('page-title', 'Detalhe da Comunicação')
 
 @section('content')
+@if(!isset($comunicacao))
+    <div class="alert alert-danger">
+        <h4>❌ Erro: Comunicação não encontrada</h4>
+        <p>A variável $comunicacao não foi passada pelo controller.</p>
+        <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary">← Voltar para lista</a>
+    </div>
+@else
 <div style="max-width: 1200px; margin: 0 auto;">
     <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary" style="margin-bottom: 20px;">← Voltar</a>
 
@@ -77,4 +84,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
