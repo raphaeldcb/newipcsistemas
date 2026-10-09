@@ -23,15 +23,17 @@ class MicrosoftGraphEmailService {
 
     public function getAccessToken() {
         try {
-            $response = Http::post("https://login.microsoftonline.com/{$this->tenantId}/oauth2/v2.0/token", [
-                'client_id' => $this->clientId,
-                'client_secret' => $this->clientSecret,
-                'scope' => 'https://graph.microsoft.com/.default',
-                'grant_type' => 'client_credentials',
-            ]);
+            $response = Http::withoutVerifying()
+                ->asForm()
+                ->post("https://login.microsoftonline.com/{$this->tenantId}/oauth2/v2.0/token", [
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'scope' => 'https://graph.microsoft.com/.default',
+                    'grant_type' => 'client_credentials',
+                ]);
 
             if ($response->failed()) {
-                Log::error('Falha ao obter token: ' . $response->body());
+                Log::error('Falha ao obter token: HTTP ' . $response->status() . ' - ' . $response->body());
                 return null;
             }
 
