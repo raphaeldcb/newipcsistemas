@@ -59,9 +59,23 @@ curl_setopt_array($ch, [
 ]);
 
 $response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error = curl_error($ch);
+
+echo "HTTP Status: $httpcode\n";
+if ($error) {
+    echo "cURL Error: $error\n";
+}
+
+echo "Raw Response: " . substr($response, 0, 500) . "\n\n";
+
 $emails = json_decode($response, true);
 
-if (isset($emails['value'])) {
+if ($emails === null) {
+    echo "❌ JSON inválido ou vazio\n";
+    echo "Full Response:\n";
+    echo $response . "\n";
+} elseif (isset($emails['value'])) {
     echo "Total encontrado: " . count($emails['value']) . "\n\n";
 
     foreach ($emails['value'] as $i => $email) {
