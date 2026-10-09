@@ -41,13 +41,8 @@ class ComunicacoesController extends Controller {
         return redirect()->route('comunicacoes.show', $comunicacao->id)->with('success', 'Comunicação criada!');
     }
 
-    public function show(Comunicacao $comunicacao) {
-        dd([
-            'controller' => 'show',
-            'comunicacao_id' => $comunicacao->id,
-            'comunicacao_subject' => $comunicacao->subject,
-            'comunicacao_obj' => $comunicacao
-        ]);
+    public function show($id) {
+        $comunicacao = Comunicacao::findOrFail($id);
         return view('comunicacoes.show', compact('comunicacao'));
     }
 
