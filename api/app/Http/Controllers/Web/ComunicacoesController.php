@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Comunicacao;
+use App\Services\ProcessExtractionService;
 use Illuminate\Http\Request;
 
 class ComunicacoesController extends Controller {
@@ -96,24 +97,69 @@ class ComunicacoesController extends Controller {
     public function updateClassification(Request $request, $id) {
         $comunicacao = Comunicacao::findOrFail($id);
         $tipo = $request->input('tipo');
+        $processService = new ProcessExtractionService();
 
         $classification = $tipo === 'judicial' ? 'Judicial' : 'Não Judicial';
 
-        // Gerar resposta automática conforme tipo
-        $sugestedResponse = $this->generateAutoResponse($tipo, $comunicacao);
+        // Para e-mails judiciais: tentar extrair número do processo
+        $processNumber = null;
+        $processData = [];
 
-        $comunicacao->update([
+        if ($tipo === 'judicial') {
+            // Tentar extrair número do processo no padrão CNJ
+            $searchText = ($comunicacao->subject ?? '') . ' ' . ($comunicacao->body ?? '');
+            $processNumber = $processService->extractProcessNumber($searchText);
+
+            if ($processNumber) {
+                // Extrair informações do processo
+                $processData = $processService->parseProcessNumber($processNumber);
+
+                // Obter estado a partir do tribunal
+                if (isset($processData['tribunal'])) {
+                    $processData['estado'] = $processService->getTribunalState($processData['tribunal']);
+                }
+
+                // Extrair comarca e vara
+                $courtInfo = $processService->extractCourtInfo($searchText);
+                $processData = array_merge($processData, $courtInfo);
+            }
+        }
+
+        // Gerar resposta automática conforme tipo
+        $sugestedResponse = $this->generateAutoResponse($tipo, $comunicacao, $processNumber, $processService);
+
+        // Preparar dados para update
+        $updateData = [
             'classification' => $classification,
             'suggested_response' => $sugestedResponse,
-            'status' => 'classificado'
-        ]);
+            'status' => 'classificado',
+        ];
+
+        // Se conseguiu extrair dados do processo, gravar
+        if (!empty($processData)) {
+            $updateData['numero_processo'] = $processData['numero_completo'] ?? null;
+            $updateData['estado'] = $processData['estado'] ?? null;
+            $updateData['vara'] = $processData['vara'] ?? null;
+            $updateData['comarca'] = $processData['comarca'] ?? null;
+        }
+
+        $comunicacao->update($updateData);
 
         return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail classificado como ' . $classification . '!');
     }
 
-    private function generateAutoResponse($tipo, $comunicacao) {
+    private function generateAutoResponse($tipo, $comunicacao, $processNumber = null, $processService = null) {
         if ($tipo === 'judicial') {
-            return "Prezados,\n\nRecebemos seu contato de natureza judicial. Encaminharemos para análise de nossos consultores jurídicos.\n\nAtenciosamente,\nEquipe IPC";
+            // Se é judicial mas não tem número do processo, responder com template padrão
+            if (!$processNumber) {
+                if (!$processService) {
+                    $processService = new ProcessExtractionService();
+                }
+                return $processService->getMissingProcessResponse();
+            }
+
+            // Se tem número do processo, resposta normal
+            return "Prezados,\n\nRecebemos seu contato de natureza judicial (Processo: " . $processNumber . "). Encaminharemos para análise de nossos consultores jurídicos.\n\nAtenciosamente,\nEquipe IPC";
         } else {
             return "Prezados,\n\nObrigado por seu contato. Nos comprometemos em responder adequadamente.\n\nAtenciosamente,\nEquipe IPC";
         }
