@@ -86,4 +86,36 @@ class ComunicacoesController extends Controller {
         ]);
         return redirect()->route('comunicacoes.index')->with('success', 'Comunicação categorizada!');
     }
+
+    public function markReviewed($id) {
+        $comunicacao = Comunicacao::findOrFail($id);
+        $comunicacao->update(['status' => 'revisado']);
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail marcado como revisado!');
+    }
+
+    public function updateClassification(Request $request, $id) {
+        $comunicacao = Comunicacao::findOrFail($id);
+        $tipo = $request->input('tipo');
+
+        $classification = $tipo === 'judicial' ? 'Judicial' : 'Não Judicial';
+
+        // Gerar resposta automática conforme tipo
+        $sugestedResponse = $this->generateAutoResponse($tipo, $comunicacao);
+
+        $comunicacao->update([
+            'classification' => $classification,
+            'suggested_response' => $sugestedResponse,
+            'status' => 'classificado'
+        ]);
+
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail classificado como ' . $classification . '!');
+    }
+
+    private function generateAutoResponse($tipo, $comunicacao) {
+        if ($tipo === 'judicial') {
+            return "Prezados,\n\nRecebemos seu contato de natureza judicial. Encaminharemos para análise de nossos consultores jurídicos.\n\nAtenciosamente,\nEquipe IPC";
+        } else {
+            return "Prezados,\n\nObrigado por seu contato. Nos comprometemos em responder adequadamente.\n\nAtenciosamente,\nEquipe IPC";
+        }
+    }
 }

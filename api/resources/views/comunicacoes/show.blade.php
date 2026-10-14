@@ -45,27 +45,21 @@
             <!-- Status: Revisado/Não Revisado -->
             <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
                 <h5 style="margin-top: 0;">✅ Status</h5>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    @if($comunicacao->status === 'revisado')
-                        <span class="badge" style="background: #27ae60; color: white; padding: 8px 12px;">✓ Revisado</span>
-                        <form method="POST" action="#" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Marcar Não Revisado</button>
-                        </form>
-                    @else
-                        <span class="badge" style="background: #e74c3c; color: white; padding: 8px 12px;">○ Não Revisado</span>
-                        <form method="POST" action="#" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-success">🚩 Sinalizar Revisado</button>
-                        </form>
-                    @endif
-                </div>
+                @if($comunicacao->status === 'revisado')
+                    <span class="badge" style="background: #27ae60; color: white; padding: 8px 12px; display: inline-block;">✓ Revisado</span>
+                @else
+                    <form method="POST" action="{{ route('comunicacoes.mark-reviewed', $comunicacao->id) }}" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">🚩 Sinalizar Revisado</button>
+                    </form>
+                    <span class="badge" style="background: #e74c3c; color: white; padding: 8px 12px; display: inline-block; margin-left: 5px;">○ Não Revisado</span>
+                @endif
             </div>
 
             <!-- Classificação: Judicial / Não Judicial -->
             <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;">
                 <h5 style="margin-top: 0;">⚖️ Tipo</h5>
-                <form method="POST" action="#" style="display: flex; gap: 8px;">
+                <form method="POST" action="{{ route('comunicacoes.update-classification', $comunicacao->id) }}" style="display: flex; gap: 8px;">
                     @csrf
                     <select name="tipo" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="">-- Selecione --</option>
@@ -76,7 +70,7 @@
                 </form>
                 @if($comunicacao->classification)
                     <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">
-                        Classificado como: <strong>{{ $comunicacao->classification }}</strong>
+                        Tipo: <strong>{{ $comunicacao->classification }}</strong>
                     </p>
                 @endif
             </div>
