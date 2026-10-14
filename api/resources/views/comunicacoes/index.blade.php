@@ -27,7 +27,15 @@
                 <!-- Assunto + Remetente -->
                 <div>
                     <div style="font-weight: 600; color: #2c3e50;">{{ substr($c->subject ?? '-', 0, 60) }}</div>
-                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">{{ substr($c->email_from ?? '-', 0, 40) }}</div>
+                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">
+                        @php
+                            $email = $c->email_from ?? '-';
+                            // Limpar caracteres feios
+                            $email = strpos($email, '|') ? explode('|', $email)[0] : $email;
+                            $email = strpos($email, '?') ? explode('?', $email)[0] : $email;
+                        @endphp
+                        {{ substr(trim($email), 0, 40) }}
+                    </div>
                 </div>
                 <!-- Classificação -->
                 <div style="text-align: center;">
@@ -60,8 +68,34 @@
     </div>
 
     @if($comunicacoes && $comunicacoes->hasPages())
-        <div style="padding: 15px; display: flex; justify-content: center;">
-            {{ $comunicacoes->appends(request()->query())->links() }}
+        <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd;">
+            <div style="font-size: 12px; color: #7f8c8d;">
+                Showing {{ $comunicacoes->firstItem() }} to {{ $comunicacoes->lastItem() }} of {{ $comunicacoes->total() }} results
+            </div>
+
+            <div style="display: flex; gap: 5px;">
+                @if($comunicacoes->onFirstPage())
+                    <button class="btn btn-sm btn-secondary" disabled>← Previous</button>
+                @else
+                    <a href="{{ $comunicacoes->appends(request()->query())->previousPageUrl() }}" class="btn btn-sm btn-primary">← Previous</a>
+                @endif
+
+                <div style="display: flex; gap: 3px; align-items: center;">
+                    @foreach($comunicacoes->getUrlRange(1, $comunicacoes->lastPage()) as $page => $url)
+                        @if($page == $comunicacoes->currentPage())
+                            <button class="btn btn-sm btn-primary" disabled>{{ $page }}</button>
+                        @else
+                            <a href="{{ $url }}&{{ http_build_query(request()->query()) }}" class="btn btn-sm btn-outline-primary">{{ $page }}</a>
+                        @endif
+                    @endforeach
+                </div>
+
+                @if($comunicacoes->hasMorePages())
+                    <a href="{{ $comunicacoes->appends(request()->query())->nextPageUrl() }}" class="btn btn-sm btn-primary">Next →</a>
+                @else
+                    <button class="btn btn-sm btn-secondary" disabled>Next →</button>
+                @endif
+            </div>
         </div>
     @endif
 </div>
