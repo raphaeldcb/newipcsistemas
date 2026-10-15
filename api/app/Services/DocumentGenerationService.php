@@ -177,13 +177,21 @@ class DocumentGenerationService
         }
 
         // ===== DADOS DE PESSOAS ENVOLVIDAS =====
-        // Buscar pessoas vinculadas ao processo
-        $pessoas = \App\Models\Pessoa::where('pro_cod', $processo->pro_cod)->get();
+        // Buscar pessoas vinculadas ao processo com sua situação
+        $pessoas = \App\Models\Pessoa::where('pro_cod', $processo->pro_cod)
+            ->orderBy('pes_cod')
+            ->get();
+
+        // Mapeamento de situações (pes_sit) para tipo de pessoa
+        $situacaoMap = self::mapearSituacoes();
+
+        // Arrays para armazenar pessoas por tipo
+        $pessoasPorTipo = [];
 
         foreach ($pessoas as $index => $pessoa) {
             $num = $index + 1;
 
-            // Tags de pessoa (múltiplas)
+            // Tags indexadas (genéricas por número)
             $tags["<PESSOA{$num}>"] = $pessoa->pes_nome ?? '';
             $tags["<PESSOA{$num}_NOME>"] = $pessoa->pes_nome ?? '';
             $tags["<PESSOA{$num}_INICIAIS>"] = $pessoa->pes_iniciais ?? '';
@@ -192,6 +200,35 @@ class DocumentGenerationService
 
             if ($pessoa->pes_dtnas) {
                 $tags["<PESSOA{$num}_DTNAS>"] = self::formatarDataExtenso($pessoa->pes_dtnas);
+            }
+
+            // Determinar tipo de pessoa pela situação (pes_sit)
+            $tipoPersona = $situacaoMap[$pessoa->pes_sit] ?? null;
+            if ($tipoPersona) {
+                if (!isset($pessoasPorTipo[$tipoPersona])) {
+                    $pessoasPorTipo[$tipoPersona] = [];
+                }
+                $pessoasPorTipo[$tipoPersona][] = $pessoa;
+            }
+        }
+
+        // Tags específicas por tipo de pessoa (PAI, MÃE, AVÓ, TIO, etc.)
+        foreach ($pessoasPorTipo as $tipo => $pessoasDoTipo) {
+            foreach ($pessoasDoTipo as $idx => $pessoa) {
+                $numTipo = $idx + 1;
+
+                // Se há múltiplas pessoas do mesmo tipo, adicionar número
+                $prefixo = ($numTipo > 1) ? "{$tipo}{$numTipo}" : $tipo;
+
+                $tags["<{$prefixo}>"] = $pessoa->pes_nome ?? '';
+                $tags["<{$prefixo}_NOME>"] = $pessoa->pes_nome ?? '';
+                $tags["<{$prefixo}_INICIAIS>"] = $pessoa->pes_iniciais ?? '';
+                $tags["<{$prefixo}_DOC>"] = $pessoa->pes_ndoc ?? '';
+                $tags["<{$prefixo}_SEXO>"] = $pessoa->pes_sexo ?? '';
+
+                if ($pessoa->pes_dtnas) {
+                    $tags["<{$prefixo}_DTNAS>"] = self::formatarDataExtenso($pessoa->pes_dtnas);
+                }
             }
         }
 
@@ -398,5 +435,35 @@ class DocumentGenerationService
         );
 
         return array_map(fn($caminho) => basename($caminho), $arquivos);
+    }
+
+    /**
+     * Mapear situação de pessoa (pes_sit) para tipo (PAI, MÃE, AVÓ, etc.)
+     *
+     * Baseado em padrão de análise de DNA/parentesco da tabela tb_situacao
+     * sit_cod → nome_tipo (para tags <tipo_NOME>, <tipo_DOC>, etc.)
+     */
+    private static function mapearSituacoes(): array
+    {
+        return [
+            1  => 'PROPOSITUS',    // Indivíduo em questão
+            2  => 'MAE',           // Mãe
+            3  => 'PAI',           // Pai
+            4  => 'AVO_MAE',       // Avó materna
+            5  => 'AVO_PAI',       // Avó paterna
+            6  => 'AVO_MAE',       // Avó (pode ser mãe ou pai da mãe)
+            7  => 'AVO_PAI',       // Avô (pode ser mãe ou pai do pai)
+            8  => 'IRMAO',         // Irmão
+            9  => 'IRMA',          // Irmã
+            10 => 'CONJUGE',       // Cônjuge
+            11 => 'TIO',           // Tio
+            12 => 'TIA',           // Tia
+            13 => 'PRIMA',         // Prima
+            14 => 'PRIMO',         // Primo
+            15 => 'SOBRINHO',      // Sobrinho
+            16 => 'SOBRINHA',      // Sobrinha
+            17 => 'TATAAVO',       // Tataavó/Tataavô
+            // Adicionar mais conforme documentado em tb_situacao
+        ];
     }
 }
