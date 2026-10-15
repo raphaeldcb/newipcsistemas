@@ -146,12 +146,15 @@ class MicrosoftEmailResponseService
 
     /**
      * Agendar resposta para dia seguinte às 10h
-     * Cria resposta (reply) ao e-mail original como rascunho
+     * Cria resposta (reply) ao e-mail original como rascunho com o corpo completo
      */
     private function scheduleResponse($token, $replyTo, $subject, $body, $emailId)
     {
         try {
-            // 1. Criar reply ao e-mail original
+            Log::info('scheduleResponse iniciado | emailId: ' . $emailId . ' | replyTo: ' . $replyTo);
+            Log::info('Body length: ' . strlen($body) . ' | Body start: ' . substr($body, 0, 50));
+
+            // 1. Criar reply ao e-mail original com o corpo já preenchido
             $createReplyResponse = Http::withToken($token)
                 ->withoutVerifying()
                 ->post(
@@ -172,9 +175,9 @@ class MicrosoftEmailResponseService
                 return false;
             }
 
-            Log::info('Reply criado com ID: ' . $replyId . ' | Body: ' . substr($body, 0, 100));
+            Log::info('Reply criado com ID: ' . $replyId);
 
-            // 2. Atualizar o rascunho com a Resposta Sugerida
+            // 2. Enviar (save) o rascunho com a Resposta Sugerida como conteúdo
             $updateResponse = Http::withToken($token)
                 ->withoutVerifying()
                 ->patch(
@@ -182,22 +185,24 @@ class MicrosoftEmailResponseService
                     [
                         'body' => [
                             'contentType' => 'text/html',
-                            'content' => '<div>' . nl2br(htmlspecialchars($body)) . '</div>'
+                            'content' => $body
                         ],
-                        'categories' => ['AGENDADO']
+                        'categories' => ['AGENDADO'],
+                        'isRead' => false
                     ]
                 );
 
             if ($updateResponse->failed()) {
-                Log::error('Falha ao atualizar reply: ' . $updateResponse->body());
-                Log::error('Response: ' . json_encode($updateResponse->json()));
+                Log::error('Falha ao atualizar reply status: ' . $updateResponse->status());
+                Log::error('Body: ' . $updateResponse->body());
                 return false;
             }
 
-            Log::info('Resposta sugerida agendada como rascunho para: ' . $replyTo);
+            Log::info('Resposta sugerida agendada como rascunho para: ' . $replyTo . ' | ID: ' . $replyId);
             return true;
         } catch (\Exception $e) {
             Log::error('Erro ao agendar resposta: ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
             return false;
         }
     }
