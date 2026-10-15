@@ -14,13 +14,13 @@
 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <a href="{{ route('comunicacoes.index') }}" class="btn btn-secondary" style="margin-bottom: 15px;">← Voltar para lista</a>
 
-    <!-- Header com Assunto -->
+    <!-- Header -->
     <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
-        <h2 style="margin: 0 0 15px 0; word-wrap: break-word;">{{ $comunicacao->subject ?? '(sem assunto)' }}</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 13px; color: #7f8c8d;">
-            <div><strong>De:</strong> {{ substr($comunicacao->email_from ?? '-', 0, 40) }}</div>
-            <div><strong>Para:</strong> {{ substr($comunicacao->email_to ?? '-', 0, 40) }}</div>
-            <div><strong>Data:</strong> {{ $comunicacao->created_at ? \Carbon\Carbon::parse($comunicacao->created_at)->format('d/m/Y H:i') : '-' }}</div>
+        <h2 style="margin: 0 0 10px 0; word-wrap: break-word;">{{ $comunicacao->subject ?? '(sem assunto)' }}</h2>
+        <div style="font-size: 13px; color: #7f8c8d; line-height: 1.6;">
+            <strong>De:</strong> {{ substr($comunicacao->email_from ?? '-', 0, 50) }} |
+            <strong>Para:</strong> {{ substr($comunicacao->email_to ?? '-', 0, 50) }} |
+            <strong>Data:</strong> {{ $comunicacao->created_at ? \Carbon\Carbon::parse($comunicacao->created_at)->format('d/m/Y H:i') : '-' }}
         </div>
     </div>
 
@@ -28,38 +28,57 @@
     <div style="background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px; min-height: 300px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;">{{ $comunicacao->body ?? '(sem conteúdo)' }}</div>
 
     <!-- ========== BOTÕES PRINCIPAIS ========== -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px;">
 
         <!-- BOTÃO 1: Marcar como Tratado (Local Only) -->
-        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border: 2px solid #2196F3; border-radius: 4px;">
-            <h4 style="margin: 0 0 10px 0; color: #1565c0;">✅ MARCAR COMO TRATADO</h4>
-            <p style="margin: 0 0 15px 0; font-size: 12px; color: #555;">Apenas no sistema (sem ação na Microsoft)</p>
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 15px; border: 2px solid #2196F3; border-radius: 4px;">
+            <h5 style="margin: 0 0 10px 0; color: #1565c0;">✅ TRATADO</h5>
+            <p style="margin: 0 0 12px 0; font-size: 11px; color: #555;">Sistema local</p>
 
             @if($comunicacao->status === 'tratado')
-                <div style="background: #4caf50; color: white; padding: 12px; border-radius: 4px; text-align: center; font-weight: bold;">
-                    ✓ Já marcado como TRATADO
+                <div style="background: #4caf50; color: white; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px; font-weight: bold;">
+                    ✓ Marcado
                 </div>
             @else
                 <form method="POST" action="{{ route('comunicacoes.mark-treated', $comunicacao->id) }}">
                     @csrf
-                    <button type="submit" style="width: 100%; padding: 12px; background: #2196F3; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                        ✅ Marcar TRATADO
+                    <button type="submit" style="width: 100%; padding: 10px; background: #2196F3; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">
+                        ✅ Marcar
                     </button>
                 </form>
             @endif
         </div>
 
-        <!-- BOTÃO 2: Sinalizar na Microsoft -->
-        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 20px; border: 2px solid #ff9800; border-radius: 4px;">
-            <h4 style="margin: 0 0 10px 0; color: #e65100;">📧 SINALIZAR NA MICROSOFT</h4>
-            <p style="margin: 0 0 15px 0; font-size: 12px; color: #555;">Marca "ANALISADO" + agenda resposta amanhã 10:00</p>
+        <!-- BOTÃO 2: Sinalizar na Microsoft (ANALISADO) -->
+        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 15px; border: 2px solid #ff9800; border-radius: 4px;">
+            <h5 style="margin: 0 0 10px 0; color: #e65100;">📧 SINALIZAR</h5>
+            <p style="margin: 0 0 12px 0; font-size: 11px; color: #555;">Marca ANALISADO</p>
 
             <form method="POST" action="{{ route('comunicacoes.mark-reviewed', $comunicacao->id) }}">
                 @csrf
-                <button type="submit" style="width: 100%; padding: 12px; background: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                    🚩 SINALIZAR & AGENDAR
+                <button type="submit" style="width: 100%; padding: 10px; background: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">
+                    🚩 Sinalizar
                 </button>
             </form>
+        </div>
+
+        <!-- BOTÃO 3: Agendar Resposta -->
+        <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); padding: 15px; border: 2px solid #9c27b0; border-radius: 4px;">
+            <h5 style="margin: 0 0 10px 0; color: #6a1b9a;">⏰ AGENDAR</h5>
+            <p style="margin: 0 0 12px 0; font-size: 11px; color: #555;">Amanhã 10:00</p>
+
+            @if($comunicacao->suggested_response)
+                <form method="POST" action="{{ route('comunicacoes.schedule-response', $comunicacao->id) }}">
+                    @csrf
+                    <button type="submit" style="width: 100%; padding: 10px; background: #9c27b0; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">
+                        ⏰ Agendar
+                    </button>
+                </form>
+            @else
+                <div style="background: #ccc; color: #666; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px;">
+                    Sem resposta
+                </div>
+            @endif
         </div>
     </div>
 

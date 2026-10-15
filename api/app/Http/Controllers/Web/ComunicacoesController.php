@@ -136,6 +136,37 @@ class ComunicacoesController extends Controller {
         return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail marcado como TRATADO no sistema!');
     }
 
+    public function scheduleResponse($id) {
+        $comunicacao = Comunicacao::findOrFail($id);
+
+        if (!$comunicacao->suggested_response) {
+            return redirect()->route('comunicacoes.show', $id)->with('error', 'Sem resposta para agendar!');
+        }
+
+        try {
+            $microsoftService = new MicrosoftEmailResponseService();
+
+            $emailId = $microsoftService->getEmailIdFromMicrosoft(
+                $comunicacao->email_from,
+                $comunicacao->subject,
+                $comunicacao->created_at
+            );
+
+            if ($emailId) {
+                // Agendar resposta para amanhã 10h
+                $microsoftService->sendOrScheduleResponse(
+                    $emailId,
+                    $comunicacao->suggested_response,
+                    true
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Erro ao agendar resposta: ' . $e->getMessage());
+        }
+
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'Resposta agendada para amanhã às 10:00!');
+    }
+
     public function markReviewed($id) {
         $comunicacao = Comunicacao::findOrFail($id);
 

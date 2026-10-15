@@ -43,6 +43,7 @@ Route::middleware('web')->group(function () {
         Route::post('comunicacoes/{comunicacao}/categorize', [WebComunicacoesController::class, 'storeCategory'])->name('comunicacoes.store-category');
         Route::post('comunicacoes/{id}/mark-treated', [WebComunicacoesController::class, 'markTreated'])->name('comunicacoes.mark-treated');
         Route::post('comunicacoes/{id}/mark-reviewed', [WebComunicacoesController::class, 'markReviewed'])->name('comunicacoes.mark-reviewed');
+        Route::post('comunicacoes/{id}/schedule-response', [WebComunicacoesController::class, 'scheduleResponse'])->name('comunicacoes.schedule-response');
         Route::post('comunicacoes/{id}/update-classification', [WebComunicacoesController::class, 'updateClassification'])->name('comunicacoes.update-classification');
         Route::resource('comunicacoes', WebComunicacoesController::class);
         Route::post('comunicacoes/{comunicacao}/mark-read', [WebComunicacoesController::class, 'markRead'])->name('comunicacoes.mark-read');
