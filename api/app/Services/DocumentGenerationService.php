@@ -44,7 +44,26 @@ class DocumentGenerationService
             }
 
             // 3. Carregar template
-            $phpWord = IOFactory::load($caminhoTemplate);
+            if (!file_exists($caminhoTemplate)) {
+                throw new \Exception("Arquivo template não encontrado: {$caminhoTemplate}");
+            }
+
+            if (!is_readable($caminhoTemplate)) {
+                throw new \Exception("Arquivo template não é legível: {$caminhoTemplate}. Permissões insuficientes.");
+            }
+
+            $fileSize = filesize($caminhoTemplate);
+            if ($fileSize < 1000) {
+                throw new \Exception("Arquivo template corrompido ou muito pequeno ({$fileSize} bytes): {$caminhoTemplate}");
+            }
+
+            Log::debug("Carregando template: {$caminhoTemplate} ({$fileSize} bytes)");
+
+            try {
+                $phpWord = IOFactory::load($caminhoTemplate);
+            } catch (\Exception $e) {
+                throw new \Exception("Erro ao carregar template {$caminhoTemplate}: " . $e->getMessage());
+            }
 
             // 4. Preparar tags para substituição
             $tags = self::prepararTags($processo);
