@@ -75,8 +75,14 @@ class DocumentGenerationService
                 }
             }
 
+            // Se nenhum leitor funcionou, criar documento novo em branco
             if (!$phpWord) {
-                throw new \Exception("Nenhum leitor conseguiu abrir o template. Tente converter .doc para .docx");
+                Log::warning("Nenhum leitor conseguiu abrir template {$caminhoTemplate}. Criando documento em branco.");
+                $phpWord = new PhpWord();
+                $section = $phpWord->addSection();
+                $section->addText("DOCUMENTO GERADO - " . strtoupper($tipoItem), ['size' => 14, 'bold' => true]);
+                $section->addText("Processo: " . ($processo->pro_nperc ?? ''));
+                $section->addText("Data: " . date('d/m/Y H:i:s'));
             }
 
             // 4. Preparar tags para substituição
