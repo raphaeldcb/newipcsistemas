@@ -172,6 +172,8 @@ class MicrosoftEmailResponseService
                 return false;
             }
 
+            Log::info('Reply criado com ID: ' . $replyId . ' | Body: ' . substr($body, 0, 100));
+
             // 2. Atualizar o rascunho com a Resposta Sugerida
             $updateResponse = Http::withToken($token)
                 ->withoutVerifying()
@@ -179,8 +181,8 @@ class MicrosoftEmailResponseService
                     "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$replyId}",
                     [
                         'body' => [
-                            'contentType' => 'text/plain',
-                            'content' => $body
+                            'contentType' => 'text/html',
+                            'content' => '<div>' . nl2br(htmlspecialchars($body)) . '</div>'
                         ],
                         'categories' => ['AGENDADO']
                     ]
@@ -188,6 +190,7 @@ class MicrosoftEmailResponseService
 
             if ($updateResponse->failed()) {
                 Log::error('Falha ao atualizar reply: ' . $updateResponse->body());
+                Log::error('Response: ' . json_encode($updateResponse->json()));
                 return false;
             }
 
