@@ -146,41 +146,54 @@ class MicrosoftEmailResponseService
 
     /**
      * Agendar resposta para dia seguinte às 10h
-     * Cria rascunho na pasta Drafts
+     * Cria resposta (reply) ao e-mail original como rascunho
      */
     private function scheduleResponse($token, $replyTo, $subject, $body, $emailId)
     {
         try {
             $agendadoText = "AGENDADO PARA: " . now()->addDay()->format('d/m/Y 10:00') . "\n\n";
 
-            // Criar rascunho na pasta Drafts
-            $response = Http::withToken($token)
+            // 1. Criar reply ao e-mail original
+            $createReplyResponse = Http::withToken($token)
                 ->withoutVerifying()
                 ->post(
-                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/mailFolders/drafts/messages",
+                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$emailId}/createReply",
+                    []
+                );
+
+            if ($createReplyResponse->failed()) {
+                Log::error('Falha ao criar reply: ' . $createReplyResponse->body());
+                return false;
+            }
+
+            $replyMessage = $createReplyResponse->json();
+            $replyId = $replyMessage['id'] ?? null;
+
+            if (!$replyId) {
+                Log::error('ID do reply não encontrado');
+                return false;
+            }
+
+            // 2. Atualizar o rascunho com o corpo da resposta
+            $updateResponse = Http::withToken($token)
+                ->withoutVerifying()
+                ->patch(
+                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$replyId}",
                     [
-                        'subject' => $subject,
                         'body' => [
                             'contentType' => 'text/plain',
                             'content' => $agendadoText . $body
-                        ],
-                        'toRecipients' => [
-                            [
-                                'emailAddress' => [
-                                    'address' => $replyTo
-                                ]
-                            ]
                         ],
                         'categories' => ['AGENDADO']
                     ]
                 );
 
-            if ($response->failed()) {
-                Log::error('Falha ao criar rascunho: ' . $response->body());
+            if ($updateResponse->failed()) {
+                Log::error('Falha ao atualizar reply: ' . $updateResponse->body());
                 return false;
             }
 
-            Log::info('Rascunho criado e agendado para: ' . $replyTo);
+            Log::info('Resposta agendada criada como rascunho para: ' . $replyTo);
             return true;
         } catch (\Exception $e) {
             Log::error('Erro ao agendar resposta: ' . $e->getMessage());
