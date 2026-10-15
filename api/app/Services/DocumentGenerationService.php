@@ -61,14 +61,16 @@ class DocumentGenerationService
 
             Log::debug("Carregando template: {$caminhoTemplate} ({$fileSize} bytes)");
 
-            // Se é .doc antigo, converter para .docx usando LibreOffice
+            // Se é .doc antigo, converter para .docx
             $caminhoTemporario = null;
             if (strtolower(pathinfo($caminhoTemplate, PATHINFO_EXTENSION)) === 'doc') {
-                Log::debug("Arquivo .doc detectado, convertendo para .docx via LibreOffice...");
-                $caminhoTemporario = self::converterDocParaDocx($caminhoTemplate);
+                Log::info("Arquivo .doc detectado, tentando converter...");
+                $caminhoTemporario = DocConverterService::converter($caminhoTemplate);
                 if ($caminhoTemporario) {
                     $caminhoTemplate = $caminhoTemporario;
-                    Log::debug("Conversão bem-sucedida: {$caminhoTemporario}");
+                    Log::info("Conversão bem-sucedida!");
+                } else {
+                    Log::warning("Conversão falhou, tentando carregar direto...");
                 }
             }
 
