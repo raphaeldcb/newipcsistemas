@@ -67,10 +67,10 @@ class DocumentGenerationService
                 try {
                     Log::debug("Tentando carregar com leitor: {$leitor}");
                     $phpWord = IOFactory::load($caminhoTemplate, $leitor);
-                    Log::debug("✅ Template carregado com sucesso usando: {$leitor}");
+                    Log::debug("Template carregado com sucesso usando: {$leitor}");
                     break;
-                } catch (\Exception $e) {
-                    Log::debug("❌ Leitor {$leitor} falhou: " . $e->getMessage());
+                } catch (\Throwable $e) {
+                    Log::debug("Leitor {$leitor} falhou: " . $e->getMessage());
                     continue;
                 }
             }
