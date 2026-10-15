@@ -151,8 +151,6 @@ class MicrosoftEmailResponseService
     private function scheduleResponse($token, $replyTo, $subject, $body, $emailId)
     {
         try {
-            $agendadoText = "AGENDADO PARA: " . now()->addDay()->format('d/m/Y 10:00') . "\n\n";
-
             // 1. Criar reply ao e-mail original
             $createReplyResponse = Http::withToken($token)
                 ->withoutVerifying()
@@ -174,7 +172,7 @@ class MicrosoftEmailResponseService
                 return false;
             }
 
-            // 2. Atualizar o rascunho com o corpo da resposta
+            // 2. Atualizar o rascunho com a Resposta Sugerida
             $updateResponse = Http::withToken($token)
                 ->withoutVerifying()
                 ->patch(
@@ -182,7 +180,7 @@ class MicrosoftEmailResponseService
                     [
                         'body' => [
                             'contentType' => 'text/plain',
-                            'content' => $agendadoText . $body
+                            'content' => $body
                         ],
                         'categories' => ['AGENDADO']
                     ]
@@ -193,7 +191,7 @@ class MicrosoftEmailResponseService
                 return false;
             }
 
-            Log::info('Resposta agendada criada como rascunho para: ' . $replyTo);
+            Log::info('Resposta sugerida agendada como rascunho para: ' . $replyTo);
             return true;
         } catch (\Exception $e) {
             Log::error('Erro ao agendar resposta: ' . $e->getMessage());
