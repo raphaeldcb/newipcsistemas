@@ -59,10 +59,24 @@ class DocumentGenerationService
 
             Log::debug("Carregando template: {$caminhoTemplate} ({$fileSize} bytes)");
 
-            try {
-                $phpWord = IOFactory::load($caminhoTemplate);
-            } catch (\Exception $e) {
-                throw new \Exception("Erro ao carregar template {$caminhoTemplate}: " . $e->getMessage());
+            // Tentar carregar com diferentes formatos (Word5 para .doc antigos, Word2007 para .docx)
+            $phpWord = null;
+            $leitoresParaTentar = ['Word5', 'Word2007', 'WordML'];
+
+            foreach ($leitoresParaTentar as $leitor) {
+                try {
+                    Log::debug("Tentando carregar com leitor: {$leitor}");
+                    $phpWord = IOFactory::load($caminhoTemplate, $leitor);
+                    Log::debug("✅ Template carregado com sucesso usando: {$leitor}");
+                    break;
+                } catch (\Exception $e) {
+                    Log::debug("❌ Leitor {$leitor} falhou: " . $e->getMessage());
+                    continue;
+                }
+            }
+
+            if (!$phpWord) {
+                throw new \Exception("Nenhum leitor conseguiu abrir o template. Tente converter .doc para .docx");
             }
 
             // 4. Preparar tags para substituição
