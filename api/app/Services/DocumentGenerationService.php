@@ -159,34 +159,44 @@ class DocumentGenerationService
                 }
 
                 if (!$libreoffice) {
-                    Log::warning("LibreOffice não encontrado no Windows");
-                    rmdir($pastaTemp);
+                    Log::error("ERRO: LibreOffice não encontrado! Instale em: https://www.libreoffice.org/download/");
+                    @rmdir($pastaTemp);
                     return null;
                 }
 
-                // Comando Windows
-                $comando = "\"{$libreoffice}\" --headless --convert-to docx:\"MS Word 2007 XML\" --outdir \"{$pastaTemp}\" \"{$caminhoDoc}\"";
+                Log::debug("LibreOffice encontrado: {$libreoffice}");
+                // Comando Windows (simplificado)
+                $comando = "\"{$libreoffice}\" --headless --convert-to docx --outdir \"{$pastaTemp}\" \"{$caminhoDoc}\"";
             } else {
                 // Linux/Mac: usar unoconv ou soffice
                 $comando = "soffice --headless --convert-to docx:\"MS Word 2007 XML\" --outdir \"{$pastaTemp}\" \"{$caminhoDoc}\"";
             }
 
-            Log::debug("Executando conversão: {$comando}");
+            Log::debug("Executando: {$comando}");
 
-            // Executar conversão
-            $output = [];
-            $returnCode = 0;
-            exec($comando, $output, $returnCode);
+            // Executar conversão com timeout
+            $output = shell_exec($comando . " 2>&1");
+            Log::debug("LibreOffice output: {$output}");
 
-            Log::debug("Resultado conversão: " . implode("\n", $output));
+            // Aguardar conversão (LibreOffice pode levar)
+            sleep(2);
 
             // Verificar se foi criado
-            if (file_exists($caminhoDocx)) {
-                Log::info("Conversão bem-sucedida: {$caminhoDocx}");
+            $arquivosTemp = scandir($pastaTemp);
+            Log::debug("Arquivos em {$pastaTemp}: " . implode(", ", $arquivosTemp));
+
+            if (file_exists($caminhoDocx) && filesize($caminhoDocx) > 0) {
+                Log::info("Conversão OK: {$caminhoDocx} (" . filesize($caminhoDocx) . " bytes)");
                 return $caminhoDocx;
             } else {
-                Log::warning("Arquivo convertido não encontrado: {$caminhoDocx}");
-                rmdir($pastaTemp);
+                Log::error("Conversão FALHOU! Arquivo não encontrado: {$caminhoDocx}");
+                // Limpar pasta temporária
+                foreach ($arquivosTemp as $arq) {
+                    if ($arq !== '.' && $arq !== '..') {
+                        @unlink("{$pastaTemp}/{$arq}");
+                    }
+                }
+                @rmdir($pastaTemp);
                 return null;
             }
         } catch (\Exception $e) {
