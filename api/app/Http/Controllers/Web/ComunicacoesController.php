@@ -244,9 +244,12 @@ class ComunicacoesController extends Controller {
             );
 
             if ($emailId) {
-                // Adicionar categoria na Microsoft
-                $categorie = $tipo === 'judicial' ? 'JUDICIAL' : 'NAO_JUDICIAL';
-                $microsoftService->categorizeEmail($emailId, $categorie);
+                // Adicionar categorias na Microsoft
+                // Sempre adiciona "ANALISADO PELO NEW Sistemas IPCMS" + tipo específico
+                $categories = [
+                    $tipo === 'judicial' ? 'JUDICIAL' : 'NAO_JUDICIAL'
+                ];
+                $microsoftService->categorizeEmail($emailId, $categories);
             }
         } catch (\Exception $e) {
             \Log::warning('Erro ao categorizar na Microsoft: ' . $e->getMessage());
