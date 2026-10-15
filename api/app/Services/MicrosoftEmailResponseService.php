@@ -184,7 +184,7 @@ class MicrosoftEmailResponseService
                     "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$replyId}",
                     [
                         'body' => [
-                            'contentType' => 'text/html',
+                            'contentType' => 'HTML',
                             'content' => $body
                         ],
                         'categories' => ['AGENDADO'],
