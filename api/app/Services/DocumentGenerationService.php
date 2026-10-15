@@ -121,6 +121,9 @@ class DocumentGenerationService
     {
         $caminhoBase = storage_path("templates/{$pastaModelo}");
 
+        Log::debug("DEBUG: Procurando templates em: {$caminhoBase}");
+        Log::debug("DEBUG: Pasta existe? " . (is_dir($caminhoBase) ? 'SIM' : 'NÃO'));
+
         if (!is_dir($caminhoBase)) {
             Log::warning("Pasta de modelo não existe: {$caminhoBase}");
             return null;
@@ -130,14 +133,23 @@ class DocumentGenerationService
         if ($nomeTemplate) {
             $caminho = "{$caminhoBase}/{$nomeTemplate}";
             if (file_exists($caminho)) {
+                Log::debug("DEBUG: Template encontrado: {$caminho}");
                 return $caminho;
             }
         }
 
         // Buscar primeiro arquivo .docx ou .doc da pasta
         $arquivos = glob("{$caminhoBase}/*.docx");
+        Log::debug("DEBUG: Arquivos .docx encontrados: " . count($arquivos ?? []));
+
         if (empty($arquivos)) {
             $arquivos = glob("{$caminhoBase}/*.doc");
+            Log::debug("DEBUG: Arquivos .doc encontrados: " . count($arquivos ?? []));
+        }
+
+        if (!empty($arquivos)) {
+            Log::debug("DEBUG: Primeira template: {$arquivos[0]}");
+            Log::debug("DEBUG: Tamanho: " . filesize($arquivos[0]) . " bytes");
         }
 
         return !empty($arquivos) ? $arquivos[0] : null;
