@@ -85,7 +85,7 @@ Este documento lista **todas as tags** disponíveis para uso em templates DOCX/D
 <DATANASC>          - Data nascimento (extenso)
 ```
 
-### Múltiplas Pessoas (indexadas)
+### Múltiplas Pessoas (indexadas por número)
 ```
 <PESSOA1>           - Nome da 1ª pessoa
 <PESSOA1_NOME>      - Nome da 1ª pessoa
@@ -94,17 +94,73 @@ Este documento lista **todas as tags** disponíveis para uso em templates DOCX/D
 <PESSOA1_SEXO>      - Sexo da 1ª pessoa
 <PESSOA1_DTNAS>     - Data nascimento da 1ª pessoa
 
-<PESSOA2>           - Nome da 2ª pessoa
-<PESSOA2_NOME>      - Nome da 2ª pessoa
-... (repetir padrão)
+<PESSOA2>, <PESSOA3>, ... <PERSONN>
+```
 
-<PESSOA3>, <PESSOA4>, ... (N pessoas)
+### Pessoas por Parentesco (tipos específicos)
+```
+<!-- PROPOSITUS -->
+<PROPOSITUS>         - Nome do propositus
+<PROPOSITUS_NOME>    - Nome
+<PROPOSITUS_DOC>     - Documento
+<PROPOSITUS_SEXO>    - Sexo
+<PROPOSITUS_DTNAS>   - Data nascimento
+
+<!-- PAI & MÃE -->
+<PAI>, <PAI_NOME>, <PAI_DOC>, <PAI_SEXO>, <PAI_DTNAS>
+<MAE>, <MAE_NOME>, <MAE_DOC>, <MAE_SEXO>, <MAE_DTNAS>
+
+<!-- AVÓS -->
+<AVO_PAI>, <AVO_PAI_NOME>, <AVO_PAI_DOC>, ...
+<AVO_MAE>, <AVO_MAE_NOME>, <AVO_MAE_DOC>, ...
+
+<!-- IRMÃOS -->
+<IRMAO>, <IRMAO_NOME>, <IRMAO_DOC>, <IRMAO_SEXO>, <IRMAO_DTNAS>
+<IRMA>, <IRMA_NOME>, <IRMA_DOC>, <IRMA_SEXO>, <IRMA_DTNAS>
+
+<!-- CÔNJUGE -->
+<CONJUGE>, <CONJUGE_NOME>, <CONJUGE_DOC>, <CONJUGE_SEXO>, <CONJUGE_DTNAS>
+
+<!-- TIOS/TIAS -->
+<TIO>, <TIO_NOME>, <TIO_DOC>, <TIO_SEXO>, <TIO_DTNAS>
+<TIA>, <TIA_NOME>, <TIA_DOC>, <TIA_SEXO>, <TIA_DTNAS>
+
+<!-- PRIMOS/PRIMAS -->
+<PRIMO>, <PRIMO_NOME>, <PRIMO_DOC>, <PRIMO_SEXO>, <PRIMO_DTNAS>
+<PRIMA>, <PRIMA_NOME>, <PRIMA_DOC>, <PRIMA_SEXO>, <PRIMA_DTNAS>
+
+<!-- SOBRINHOS/SOBRINHAS -->
+<SOBRINHO>, <SOBRINHO_NOME>, <SOBRINHO_DOC>, <SOBRINHO_SEXO>, <SOBRINHO_DTNAS>
+<SOBRINHA>, <SOBRINHA_NOME>, <SOBRINHA_DOC>, <SOBRINHA_SEXO>, <SOBRINHA_DTNAS>
+
+<!-- TATAAVÓS -->
+<TATAAVO>, <TATAAVO_NOME>, <TATAAVO_DOC>, <TATAAVO_SEXO>, <TATAAVO_DTNAS>
+```
+
+### Suporte a Múltiplos Parentes do Mesmo Tipo
+```
+<!-- Se há 2 pais/mães/tios/etc. -->
+<PAI>      - Primeiro pai
+<PAI2>     - Segundo pai
+<PAI3>     - Terceiro pai
+
+<MAE>      - Primeira mãe
+<MAE2>     - Segunda mãe
+
+<TIO>      - Primeiro tio
+<TIO2>     - Segundo tio
+<TIO3>     - Terceiro tio
+
+<!-- Mesmo padrão para todos os tipos -->
 ```
 
 **Exemplo:**
 ```
-Certifico que <?= <PESSOA1_NOME> ?>, <?= <PESSOA1_SEXO> ?>,
-nascido(a) em <?= <PESSOA1_DTNAS> ?>, documento <?= <PESSOA1_DOC> ?>...
+Certifico que <?= <PAI_NOME> ?>, <?= <PAI_SEXO> ?>,
+nascido(a) em <?= <PAI_DTNAS> ?>, documento <?= <PAI_DOC> ?>
+
+E <?= <MAE_NOME> ?>, <?= <MAE_SEXO> ?>,
+nascida em <?= <MAE_DTNAS> ?>, documento <?= <MAE_DOC> ?>...
 ```
 
 ---
