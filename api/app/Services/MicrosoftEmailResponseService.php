@@ -178,6 +178,11 @@ class MicrosoftEmailResponseService
             Log::info('Reply criado com ID: ' . $replyId);
 
             // 2. Enviar (save) o rascunho com a Resposta Sugerida como conteúdo
+            // Converter text/plain para HTML preservando formatação
+            $htmlContent = '<pre style="font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word;">' .
+                          htmlspecialchars($body, ENT_QUOTES, 'UTF-8') .
+                          '</pre>';
+
             $updateResponse = Http::withToken($token)
                 ->withoutVerifying()
                 ->patch(
@@ -185,7 +190,7 @@ class MicrosoftEmailResponseService
                     [
                         'body' => [
                             'contentType' => 'HTML',
-                            'content' => $body
+                            'content' => $htmlContent
                         ],
                         'categories' => ['AGENDADO'],
                         'isRead' => false
