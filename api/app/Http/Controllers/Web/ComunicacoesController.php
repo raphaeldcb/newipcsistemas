@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Comunicacao;
 use App\Services\ProcessExtractionService;
+use App\Services\MicrosoftEmailResponseService;
 use Illuminate\Http\Request;
 
 class ComunicacoesController extends Controller {
@@ -131,8 +132,48 @@ class ComunicacoesController extends Controller {
 
     public function markReviewed($id) {
         $comunicacao = Comunicacao::findOrFail($id);
+
+        // Marcar como revisado localmente
         $comunicacao->update(['status' => 'revisado']);
-        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail marcado como revisado!');
+
+        // Integração Microsoft: marcar como analisado e agendar resposta
+        try {
+            $microsoftService = new MicrosoftEmailResponseService();
+
+            // Obter ID do e-mail na Microsoft
+            $emailId = $microsoftService->getEmailIdFromMicrosoft(
+                $comunicacao->email_from,
+                $comunicacao->subject,
+                $comunicacao->created_at
+            );
+
+            if ($emailId) {
+                // 1. Marcar como "ANALISADO PELO NEW Sistemas IPCMS" + "Categorizado"
+                $microsoftService->markAsAnalyzed($emailId);
+
+                // 2. Agendar resposta para dia seguinte às 10h (ou enviar imediatamente se houver resposta pronta)
+                if ($comunicacao->suggested_response && $comunicacao->final_response) {
+                    // Enviar imediatamente se já tem resposta final
+                    $microsoftService->sendOrScheduleResponse(
+                        $emailId,
+                        $comunicacao->final_response,
+                        false
+                    );
+                } elseif ($comunicacao->suggested_response) {
+                    // Agendar resposta sugerida para dia seguinte
+                    $microsoftService->sendOrScheduleResponse(
+                        $emailId,
+                        $comunicacao->suggested_response,
+                        true
+                    );
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Erro ao integrar com Microsoft: ' . $e->getMessage());
+            // Continua mesmo se Microsoft falhar
+        }
+
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail marcado como revisado! Marcação e resposta enviadas para Microsoft.');
     }
 
     public function updateClassification(Request $request, $id) {
