@@ -58,6 +58,10 @@ Route::middleware('web')->group(function () {
         Route::post('/processos/{processo}/historicos', [WebProcessosController::class, 'storeHistorico'])->name('processos.historicos.store');
         Route::put('/processos/{processo}/historicos/{his_contr}', [WebProcessosController::class, 'updateHistorico'])->name('processos.historicos.update');
         Route::delete('/processos/{processo}/historicos/{his_contr}', [WebProcessosController::class, 'destroyHistorico'])->name('processos.historicos.destroy');
+        // Documentos
+        Route::get('/processos/{processo}/documentos', [WebProcessosController::class, 'listDocumentos'])->name('processos.documentos');
+        Route::post('/processos/{processo}/gerar-documento', [WebProcessosController::class, 'gerarDocumento'])->name('processos.gerar-documento');
+        Route::get('/processos/api/templates', [WebProcessosController::class, 'listarTemplates'])->name('processos.listar-templates');
 
         // Pessoas
         Route::resource('pessoas', WebPessoasController::class);

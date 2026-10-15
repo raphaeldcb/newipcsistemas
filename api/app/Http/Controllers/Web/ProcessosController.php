@@ -114,4 +114,66 @@ class ProcessosController extends Controller {
         Historico::where('pro_cod', $processo->pro_cod)->where('his_contr', $his_contr)->delete();
         return redirect()->route('processos.show', $processo->pro_cod)->with('success', 'Histórico removido!');
     }
+
+    /**
+     * Listar templates disponíveis para um tipo de item
+     */
+    public function listarTemplates(Request $request) {
+        $tipoItem = $request->input('tipo_item');
+        $templates = \App\Services\DocumentGenerationService::listarTemplates($tipoItem);
+        return response()->json(['templates' => $templates]);
+    }
+
+    /**
+     * Gerar documento a partir de processo
+     */
+    public function gerarDocumento(Request $request, Processo $processo) {
+        try {
+            $tipoItem = $request->input('tipo_item', 'L'); // L=Laudo padrão
+            $nomeTemplate = $request->input('template');
+
+            $caminhoDocumento = \App\Services\DocumentGenerationService::gerar($processo, $tipoItem, $nomeTemplate);
+
+            return response()->download($caminhoDocumento)->deleteFileAfterSend(false);
+        } catch (\Exception $e) {
+            return redirect()->route('processos.show', $processo->pro_cod)
+                ->with('error', 'Erro ao gerar documento: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Visualizar lista de documentos gerados para um processo
+     */
+    public function listDocumentos(Processo $processo) {
+        $pastaDestino = storage_path('documents/generated');
+        $documentos = [];
+
+        if (is_dir($pastaDestino)) {
+            $arquivos = glob("{$pastaDestino}/{$processo->id}_*.docx");
+            foreach ($arquivos as $arquivo) {
+                $documentos[] = [
+                    'nome' => basename($arquivo),
+                    'caminho' => $arquivo,
+                    'tamanho' => filesize($arquivo),
+                    'criado_em' => filemtime($arquivo),
+                    'tipo_item' => $this->extrairTipoItem(basename($arquivo))
+                ];
+            }
+        }
+
+        // Ordenar por data decrescente
+        usort($documentos, function($a, $b) {
+            return $b['criado_em'] <=> $a['criado_em'];
+        });
+
+        return view('processos.documentos', compact('processo', 'documentos'));
+    }
+
+    /**
+     * Extrair tipo de item do nome do arquivo
+     */
+    private function extrairTipoItem(string $nomeArquivo): string {
+        $partes = explode('_', $nomeArquivo);
+        return $partes[1] ?? 'L';
+    }
 }

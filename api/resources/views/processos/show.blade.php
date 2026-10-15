@@ -5,6 +5,7 @@
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2>⚖️ Processo #{{ $processo->pro_cod }}</h2>
     <div style="gap: 10px; display: flex;">
+      <a href="{{ route('processos.documentos', $processo->pro_cod) }}" class="btn btn-info" style="padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 4px;">📄 Documentos</a>
       <a href="{{ route('processos.edit', $processo->pro_cod) }}" class="btn btn-warning" style="padding: 10px 15px;">✏️ Editar</a>
       <form action="{{ route('processos.destroy', $processo->pro_cod) }}" method="POST" style="display: inline;">
         @csrf
