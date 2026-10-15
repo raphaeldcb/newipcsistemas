@@ -104,59 +104,65 @@ class DocumentGenerationService
 
     /**
      * Preparar array de tags para substituição
+     *
+     * Tags baseadas no sistema Delphi original (ufGeraWord.pas)
      */
     private static function prepararTags(Processo $processo): array
     {
         $tags = [];
 
-        // Informações básicas do processo
+        // ===== INFORMAÇÕES BÁSICAS DO PROCESSO =====
         $tags['<PROCESSO>'] = $processo->pro_nperc ?? '';
         $tags['<CODIGO>'] = $processo->pro_cod ?? '';
+        $tags['<DOCUMENTOHISTORICO>'] = $processo->his_doc ?? ''; // Número laudo do histórico
 
-        // Datas - Coleta
+        // ===== DATAS - EXTENSAS (DD de mês de YYYY) =====
         if ($processo->pro_dcole) {
             $tags['<DTCOLETA>'] = self::formatarDataExtenso($processo->pro_dcole);
         }
 
-        // Datas - Atual
         $tags['<DTATUAL>'] = self::formatarDataExtenso(now());
 
-        // Datas - Recepção
         if ($processo->pro_drec) {
             $tags['<DTREC>'] = self::formatarDataExtenso($processo->pro_drec);
         }
 
-        // Datas - Resultado
         if ($processo->pro_dresu) {
             $tags['<DTRESULT>'] = self::formatarDataExtenso($processo->pro_dresu);
         }
 
-        // Horas - Coleta
+        // ===== DATAS - FORMATADAS (DD/MM/YYYY) =====
+        if ($processo->pro_dresu) {
+            $dtResultF = \Carbon\Carbon::parse($processo->pro_dresu)->format('d/m/Y');
+            $tags['<DTRESULTF>'] = $dtResultF;
+        }
+
+        // ===== HORAS - COLETA =====
         if ($processo->pro_hcole) {
-            $horas = explode(':', $processo->pro_hcole);
-            $tags['<HORA>'] = $horas[0] ?? '';
-            $tags['<MINUTO>'] = $horas[1] ?? '';
+            $partes = explode(':', $processo->pro_hcole);
+            $tags['<HORA>'] = $partes[0] ?? '';
+            $tags['<MINUTO>'] = $partes[1] ?? '';
         }
 
-        // Horas - Recepção
+        // ===== HORAS - RECEPÇÃO =====
         if ($processo->pro_hrec) {
-            $horas = explode(':', $processo->pro_hrec);
-            $tags['<HORARECEPCAO>'] = $horas[0] ?? '';
-            $tags['<MINUTORECEPCAO>'] = $horas[1] ?? '';
+            $partes = explode(':', $processo->pro_hrec);
+            $tags['<HORARECEPCAO>'] = $partes[0] ?? '';
+            $tags['<MINUTORECEPCAO>'] = $partes[1] ?? '';
         }
 
-        // Resultado
+        // ===== RESULTADOS =====
         $tags['<PROBABILIDADE>'] = $processo->pro_prob ?? '';
+
         if ($processo->pro_resul == 1) {
             $tags['<PROBABILIDADEPPC>'] = 'POSITIVO COM ' . ($processo->pro_prob ?? '0') . '%';
         } else {
             $tags['<PROBABILIDADEPPC>'] = 'NEGATIVO COM 100% DE CERTEZA DE EXCLUSÃO';
         }
 
-        // Autorização de retirada
         $tags['<AUTORETIRAR>'] = $processo->pro_areti ?? '';
 
-        // Dados Judiciários
+        // ===== DADOS JUDICIÁRIOS =====
         if ($processo->juiz) {
             $tags['<JUIZ>'] = $processo->juiz->nome ?? '';
         }
@@ -170,10 +176,72 @@ class DocumentGenerationService
             $tags['<ESTADO>'] = $processo->uf->sigla ?? '';
         }
 
-        // Número do documento/laudo (histórico)
-        // Será preenchido dinamicamente se necessário
+        // ===== DADOS DE PESSOAS ENVOLVIDAS =====
+        // Buscar pessoas vinculadas ao processo
+        $pessoas = \App\Models\Pessoa::where('pro_cod', $processo->pro_cod)->get();
 
-        Log::debug('Tags preparadas para substituição', ['quantidade' => count($tags)]);
+        foreach ($pessoas as $index => $pessoa) {
+            $num = $index + 1;
+
+            // Tags de pessoa (múltiplas)
+            $tags["<PESSOA{$num}>"] = $pessoa->pes_nome ?? '';
+            $tags["<PESSOA{$num}_NOME>"] = $pessoa->pes_nome ?? '';
+            $tags["<PESSOA{$num}_INICIAIS>"] = $pessoa->pes_iniciais ?? '';
+            $tags["<PESSOA{$num}_DOC>"] = $pessoa->pes_ndoc ?? '';
+            $tags["<PESSOA{$num}_SEXO>"] = $pessoa->pes_sexo ?? '';
+
+            if ($pessoa->pes_dtnas) {
+                $tags["<PESSOA{$num}_DTNAS>"] = self::formatarDataExtenso($pessoa->pes_dtnas);
+            }
+        }
+
+        // Tags genéricas da primeira pessoa (compatibilidade)
+        if ($pessoas->count() > 0) {
+            $p1 = $pessoas->first();
+            $tags['<NOME>'] = $p1->pes_nome ?? '';
+            $tags['<INICIAIS>'] = $p1->pes_iniciais ?? '';
+            $tags['<DOCUMENTO>'] = $p1->pes_ndoc ?? '';
+            $tags['<SEXO>'] = $p1->pes_sexo ?? '';
+            if ($p1->pes_dtnas) {
+                $tags['<DATANASC>'] = self::formatarDataExtenso($p1->pes_dtnas);
+            }
+        }
+
+        // ===== DADOS DE HISTÓRICO (ITENS) =====
+        // Buscar históricos do processo
+        $historicos = \App\Models\Historico::where('pro_cod', $processo->pro_cod)->get();
+
+        foreach ($historicos as $index => $historico) {
+            $num = $index + 1;
+
+            if ($historico->item) {
+                $tags["<ITEM{$num}>"] = $historico->item->nome ?? '';
+                $tags["<ITEM{$num}_DESC>"] = $historico->item->descricao ?? '';
+            }
+
+            if ($historico->his_data) {
+                $tags["<ITEM{$num}_DATA>"] = self::formatarDataExtenso($historico->his_data);
+            }
+
+            $tags["<ITEM{$num}_DOC>"] = $historico->his_doc ?? '';
+            $tags["<ITEM{$num}_OBS>"] = $historico->his_obs ?? '';
+        }
+
+        // Tags genéricas do primeiro item (compatibilidade)
+        if ($historicos->count() > 0) {
+            $h1 = $historicos->first();
+            if ($h1->item) {
+                $tags['<ITEM>'] = $h1->item->nome ?? '';
+            }
+            $tags['<ITEM_DATA>'] = $h1->his_data ? self::formatarDataExtenso($h1->his_data) : '';
+            $tags['<ITEM_DOC>'] = $h1->his_doc ?? '';
+        }
+
+        Log::debug('Tags preparadas para substituição', [
+            'quantidade' => count($tags),
+            'pessoas' => $pessoas->count(),
+            'itens' => $historicos->count()
+        ]);
 
         return $tags;
     }
