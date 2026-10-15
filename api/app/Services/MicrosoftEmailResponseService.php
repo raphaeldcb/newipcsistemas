@@ -146,22 +146,23 @@ class MicrosoftEmailResponseService
 
     /**
      * Agendar resposta para dia seguinte às 10h
-     * Nota: Microsoft Graph não suporta agendamento nativo de envios
-     * Solução: Salvar em rascunho + notificar usuário para enviar manualmente
+     * Cria rascunho na pasta Drafts
      */
     private function scheduleResponse($token, $replyTo, $subject, $body, $emailId)
     {
         try {
-            // Criar rascunho da resposta
+            $agendadoText = "AGENDADO PARA: " . now()->addDay()->format('d/m/Y 10:00') . "\n\n";
+
+            // Criar rascunho na pasta Drafts
             $response = Http::withToken($token)
                 ->withoutVerifying()
                 ->post(
-                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages",
+                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/mailFolders/drafts/messages",
                     [
                         'subject' => $subject,
                         'body' => [
                             'contentType' => 'text/plain',
-                            'content' => "AGENDADO PARA: " . now()->addDay()->format('d/m/Y 10:00') . "\n\n" . $body
+                            'content' => $agendadoText . $body
                         ],
                         'toRecipients' => [
                             [
@@ -170,7 +171,6 @@ class MicrosoftEmailResponseService
                                 ]
                             ]
                         ],
-                        'isDraft' => true,
                         'categories' => ['AGENDADO']
                     ]
                 );
