@@ -233,7 +233,26 @@ class ComunicacoesController extends Controller {
 
         $comunicacao->update($updateData);
 
-        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail classificado como ' . $classification . '!');
+        // Categorizar na Microsoft
+        try {
+            $microsoftService = new MicrosoftEmailResponseService();
+
+            $emailId = $microsoftService->getEmailIdFromMicrosoft(
+                $comunicacao->email_from,
+                $comunicacao->subject,
+                $comunicacao->created_at
+            );
+
+            if ($emailId) {
+                // Adicionar categoria na Microsoft
+                $categorie = $tipo === 'judicial' ? 'JUDICIAL' : 'NAO_JUDICIAL';
+                $microsoftService->categorizeEmail($emailId, $categorie);
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Erro ao categorizar na Microsoft: ' . $e->getMessage());
+        }
+
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail classificado como ' . $classification . ' (local + Microsoft)!');
     }
 
     private function generateAutoResponse($tipo, $comunicacao, $processNumber = null, $processService = null) {

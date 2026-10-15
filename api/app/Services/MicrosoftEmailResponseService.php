@@ -189,6 +189,40 @@ class MicrosoftEmailResponseService
     }
 
     /**
+     * Categorizar e-mail na Microsoft
+     */
+    public function categorizeEmail($emailId, $category)
+    {
+        $token = $this->graphService->getAccessToken();
+        if (!$token) {
+            Log::error('Não foi possível obter token para categorizar');
+            return false;
+        }
+
+        try {
+            $response = Http::withToken($token)
+                ->withoutVerifying()
+                ->patch(
+                    "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$emailId}",
+                    [
+                        'categories' => [$category]
+                    ]
+                );
+
+            if ($response->failed()) {
+                Log::error('Falha ao categorizar: ' . $response->body());
+                return false;
+            }
+
+            Log::info('E-mail categorizado como ' . $category . ': ' . $emailId);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erro ao categorizar: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Obter ID do e-mail na Microsoft a partir dos dados locais
      */
     public function getEmailIdFromMicrosoft($emailFrom, $subject, $date)
