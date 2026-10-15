@@ -83,6 +83,34 @@ class ProcessExtractionService
     }
 
     /**
+     * Classificar automaticamente como Judicial ou Não Judicial
+     */
+    public function classifyAsJudicialOrNot($subject, $body)
+    {
+        $text = strtolower(($subject ?? '') . ' ' . ($body ?? ''));
+
+        // Palavras-chave judicial
+        $judicialKeywords = [
+            'processo', 'autos', 'vara', 'tribunal', 'juiz', 'intimação',
+            'despacho', 'sentença', 'decisão', 'apelação', 'agravo',
+            'mandado', 'ação judicial', 'cível', 'criminal', 'trabalhista',
+            'comarca', 'foro', 'cartório', 'protocolo', 'cnj',
+            'número do autos', 'processo número', 'autos número',
+            'poder judiciário', 'justiça', 'tribunal de justiça'
+        ];
+
+        $judicialCount = 0;
+        foreach ($judicialKeywords as $keyword) {
+            if (strpos($text, $keyword) !== false) {
+                $judicialCount += substr_count($text, $keyword);
+            }
+        }
+
+        // Se encontrou 2+ menções de palavras judiciais, classificar como Judicial
+        return $judicialCount >= 2 ? 'Judicial' : 'Não Judicial';
+    }
+
+    /**
      * Resposta padrão quando falta número do processo
      */
     public function getMissingProcessResponse()

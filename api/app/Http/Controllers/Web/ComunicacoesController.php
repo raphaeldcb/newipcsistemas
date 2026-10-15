@@ -44,6 +44,47 @@ class ComunicacoesController extends Controller {
 
     public function show($id) {
         $comunicacao = Comunicacao::findOrFail($id);
+
+        // Se ainda não foi classificado, classificar automaticamente
+        if (!$comunicacao->classification || !in_array($comunicacao->classification, ['Judicial', 'Não Judicial'])) {
+            $processService = new ProcessExtractionService();
+            $tipo = $processService->classifyAsJudicialOrNot($comunicacao->subject, $comunicacao->body);
+
+            // Gerar resposta automática
+            $searchText = ($comunicacao->subject ?? '') . ' ' . ($comunicacao->body ?? '');
+            $processNumber = $processService->extractProcessNumber($searchText);
+
+            $sugestedResponse = $this->generateAutoResponse(
+                strtolower($tipo) === 'judicial' ? 'judicial' : 'nao_judicial',
+                $comunicacao,
+                $processNumber,
+                $processService
+            );
+
+            $updateData = [
+                'classification' => $tipo,
+                'suggested_response' => $sugestedResponse,
+            ];
+
+            // Tentar extrair número do processo
+            if ($processNumber) {
+                $processData = $processService->parseProcessNumber($processNumber);
+                if (isset($processData['tribunal'])) {
+                    $processData['estado'] = $processService->getTribunalState($processData['tribunal']);
+                }
+                $courtInfo = $processService->extractCourtInfo($searchText);
+                $processData = array_merge($processData, $courtInfo);
+
+                $updateData['numero_processo'] = $processData['numero_completo'] ?? null;
+                $updateData['estado'] = $processData['estado'] ?? null;
+                $updateData['vara'] = $processData['vara'] ?? null;
+                $updateData['comarca'] = $processData['comarca'] ?? null;
+            }
+
+            $comunicacao->update($updateData);
+            $comunicacao->refresh();
+        }
+
         return view('comunicacoes.show', compact('comunicacao'));
     }
 
