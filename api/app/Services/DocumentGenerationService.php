@@ -12,13 +12,15 @@ class DocumentGenerationService
 {
     /**
      * Tipos de itens e suas respectivas pastas de modelo
+     * Baseado na estrutura: DNA/[pasta]/[modelos]
      */
     const ITEM_TYPES = [
-        'L' => 'laudos',           // Laudo
-        'F' => 'folhas_resultado', // Folha de Resultado
-        'A' => 'autorizacoes_coleta', // Autorização de Coleta
-        'R' => 'recibos',          // Recibo (não existe ainda)
-        'E' => 'termos_entrega',   // Termo de Entrega (não existe ainda)
+        'L' => 'laudos',                // Laudo (DNA/Laudos/)
+        'F' => 'folhas_resultado',      // Folha de Resultado (DNA/Folhas_Resultado/)
+        'A' => 'autorizacoes_coleta',   // Autorização de Coleta (DNA/Autorizacoes_Coleta/)
+        'E' => 'gerais',                // Entrega (DNA/ENTREGA.doc)
+        'R' => 'gerais',                // Recibo/Correspondência (DNA/CORRESPONDENCIA.doc)
+        'O' => 'gerais',                // Ofício (DNA/Oficios/*)
     ];
 
     /**
