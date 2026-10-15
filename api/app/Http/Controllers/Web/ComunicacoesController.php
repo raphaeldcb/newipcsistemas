@@ -130,11 +130,17 @@ class ComunicacoesController extends Controller {
         return redirect()->route('comunicacoes.index')->with('success', 'Comunicação categorizada!');
     }
 
+    public function markTreated($id) {
+        $comunicacao = Comunicacao::findOrFail($id);
+        $comunicacao->update(['status' => 'tratado']);
+        return redirect()->route('comunicacoes.show', $id)->with('success', 'E-mail marcado como TRATADO no sistema!');
+    }
+
     public function markReviewed($id) {
         $comunicacao = Comunicacao::findOrFail($id);
 
-        // Marcar como revisado localmente
-        $comunicacao->update(['status' => 'revisado']);
+        // Marcar como tratado localmente
+        $comunicacao->update(['status' => 'tratado']);
 
         // Integração Microsoft: marcar como analisado e agendar resposta
         try {
