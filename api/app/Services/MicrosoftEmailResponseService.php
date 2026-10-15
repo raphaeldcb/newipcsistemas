@@ -34,7 +34,7 @@ class MicrosoftEmailResponseService
                 ->patch(
                     "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$emailId}",
                     [
-                        'categories' => ['ANALISADO PELO NEW Sistemas IPCMS', 'Categorizado']
+                        'categories' => ['ANALISADO PELO NEW Sistemas IPCMS']
                     ]
                 );
 
