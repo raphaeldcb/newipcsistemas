@@ -61,30 +61,37 @@ class DocumentGenerationService
 
             Log::debug("Carregando template: {$caminhoTemplate} ({$fileSize} bytes)");
 
-            // Tentar carregar com diferentes formatos (Word5 para .doc antigos, Word2007 para .docx)
-            $phpWord = null;
-            $leitoresParaTentar = ['Word5', 'Word2007', 'WordML'];
-
-            foreach ($leitoresParaTentar as $leitor) {
-                try {
-                    Log::debug("Tentando carregar com leitor: {$leitor}");
-                    $phpWord = IOFactory::load($caminhoTemplate, $leitor);
-                    Log::debug("Template carregado com sucesso usando: {$leitor}");
-                    break;
-                } catch (\Throwable $e) {
-                    Log::debug("Leitor {$leitor} falhou: " . $e->getMessage());
-                    continue;
+            // Se é .doc antigo, converter para .docx usando LibreOffice
+            $caminhoTemporario = null;
+            if (strtolower(pathinfo($caminhoTemplate, PATHINFO_EXTENSION)) === 'doc') {
+                Log::debug("Arquivo .doc detectado, convertendo para .docx via LibreOffice...");
+                $caminhoTemporario = self::converterDocParaDocx($caminhoTemplate);
+                if ($caminhoTemporario) {
+                    $caminhoTemplate = $caminhoTemporario;
+                    Log::debug("Conversão bem-sucedida: {$caminhoTemporario}");
                 }
             }
 
-            // Se nenhum leitor funcionou, criar documento novo em branco
-            if (!$phpWord) {
-                Log::warning("Nenhum leitor conseguiu abrir template {$caminhoTemplate}. Criando documento em branco.");
+            // Carregar com Word2007 (padrão para .docx)
+            try {
+                Log::debug("Carregando template como Word2007: {$caminhoTemplate}");
+                $phpWord = IOFactory::load($caminhoTemplate, 'Word2007');
+                Log::debug("Template carregado com sucesso");
+            } catch (\Throwable $e) {
+                Log::warning("Falha ao carregar template: " . $e->getMessage());
+                // Se falhar, criar documento em branco
+                Log::warning("Criando documento em branco...");
                 $phpWord = new PhpWord();
                 $section = $phpWord->addSection();
                 $section->addText("DOCUMENTO GERADO - " . strtoupper($tipoItem), ['size' => 14, 'bold' => true]);
                 $section->addText("Processo: " . ($processo->pro_nperc ?? ''));
                 $section->addText("Data: " . date('d/m/Y H:i:s'));
+            } finally {
+                // Limpar arquivo temporário
+                if ($caminhoTemporario && file_exists($caminhoTemporario)) {
+                    unlink($caminhoTemporario);
+                    Log::debug("Arquivo temporário removido: {$caminhoTemporario}");
+                }
             }
 
             // 4. Preparar tags para substituição
@@ -112,6 +119,80 @@ class DocumentGenerationService
     private static function identificarPasta(string $tipoItem): string
     {
         return self::ITEM_TYPES[$tipoItem] ?? 'oficios';
+    }
+
+    /**
+     * Converter .doc antigo para .docx usando LibreOffice
+     * Retorna caminho do arquivo temporário convertido, ou null se falhar
+     */
+    private static function converterDocParaDocx(string $caminhoDoc): ?string
+    {
+        try {
+            // Criar pasta temporária
+            $pastaTemp = sys_get_temp_dir() . '/laravel_doc_convert_' . time();
+            if (!mkdir($pastaTemp, 0777, true) && !is_dir($pastaTemp)) {
+                Log::warning("Não foi possível criar pasta temporária: {$pastaTemp}");
+                return null;
+            }
+
+            // Caminhos
+            $nomeArquivo = pathinfo($caminhoDoc, PATHINFO_FILENAME);
+            $caminhoDocx = "{$pastaTemp}/{$nomeArquivo}.docx";
+
+            // Comando LibreOffice para converter
+            // Detectar SO
+            $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+            if ($isWindows) {
+                // Windows: procurar soffice.exe
+                $caminhos = [
+                    'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
+                    'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe',
+                ];
+
+                $libreoffice = null;
+                foreach ($caminhos as $caminho) {
+                    if (file_exists($caminho)) {
+                        $libreoffice = $caminho;
+                        break;
+                    }
+                }
+
+                if (!$libreoffice) {
+                    Log::warning("LibreOffice não encontrado no Windows");
+                    rmdir($pastaTemp);
+                    return null;
+                }
+
+                // Comando Windows
+                $comando = "\"{$libreoffice}\" --headless --convert-to docx:\"MS Word 2007 XML\" --outdir \"{$pastaTemp}\" \"{$caminhoDoc}\"";
+            } else {
+                // Linux/Mac: usar unoconv ou soffice
+                $comando = "soffice --headless --convert-to docx:\"MS Word 2007 XML\" --outdir \"{$pastaTemp}\" \"{$caminhoDoc}\"";
+            }
+
+            Log::debug("Executando conversão: {$comando}");
+
+            // Executar conversão
+            $output = [];
+            $returnCode = 0;
+            exec($comando, $output, $returnCode);
+
+            Log::debug("Resultado conversão: " . implode("\n", $output));
+
+            // Verificar se foi criado
+            if (file_exists($caminhoDocx)) {
+                Log::info("Conversão bem-sucedida: {$caminhoDocx}");
+                return $caminhoDocx;
+            } else {
+                Log::warning("Arquivo convertido não encontrado: {$caminhoDocx}");
+                rmdir($pastaTemp);
+                return null;
+            }
+        } catch (\Exception $e) {
+            Log::error("Erro ao converter .doc para .docx: " . $e->getMessage());
+            return null;
+        }
     }
 
     /**
