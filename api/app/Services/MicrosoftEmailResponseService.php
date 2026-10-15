@@ -190,7 +190,7 @@ class MicrosoftEmailResponseService
 
     /**
      * Categorizar e-mail na Microsoft
-     * Adiciona múltiplas categorias ao mesmo tempo
+     * Adiciona apenas "ANALISADO PELO NEW Sistemas IPCMS"
      */
     public function categorizeEmail($emailId, $categories = [])
     {
@@ -201,23 +201,15 @@ class MicrosoftEmailResponseService
         }
 
         try {
-            // Se passou string, converte para array
-            if (is_string($categories)) {
-                $categories = [$categories];
-            }
-
-            // Sempre adicionar "ANALISADO PELO NEW Sistemas IPCMS"
-            $categories = array_merge($categories, ['ANALISADO PELO NEW Sistemas IPCMS']);
-
-            // Remover duplicatas
-            $categories = array_unique($categories);
+            // Sempre adicionar APENAS "ANALISADO PELO NEW Sistemas IPCMS"
+            $finalCategories = ['ANALISADO PELO NEW Sistemas IPCMS'];
 
             $response = Http::withToken($token)
                 ->withoutVerifying()
                 ->patch(
                     "https://graph.microsoft.com/v1.0/users/{$this->mailbox}/messages/{$emailId}",
                     [
-                        'categories' => $categories
+                        'categories' => $finalCategories
                     ]
                 );
 
@@ -226,7 +218,7 @@ class MicrosoftEmailResponseService
                 return false;
             }
 
-            Log::info('E-mail categorizado com: ' . implode(', ', $categories) . ' - ID: ' . $emailId);
+            Log::info('E-mail categorizado como: ANALISADO PELO NEW Sistemas IPCMS - ID: ' . $emailId);
             return true;
         } catch (\Exception $e) {
             Log::error('Erro ao categorizar: ' . $e->getMessage());
