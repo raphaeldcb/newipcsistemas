@@ -13,6 +13,7 @@ use App\Http\Controllers\Web\AlelosController as WebAlelosController;
 use App\Http\Controllers\Web\CreditosController as WebCreditosController;
 use App\Http\Controllers\Web\ProcessosController as WebProcessosController;
 use App\Http\Controllers\Web\RelatoriosController as WebRelatoriosController;
+use App\Http\Controllers\Web\LaudoExportController;
 use App\Http\Controllers\Auth\LoginController;
 
 // Redirect root to dashboard or login
@@ -62,6 +63,14 @@ Route::middleware('web')->group(function () {
         Route::get('/processos/{processo}/documentos', [WebProcessosController::class, 'listDocumentos'])->name('processos.documentos');
         Route::post('/processos/{processo}/gerar-documento', [WebProcessosController::class, 'gerarDocumento'])->name('processos.gerar-documento');
         Route::get('/processos/api/templates', [WebProcessosController::class, 'listarTemplates'])->name('processos.listar-templates');
+
+        // Exportação de Laudos em Excel
+        Route::get('/processos/{processo}/laudos/exportar', [LaudoExportController::class, 'index'])->name('laudos.exportar');
+        Route::post('/processos/{processo}/laudos/exportar', [LaudoExportController::class, 'exportar'])->name('laudos.exportar.post');
+        Route::post('/processos/{processo}/laudos/importar-csv', [LaudoExportController::class, 'importarCSV'])->name('laudos.importar-csv');
+        Route::get('/processos/{processo}/laudos/download/{nomeArquivo}', [LaudoExportController::class, 'download'])->name('laudos.download');
+        Route::get('/processos/{processo}/laudos/listar', [LaudoExportController::class, 'listar'])->name('laudos.listar');
+        Route::delete('/processos/{processo}/laudos/deletar/{exp_cod}', [LaudoExportController::class, 'deletar'])->name('laudos.deletar');
 
         // Pessoas
         Route::resource('pessoas', WebPessoasController::class);
